@@ -1,8 +1,6 @@
 local M = {}
 --require('cocos.controller.ControllerConstants')
 --local _KEY = cc.ControllerKey
---M.KeyMap = _KEY
---M.KeyUnmap = {}
 
 -- key and axis may have same code
 local status_button = {}
@@ -328,17 +326,5 @@ function M.setMapping(name, key, is_axis, is_pos)
         mapping.button[key] = ik
     end
 end
-
---function M.nameIsButton(name)
---    local ret = string.match(name, '^BUTTON_')
---    return ret ~= nil
---end
---function M.nameIsJoystick(name)
---    local ret = string.match(name, '^JOYSTICK_')
---    return ret ~= nil
---end
---function M.nameIsTrigger(name)
---    return name == 'AXIS_LEFT_TRIGGER' or name == 'AXIS_RIGHT_TRIGGER'
---end
 
 return M

@@ -1,14 +1,17 @@
 ---@class ui.MessageBox:cc.Node
 local M = class('ui.MessageBox', cc.Node)
-local size_min = cc.size(200 - 24, 40)
-local size_max = cc.size(600 - 24, 300)
 
-function M:ctor(title, msg)
+function M:ctor(title, msg, param)
+    param = param or {}
+
     local dir = cc.Director:getInstance()
     local sc = dir:getRunningScene()
     local glv = dir:getOpenGLView()
     local sz = glv:getDesignResolutionSize()
     local helper = require('ui.helper')
+
+    local size_min = param.minSize or cc.size(200 - 24, 40)
+    local size_max = param.maxSize or cc.size(600 - 24, 300)
 
     self:setContentSize(sz)
     local ch = sc:getChildren()
@@ -34,7 +37,7 @@ function M:ctor(title, msg)
     --    Print('click')
     --end)
 
-    local lb = require('ui.label').TTF(msg or 'Massage')
+    local lb = require('ui.label').TTF(msg or 'Massage', param.fontSize)
     lb:setTextColor(cc.BLACK)
     require('ui.label').clampWidth(lb, size_max.width)
     local sz = lb:getContentSize()
@@ -83,6 +86,12 @@ function M:ctor(title, msg)
     dr:addTo(la)
     dr:setLineWidth(1)
     dr:drawRect(cc.p(0, 0), cc.p(la_sz.width, la_sz.height), cc.convertColor(clr, '4f'))
+
+    if plus.isMobile() then
+        local scale = sz.height / 720
+        scale = scale * 1.5
+        la:setScale(scale)
+    end
 end
 
 function M:addButton(title, pos, callback, autoRemove)
@@ -105,8 +114,8 @@ function M:setTitle(title)
     self._cap:setTitle(title)
 end
 
-function M.OK(title, msg, onConfirm)
-    local ret = M(title, msg)
+function M.OK(title, msg, onConfirm, param)
+    local ret = M(title, msg, param)
     local sz = ret._la:getContentSize()
     ret:addButton('OK', cc.p(sz.width - 90, 35), onConfirm, true)
     return ret

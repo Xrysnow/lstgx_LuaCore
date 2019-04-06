@@ -1,3 +1,4 @@
+---@class MainScene:ViewBase
 local MainScene = class("MainScene", cc.load("mvc").ViewBase)
 
 --local ASSETS_PATH = 'src/mod/demo/assets/'

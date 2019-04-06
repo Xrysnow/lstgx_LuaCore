@@ -50,6 +50,7 @@ local function main()
                 lstg.SystemLog(string.format('change src path to %q', src))
             end
         end
+        require('platform.android.native').setOrientationLandscape()
     end
     lstg.DoFile('launch')
     lstg.SystemLog('start app')
@@ -76,7 +77,7 @@ __G__TRACKBACK__ = function(msg)
         ex.OnExit()
         os.exit()
     end
-    lstg.SystemLog('caught error in __G__TRACKBACK__')
+    lstg.SystemLog('caught error in main')
     return msg
 end
 

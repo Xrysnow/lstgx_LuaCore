@@ -135,7 +135,7 @@ function M:onEnter()
     --require('editor.dialog.SelectObjectClass')()
     --require('editor.dialog.InputParameter')()
     --require('editor.dialog.InputTypeName')()
-    local fp=require('editor.FilePanel')(
+    local fp = require('editor.FilePanel')(
             {
                 path      = 'api.lua',
                 size      = cc.size(256, 720),
@@ -149,11 +149,12 @@ function M:onEnter()
 
     self:_initColorPicker()
 
-    local color_bg=cc.c4b(224,224,224,255)
+    local color_bg = cc.c4b(224, 224, 224, 255)
     self.sv = require('ui.SplitViewH')(nil, nil, { size = cc.size(1280, 720), color = color_bg })
     self.sv:addTo(self)
     self.sv:setMargin(8)
-    self.sv:setLeft(self:_createToolbar(), { 104 })
+    local toolbar = self:_createToolbar()
+    self.sv:setLeft(toolbar, { 104 })
 
     self.svr = require('ui.SplitViewH')(nil, nil, { color = color_bg })
     self.svr.margin.m = 8
