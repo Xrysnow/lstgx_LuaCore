@@ -156,10 +156,25 @@ function M:getProjection(other)
     return other * (self:dot(other) / other:dot(other))
 end
 
---- Complex multiplication of two points ("rotates" two points).
----@return math.vec2 vector with an angle of this.getAngle() + other.getAngle(), and a length of this.getLength() * other.getLength().
+function M:getRotateAround(point, angle)
+    if point:isZero() then
+        return self:getRotated(angle)
+    else
+        return point + (self - point):getRotated(angle)
+    end
+end
+
+--- Complex multiplication of two points ("rotates" two points), or rotate a point by angle.
+---@param other math.vec2|number vector or angle
+---@return math.vec2
 function M:getRotated(other)
-    return M(self.x * other.x - self.y * other.y, self.x * other.y + self.y * other.x)
+    local x, y
+    if type(other) == 'number' then
+        x, y = math.cos(other), math.sin(other)
+    else
+        x, y = other.x, other.y
+    end
+    return M(self.x * x - self.y * y, self.x * y + self.y * x)
 end
 
 --- Calculates perpendicular of v, rotated 90 degrees clockwise -- cross(v, rperp(v)) <= 0
@@ -170,12 +185,6 @@ end
 function M:getScaled(scalar)
     return M(self.x * scalar,
              self.y * scalar)
-end
-
---- Unrotates two points.
----@return math.vec2 vector with an angle of this.getAngle() - other.getAngle(), and a length of this.getLength() * other.getLength().
-function M:getUnrotated(other)
-    return M(self.x * other.x + self.y * other.y, self.y * other.x - self.x * other.y)
 end
 
 function M:isOne()
