@@ -6,11 +6,11 @@ local function checkReturn(ret)
     if ret ~= '' then
         return ret:gsub('\\', '/')
     end
-    local err = lstg.XFileDialog:getLastError()
+    local err = lstg.FileDialog:getLastError()
     if err == 'cancel' then
         --return
     else
-        Print(string.format('got error in XFileDialog: %s', err))
+        Print(string.format('got error in FileDialog: %s', err))
         --return
     end
     return nil, err
@@ -57,22 +57,22 @@ function M.open(filter, defaultPath)
     if defaultPath and jit.os == 'Windows' then
         defaultPath = defaultPath:gsub('/', '\\')
     end
-    return checkReturn(lstg.XFileDialog:open(makeFilter(filter), defaultPath or ''))
+    return checkReturn(lstg.FileDialog:open(makeFilter(filter), defaultPath or ''))
 end
 
 ---
 ---@param filter string|table
 ---@param defaultPath string
 function M.openMultiple(filter, defaultPath)
-    local ret = lstg.XFileDialog:openMultiple(makeFilter(filter), defaultPath or '')
+    local ret = lstg.FileDialog:openMultiple(makeFilter(filter), defaultPath or '')
     if #ret > 0 then
         return ret
     end
-    local err = lstg.XFileDialog:getLastError()
+    local err = lstg.FileDialog:getLastError()
     if err == 'cancel' then
         --return
     else
-        Print(string.format('got error in XFileDialog: %s', err))
+        Print(string.format('got error in FileDialog: %s', err))
     end
     return nil, err
 end
@@ -81,7 +81,7 @@ end
 ---@param filter string|table
 ---@param defaultPath string
 function M.save(filter, defaultPath)
-    local path, msg = checkReturn(lstg.XFileDialog:save(makeFilter(filter), defaultPath or ''))
+    local path, msg = checkReturn(lstg.FileDialog:save(makeFilter(filter), defaultPath or ''))
     if path and string.fileext(path) == '' then
         local ext = splitFilter(filter)[1]
         if ext and ext ~= '' then
@@ -94,7 +94,7 @@ end
 ---
 ---@param defaultPath string
 function M.pickFolder(defaultPath)
-    return checkReturn(lstg.XFileDialog:pickFolder(defaultPath or ''))
+    return checkReturn(lstg.FileDialog:pickFolder(defaultPath or ''))
 end
 
 return M
