@@ -358,6 +358,7 @@ end
 
 --
 
+local fu = cc.FileUtils:getInstance()
 local glc = cc.GLProgramCache:getInstance()
 local shader_path = "src/shader/"
 local internalShaders = {
@@ -404,14 +405,20 @@ for k, v in pairs(internalBM) do
 end
 lstg.BlendMode:getByName(''):setAsDefault()
 
-function CreateBlendMode(name, blendEquation, blendFuncSrc, blendFuncDst, glProgram)
-    if not glProgram then
+function CreateBlendMode(name, blendEquation, blendFuncSrc, blendFuncDst, shaderName)
+    local glProgram
+    if not shaderName then
         glProgram = 'lstg.mul'
+    else
+        local res = FindResFX(shaderName)
+        if res then
+            local glp = res:getProgram()
+            glProgram = tostring(glp)
+            glc:addGLProgram(glp, glProgram)
+        else
+            glProgram = tostring(shaderName)
+        end
     end
-    if type(glProgram) == 'string' then
-        glProgram = glc:getGLProgram(glProgram)
-    end
-    assert(glProgram)
     local ret = lstg.BlendMode:createByNames(name, blendEquation, blendFuncSrc, blendFuncDst, glProgram)
     assert(ret, i18n 'failed to create BlendMode')
     return ret
