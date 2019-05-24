@@ -2,7 +2,7 @@ local KEY_BIT = { 128, 64, 32, 16, 8, 4, 2, 1 }
 local KEY_NAME = { "up", "down", "left", "right", "slow", "shoot", "spell", "special" }
 
 --- 将按键状态转换为二进制数值
---- @return number @返回二进制按键数值
+---@return number 返回二进制按键数值
 local function KeyState2Byte(state)
     local ret = 0
     for i, k in ipairs(KEY_NAME) do
@@ -27,13 +27,14 @@ end
 
 ---------------------------------------------------ReplayFrameReader
 
+---@class plus.ReplayFrameReader
 local ReplayFrameReader = plus.Class()
 plus.ReplayFrameReader  = ReplayFrameReader
 
 --- 构造ReplayFrameReader
---- @param path string @文件路径
---- @param offset number @录像数据偏移
---- @param count number @录像帧数量
+---@param path string 文件路径
+---@param offset number 录像数据偏移
+---@param count number 录像帧数量
 function ReplayFrameReader:init(path, offset, count)
     self._fs = plus.FileStream(path, "rb")
 
@@ -45,7 +46,7 @@ function ReplayFrameReader:init(path, offset, count)
 end
 
 --- 下一帧
---- @return boolean @若达到结尾则返回false，否则返回true
+---@return boolean 若达到结尾则返回false，否则返回true
 function ReplayFrameReader:Next(state)
     if self._read >= self._count then
         return false
@@ -70,6 +71,7 @@ end
 
 ---------------------------------------------------ReplayFrameWriter
 
+---@class plus.ReplayFrameWriter
 local ReplayFrameWriter = plus.Class()
 plus.ReplayFrameWriter  = ReplayFrameWriter
 
@@ -96,11 +98,12 @@ end
 
 ---------------------------------------------------ReplayManager
 
+---@class plus.ReplayManager
 local ReplayManager = plus.Class()
 plus.ReplayManager  = ReplayManager
 
 ---构造ReplayManager
----@param replayDirectory string @录像文件夹
+---@param replayDirectory string 录像文件夹
 function ReplayManager:init(replayDirectory)
     self._repdir = replayDirectory
     self._filefmt = "slot(%d).rep"
@@ -180,10 +183,10 @@ function ReplayManager.ReadReplayInfo(path)
                     stage.stageDate = r:ReadUInt()  ---游戏日期(UNIX时间戳)
                     local stagePlayerLength = r:ReadUShort()  ---使用自机
                     stage.stagePlayer = r:ReadString(stagePlayerLength)
- ---                  local stage_num = r:ReadUShort()  --关卡所在位置
- ---                  stage.cur_stage_num = stage_num
- ---                  stage.group_num= r:ReadUShort() --关卡组长度
-                    ---录像数据
+--                  local stage_num = r:ReadUShort()  --关卡所在位置
+--                  stage.cur_stage_num = stage_num
+--                  stage.group_num= r:ReadUShort() --关卡组长度
+                    --录像数据
                     stage.frameCount = r:ReadUInt()  ---帧数
                     stage.frameDataPosition = f:GetPosition()  ---数据起始位置
                     f:Seek(stage.frameCount)  ---跳过帧数据
@@ -270,9 +273,9 @@ function ReplayManager.SaveReplayInfo(path, data)
                     w:WriteUInt(stage.stageDate or 0)  ---游戏日期(UNIX时间戳)
                     w:WriteUShort(string.len(stage.stagePlayer))  ---使用自机
                     w:WriteString(stage.stagePlayer, false)
- ---                  w:WriteUShort(stage.cur_stage_num)--关卡所在位置
- ---                  w:WriteUShort(stage.group_num)  --关卡组长度
-                    ---录像数据
+--                  w:WriteUShort(stage.cur_stage_num)--关卡所在位置
+--                  w:WriteUShort(stage.group_num)  --关卡组长度
+                    --录像数据
                     print(stage.frameData:GetCount())
                     w:WriteUInt(stage.frameData:GetCount())  ---帧数
                     stage.frameData:Write(f)  ---数据
@@ -330,7 +333,7 @@ function ReplayManager:GetSlotCount()
 end
 
 --- 获取录像信息
---- @param slot number @录像槽
+---@param slot number 录像槽
 function ReplayManager:GetRecord(slot)
     assert(slot >= 0 and slot <= self._slotmax, "invalid argument.")
     return self._slots[slot]

@@ -1,7 +1,7 @@
 local FU = cc.FileUtils:getInstance()
 
 ---判断文件夹是否存在
----@param path @路径
+---@param path string 路径
 ---@return boolean
 function plus.FileExists(path)
     path = string.gsub(path, '\\', '/')
@@ -21,14 +21,14 @@ function plus.FileExists(path)
 end
 
 ---判断文件夹是否存在
----@param path @路径
+---@param path string 路径
 ---@return boolean
 function plus.DirectoryExists(path)
     return FU:isDirectoryExist(path)
 end
 
 ---创建目录
----@param path @路径
+---@param path string 路径
 function plus.CreateDirectory(path)
     SystemLog(string.format(i18n 'try to create directory %q', path))
     if FU:isDirectoryExist(path) then
@@ -40,11 +40,11 @@ function plus.CreateDirectory(path)
 end
 
 ---枚举目录中的文件或文件夹，仅本地文件
----@param path @目录
----@return table
 ---结果表述为：
 --- { { isDirectory = false, name = "abc.txt", lastAccessTime = 0, size = 0 },
 ---   { isDirectory = true, name = "test" } }
+---@param path string 目录
+---@return table
 function plus.EnumFiles(path)
     path = string.gsub(path, '\\', '/')
     if path:sub(-1) ~= '/' then
@@ -86,10 +86,17 @@ function plus.EnumFiles(path)
     return ret
 end
 
+---
+---@param path string
+---@return table
 function plus.enumFiles(path)
     return plus.EnumFiles(path)
 end
 
+---
+---@param path string
+---@param suffix string
+---@return table
 function plus.enumFilesByType(path, suffix)
     local ret = {}
     suffix = string.lower(suffix)
@@ -236,7 +243,7 @@ end
 ---gives an error by a messagebox
 ---@param msg string
 ---@param title string
----@param exit boolean @true if omitted
+---@param exit boolean true if omitted
 function plus.error(msg, title, exit)
     msg = msg or ''
     title = title or ''

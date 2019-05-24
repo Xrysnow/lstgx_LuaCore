@@ -1,4 +1,5 @@
 --- spline
+---@class x.spline
 local M = {}
 
 ---

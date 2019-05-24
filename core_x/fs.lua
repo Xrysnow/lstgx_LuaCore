@@ -1,9 +1,10 @@
 --
 
-local m = {}
+---@class x.FileSystem
+local M = {}
 local fu = cc.FileUtils:getInstance()
 
-function m.listFiles(rootpath, pathes)
+function M.listFiles(rootpath, pathes)
     pathes = pathes or {}
     assert(rootpath)
     local files = plus.EnumFiles(rootpath)
@@ -18,15 +19,15 @@ end
 ---getExtension
 ---@param str string
 ---@return string
-function m.getExtension(str)
+function M.getExtension(str)
     return str:match(".+%.(%w+)$")
 end
 
-function m.listScripts(rootpath)
-    local fs = m.listFiles(rootpath)
+function M.listScripts(rootpath)
+    local fs = M.listFiles(rootpath)
     local ret = {}
     for i, v in pairs(fs) do
-        local ext = m.getExtension(v)
+        local ext = M.getExtension(v)
         if ext == 'lua' or ext == 'luac' then
             table.insert(ret, string.sub(v, 1))
         end
@@ -37,7 +38,7 @@ end
 ---getFolder
 ---@param filePath string
 ---@return string
-function m.getFolder(filePath)
+function M.getFolder(filePath)
     local p1 = string.match(filePath, "^(.*)\\")
     local p2 = string.match(filePath, "^(.*)/")
     local ret
@@ -54,16 +55,16 @@ end
 
 ---getScriptPath
 ---@return string
-function m.getScriptPath()
+function M.getScriptPath()
     local p = debug.getinfo(2, "S").source
     p = fu:fullPathForFilename(p)
     return p
 end
 
-function m.getScriptFolder()
+function M.getScriptFolder()
     local p = debug.getinfo(2, "S").source
     p = fu:fullPathForFilename(p)
-    return m.getFolder(p)
+    return M.getFolder(p)
 end
 
-return m
+return M

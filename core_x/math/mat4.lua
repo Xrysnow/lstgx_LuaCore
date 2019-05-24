@@ -202,8 +202,7 @@ end
 ---@param zNearPlane number
 ---@param zFarPlane number
 ---@return math.mat4
-function M:createOrthographicOffCenter(left, right, bottom, top,
-                                       zNearPlane, zFarPlane)
+function M:createOrthographicOffCenter(left, right, bottom, top, zNearPlane, zFarPlane)
     assert(right ~= left)
     assert(top ~= bottom)
     assert(zFarPlane ~= zNearPlane)
@@ -226,8 +225,7 @@ end
 ---@param cameraUpVector math.vec3
 ---@param cameraForwardVector math.vec3
 ---@return math.mat4
-function M:createBillboard(objectPosition, cameraPosition,
-                           cameraUpVector, cameraForwardVector)
+function M:createBillboard(objectPosition, cameraPosition, cameraUpVector, cameraForwardVector)
     local delta = cameraPosition - objectPosition
     local isSufficientDelta = delta:lengthSquared() > 1e-6
 

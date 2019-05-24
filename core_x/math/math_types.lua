@@ -103,15 +103,8 @@ local function chars2uint(c)
 end
 
 ---
-
+---@class math.Int
 Int = Int or {}
-UInt = UInt or {}
-Int64 = Int64 or {}   ---## You'd better use with ctype.
-UInt64 = UInt64 or {}  ---## You'd better use with ctype.
-Float = Float or {}   ---# Possible loss of precision, be careful.
-Double = Double or {}
-
----
 
 Int.max = 2 ^ 31 - 1
 Int.min = -2 ^ 31
@@ -145,6 +138,9 @@ function Int.fromhex(h)
 end
 
 ---
+---## Better use with ctype.
+---@class math.Int64
+Int64 = Int64 or {}
 
 Int64.max = 2 ^ 63 - 1
 Int64.min = -2 ^ 63
@@ -181,6 +177,8 @@ function Int64.fromhex(h)
 end
 
 ---
+---@class math.UInt
+UInt = UInt or {}
 
 UInt.max = 2 ^ 32 - 1
 UInt.min = 0
@@ -210,6 +208,9 @@ function UInt.fromhex(h)
 end
 
 ---
+---## Better use with ctype.
+---@class math.UInt64
+UInt64 = UInt64 or {}
 
 UInt64.max = 2 ^ 64 - 1
 UInt64.min = 0
@@ -242,6 +243,9 @@ function UInt64.fromhex(h)
 end
 
 ---
+---## Possible loss of precision, be careful.
+---@class math.Float
+Float = Float or {}
 
 local f1 = unionF({ 1e39 })
 local f2 = unionF({ -1e39 })
@@ -285,6 +289,8 @@ function Float.fromhex(h)
 end
 
 ---
+---@class math.Double
+Double = Double or {}
 
 local d1 = unionD({ 1e309 })
 local d2 = unionD({ -1e309 })

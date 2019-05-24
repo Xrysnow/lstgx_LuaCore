@@ -3,8 +3,8 @@ all_class = {}
 class_name = {}
 
 ---定义类
----@param base object @基类
----@param define table @属性表
+---@param base object 基类
+---@param define table 需要额外继承的表，通常与base相同
 ---@return object
 function Class(base, define)
     base = base or object

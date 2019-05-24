@@ -1,13 +1,14 @@
 --
 
-local m = {}
+---@class x.range
+local M = {}
 
 --- Returns a iterator of range [start, stop) or [0, start)
 ---@param start number
 ---@param stop number
 ---@param step number @ will be 1 if ommited
 ---@return function
-function m.range(start, stop, step)
+function M.range(start, stop, step)
     step = step or 1
     if step > 0 then
         if not stop then
@@ -39,4 +40,4 @@ function m.range(start, stop, step)
     return f
 end
 
-return m
+return M

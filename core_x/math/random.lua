@@ -20,8 +20,8 @@ local SG_MAGICCONST = 1.0 + log(4.5)
 --local BPF = 53        -- Number of bits in a float
 --local RECIP_BPF = pow(2, -BPF)
 
----@class Random
-local m = {}
+---@class x.random
+local M = {}
 
 -------------------- integer methods  -------------------
 
@@ -31,7 +31,7 @@ local m = {}
 ---@param stop number
 ---@param step number
 ---@return number
-function m:randrange(start, stop, step)
+function M:randrange(start, stop, step)
     local istart = int(start)
     if istart ~= start then
         error("non-integer arg 1 for randrange()")
@@ -80,7 +80,7 @@ end
 ---@param a number
 ---@param b number
 ---@return number
-function m:randint(a, b)
+function M:randint(a, b)
     return self:randrange(a, b + 1)
 end
 
@@ -89,7 +89,7 @@ local _maxsize = math.pow(2, 53)
 ---Return a random int in the range [0, n)
 ---@param n number
 ---@return number
-function m:_randbelow(n)
+function M:_randbelow(n)
     if n <= 0 then
         error('n <= 0')
     end
@@ -109,7 +109,7 @@ end
 -------------------- sequence methods  -------------------
 
 ---Choose a random element from a non-empty sequence.
-function m:choice(seq)
+function M:choice(seq)
     local len = #seq
     if len == 0 then
         error("Cannot choose from an empty sequence")
@@ -122,7 +122,7 @@ end
 --- Optional argument random is a 0-argument function returning a
 --- random float in [0.0, 1.0); if it is the default None, the
 --- standard random.random will be used.
-function m:shuffle(x, random)
+function M:shuffle(x, random)
     local len = #x
     if not random then
         for i = len, 2, -1 do
@@ -151,7 +151,7 @@ end
 ---@param population table
 ---@param k number
 ---@return table
-function m:sample(population, k)
+function M:sample(population, k)
     local n = #population
     if k < 0 or k > n then
         error("Sample larger than population")
@@ -175,7 +175,7 @@ end
 ---@param a number
 ---@param b number
 ---@return number
-function m:uniform(a, b)
+function M:uniform(a, b)
     return a + (b - a) * self:random()
 end
 
@@ -191,7 +191,7 @@ end
 ---@param high number
 ---@param mode number
 ---@return number
-function m:triangular(low, high, mode)
+function M:triangular(low, high, mode)
     low = low or 0
     high = high or 1
     local c = 0.5
@@ -219,7 +219,7 @@ end
 ---@param mu number
 ---@param sigma number
 ---@return number
-function m:normalvariate(mu, sigma)
+function M:normalvariate(mu, sigma)
     local z, zz, u1, u2
     while true do
         u1 = self:random()
@@ -243,7 +243,7 @@ end
 ---@param mu number
 ---@param sigma number
 ---@return number
-function m:lognormvariate(mu, sigma)
+function M:lognormvariate(mu, sigma)
     return exp(self:normalvariate(mu, sigma))
 end
 
@@ -259,7 +259,7 @@ end
 --- infinity to 0 if lambd is negative.
 ---@param lambd number
 ---@return number
-function m:expovariate(lambd)
+function M:expovariate(lambd)
     return -log(1 - self:random()) / lambd
 end
 
@@ -274,7 +274,7 @@ end
 ---@param mu number
 ---@param kappa number
 ---@return number
-function m:vonmisesvariate(mu, kappa)
+function M:vonmisesvariate(mu, kappa)
     if kappa <= 1e-6 then
         return TWOPI * self:random()
     end
@@ -315,7 +315,7 @@ end
 ---@param alpha number
 ---@param beta number
 ---@return number
-function m:gammavariate(alpha, beta)
+function M:gammavariate(alpha, beta)
     if alpha <= 0 or beta <= 0 then
         error("gammavariate: alpha and beta must be > 0.0")
     end
@@ -377,7 +377,7 @@ end
 ---@param mu number
 ---@param sigma number
 ---@return number
-function m:gauss(mu, sigma)
+function M:gauss(mu, sigma)
     local z = self.gauss_next
     self.gauss_next = nil
     if not z then
@@ -398,7 +398,7 @@ end
 ---@param alpha number
 ---@param beta number
 ---@return number
-function m:betavariate(alpha, beta)
+function M:betavariate(alpha, beta)
     local y = self:gammavariate(alpha, 1)
     if y == 0 then
         return 0
@@ -412,7 +412,7 @@ end
 --- Pareto distribution.  alpha is the shape parameter.
 ---@param alpha number
 ---@return number
-function m:paretovariate(alpha)
+function M:paretovariate(alpha)
     local u = 1 - self:random()
     return 1 / pow(u, 1 / alpha)
 end
@@ -426,12 +426,12 @@ end
 ---@param alpha number
 ---@param beta number
 ---@return number
-function m:weibullvariate(alpha, beta)
+function M:weibullvariate(alpha, beta)
     local u = 1 - self:random()
     return alpha * pow(-log(u), 1 / beta)
 end
 
-function m:random()
+function M:random()
     if self._random_g then
         return self._random_g()
     else
@@ -439,7 +439,7 @@ function m:random()
     end
 end
 
-function m:seed(a)
+function M:seed(a)
     if self._random_s then
         self._random_s(a)
     else
@@ -448,9 +448,9 @@ function m:seed(a)
     self.gauss_next = nil
 end
 
-function m:_set_random(generator, seeder)
+function M:_set_random(generator, seeder)
     self._random_g = generator
     self._random_s = seeder
 end
 
-return m
+return M

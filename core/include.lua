@@ -5,8 +5,10 @@ lstg.included = {}
 ---脚本搜索路径
 lstg.current_script_path = { '' }
 
----Include(filename)
----包含（执行）脚本文件
+---
+--- 包含（执行）脚本文件
+---@param filename string
+---@return any 脚本返回值
 function Include(filename)
     filename = tostring(filename)
     filename = string.gsub(filename, '\\', '/')
@@ -28,8 +30,9 @@ function Include(filename)
             table.insert(lstg.current_script_path, '')
         end
         lstg.included[filename] = true
-        DoFile(filename)
+        local ret = DoFile(filename)
         lstg.current_script_path[#lstg.current_script_path] = nil
+        return ret
     end
 end
 

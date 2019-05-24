@@ -164,7 +164,7 @@ function SetViewMode(mode)
     _setViewMode(mode)
 end
 
----set 3D var
+---设置3D变量
 function Set3D(key, a, b, c)
     if key == 'fog' then
         a = tonumber(a or 0)
@@ -188,7 +188,7 @@ function Set3D(key, a, b, c)
     end
 end
 
----reset 3D var
+---重置3D变量
 function Reset3D()
     lstg.view3d.eye = { 0, 0, -1 }
     lstg.view3d.at = { 0, 0, 0 }

@@ -60,6 +60,9 @@ local function _getMap(resType)
     return pools[_cur][assert(_toResType(resType), string.format('invalid resuorce type %q', resType))]
 end
 local _log = false
+
+--- 设置是否在资源加载时写出日志
+---@param b boolean
 function SetResLoadInfo(b)
     _log = b
 end
@@ -101,7 +104,7 @@ local function _check(res, type, args)
 end
 
 --- 设置当前激活的资源池类型
----@param pool_type string @'stage' or 'global'
+---@param poolType string stage/global
 function SetResourceStatus(poolType)
     _cur = poolType
 end
@@ -109,6 +112,9 @@ lstg.SetResourceStatus = SetResourceStatus
 
 --- 若只有一个参数，则删除一个池中的所有资源。否则删除对应池中的某个资源。参数可选global或stage。
 --- 若资源仍在使用之中，将继续保持装载直到相关的对象被释放。
+---@param poolType string
+---@param resType string
+---@param name string
 function RemoveResource(poolType, resType, name)
     local pool = assert(pools[poolType],
                         "invalid argument #1 for 'RemoveResource', requires 'stage' or 'global'")
@@ -126,11 +132,14 @@ function RemoveResource(poolType, resType, name)
 end
 lstg.RemoveResource = RemoveResource
 
---- 获得一个资源的类别，通常用于检测资源是否存在。
+---
+--- 获得一个资源所在资源池的类别，通常用于检测资源是否存在
 --->   细节
---->       方法会根据名称先在全局资源池中寻找，若有则返回global。
---->       若全局资源表中没有找到资源，则在关卡资源池中找，若有则返回stage。
---->       若不存在资源，则返回nil。
+--->       方法会根据名称先在全局资源池中寻找，若有则返回global
+--->       若全局资源表中没有找到资源，则在关卡资源池中找，若有则返回stage
+--->       若不存在资源，则返回nil
+---@param resType string 资源类型 tex,img,ani,bgm,snd,psi,fnt,ttf,fx
+---@param name string 资源名
 function CheckRes(resType, name)
     resType = _toResType(resType)
     assert(resType,
@@ -145,7 +154,9 @@ end
 lstg.CheckRes = CheckRes
 
 --- 枚举资源池中某种类型的资源
---- 依次返回全局资源池、关卡资源池中该类型的所有资源的名称。
+--- 依次返回全局资源池、关卡资源池中该类型的所有资源的名称
+---@param resType string 资源类型: tex,img,ani,bgm,snd,psi,fnt,ttf,fx
+---@return table,table 包含资源名的table，分别属于全局和关卡资源池
 function EnumRes(resType)
     return pools.global[_toResType(resType)]:keys(), pools.stage[_toResType(resType)]:keys()
 end
@@ -164,9 +175,8 @@ end
 lstg.GetTextureSize = GetTextureSize
 
 --- 从文件载入纹理，支持多种格式，推荐png
----@param texname string
----@param filename string
----@param mipmap boolean @是否使用纹理链
+---@param name string
+---@param path string
 ---@return lstg.ResTexture
 function LoadTexture(name, path)
     local map = _getMap(ENUM_RES_TYPE.tex)
@@ -175,17 +185,12 @@ function LoadTexture(name, path)
         return old
     end
     path = string.path_uniform(path)
-    ---@type lstg.ResTexture
     local res
     FileTaskWrapper(path, true, function()
         res = lstg.ResTexture:create(name, path)
     end)
     _check(res, 'tex', { name, path })
     map:insert(name, res)
-
-    if name == 'hint' then
-        Print('[res]',name,res:getTexture():getName())
-    end
     return res
 end
 lstg.LoadTexture = LoadTexture
@@ -209,20 +214,17 @@ function LoadTextureAsync(name, path, callback)
 end
 
 --- 在纹理中创建图像
---- x,y：图像在纹理上左上角的坐标（纹理左上角为（0,0），向下向右为正方向）
---- w,h：图像的大小
---- a,b,rect：横向、纵向碰撞判定和判定形状。
---->  细节
---->    当把一个图像赋予对象的img字段时，它的a、b、rect属性会自动被赋值到对象上。
+---  细节
+--->    当把一个图像赋予对象的img字段时，它的a、b、rect属性会自动被赋值到对象上
 ---@param name string
 ---@param tex_name string
 ---@param x number
----@param y number
+---@param y number 图像在纹理上左上角的坐标（纹理左上角为（0,0），向下向右为正方向）
 ---@param w number
----@param h number
+---@param h number 图像的大小
 ---@param a number
----@param b number
----@param colliType boolean|number|string
+---@param b number 横向、纵向碰撞半径
+---@param colliType boolean|number|string 判定形状
 ---@return lstg.ResSprite
 function LoadImage(name, tex_name, x, y, w, h, a, b, colliType)
     local map = _getMap(ENUM_RES_TYPE.img)
@@ -244,22 +246,19 @@ end
 lstg.LoadImage = LoadImage
 
 --- 设置图像状态，可选一个颜色参数用于设置所有顶点或者给出4个颜色设置所有顶点。
---- name：图像资源名
---- blend_mode：混合模式
----    混合选项可选
---->""          默认值，=mul+alpha
---->"mul+add"   顶点颜色使用乘法，目标混合使用加法
---->"mul+alpha" (默认)顶点颜色使用乘法，目标混合使用alpha混合
---->"mul+sub"   顶点颜色使用乘法，结果=图像上的颜色-屏幕上的颜色
---->"mul+rev"   顶点颜色使用乘法，结果=屏幕上的颜色-图像上的颜色
---->"add+add"   顶点颜色使用加法，目标混合使用加法
---->"add+alpha" 顶点颜色使用加法，目标混合使用alpha混合
---->"add+sub"   顶点颜色使用加法，结果=图像上的颜色-屏幕上的颜色
---->"add+rev"   顶点颜色使用加法，结果=屏幕上的颜色-图像上的颜色
----color：混合颜色
----@param name string
----@param blend_mode string
----@param color lstg.Color
+---   混合模式可选
+---> ""          默认值，=mul+alpha
+---> "mul+add"   顶点颜色使用乘法，目标混合使用加法
+---> "mul+alpha" (默认)顶点颜色使用乘法，目标混合使用alpha混合
+---> "mul+sub"   顶点颜色使用乘法，结果=图像上的颜色-屏幕上的颜色
+---> "mul+rev"   顶点颜色使用乘法，结果=屏幕上的颜色-图像上的颜色
+---> "add+add"   顶点颜色使用加法，目标混合使用加法
+---> "add+alpha" 顶点颜色使用加法，目标混合使用alpha混合
+---> "add+sub"   顶点颜色使用加法，结果=图像上的颜色-屏幕上的颜色
+---> "add+rev"   顶点颜色使用加法，结果=屏幕上的颜色-图像上的颜色
+---@param name string 图像资源名
+---@param blendMode string 混合模式
+---@param color1 lstg.Color 混合颜色
 function SetImageState(name, blendMode, color1, color2, color3, color4)
     local sp = FindResSprite(name)
     if not sp then
@@ -277,13 +276,10 @@ end
 lstg.SetImageState = SetImageState
 
 --- 设置图像中心
---- name：图像资源名
---- x,y：相对于图像左上角的坐标
----@param name string
+---@param name string 图像资源名
 ---@param x number
----@param y number
+---@param y number 相对于图像左上角的坐标
 function SetImageCenter(name, x, y)
-    ---@type lstg.ResSprite
     local sp = FindResSprite(name)
     if not sp then
         error(string.format("can't find image %q", name))
@@ -293,6 +289,11 @@ function SetImageCenter(name, x, y)
 end
 lstg.SetImageCenter = SetImageCenter
 
+---
+--- 复制已载入的图像资源
+---@param newname string 新的图像资源名
+---@param img string 原有图像资源名
+---@return lstg.ResSprite
 function CopyImage(newname, img)
     local map = _getMap(ENUM_RES_TYPE.img)
     local old = map:at(newname)
@@ -314,15 +315,15 @@ end
 ---@param name string
 ---@param tex_name string
 ---@param x number
----@param y number @第一帧的左上角位置
+---@param y number 第一帧的左上角位置
 ---@param w number
----@param h number @一帧的大小
+---@param h number 一帧的大小
 ---@param nCol number
----@param nRow number @纵向横向的分割数，以列优先顺序排列
----@param interval number @帧间隔
+---@param nRow number 纵向横向的分割数，以列优先顺序排列
+---@param interval number 帧间隔
 ---@param a number
 ---@param b number
----@param colliType boolean @同Image
+---@param colliType boolean 同LoadImage
 ---@return lstg.ResAnimation
 function LoadAnimation(name, tex_name, x, y, w, h, nCol, nRow, interval, a, b, colliType)
     local map = _getMap(ENUM_RES_TYPE.ani)
@@ -345,6 +346,7 @@ end
 lstg.LoadAnimation = LoadAnimation
 
 --- 类似于SetImageState
+---@see SetImageState
 function SetAnimationState(name, blendMode, color1, color2, color3, color4)
     local ani = FindResAnimation(name)
     if not ani then
@@ -362,6 +364,7 @@ end
 lstg.SetAnimationState = SetAnimationState
 
 --- 类似于SetImageCenter
+---@see SetImageCenter
 function SetAnimationCenter(name, x, y)
     local ani = FindResAnimation(name)
     if not ani then
@@ -419,8 +422,8 @@ end
 --- 装载粒子系统
 --- 使用HGE所用的粒子文件结构
 ---@param name string
----@param path string @定义文件
----@param img_name string @粒子图片
+---@param path string 定义文件
+---@param img_name string 粒子图片
 ---@param a number
 ---@param b number
 ---@param colliType boolean
@@ -446,10 +449,10 @@ end
 
 --- 装载纹理字体
 --- 支持HGE的纹理字体，将根据定义文件在字体同级目录下寻找纹理文件
----@param name string @名称
----@param path string @定义文件
+---@param name string 名称
+---@param path string 定义文件
 ---@return lstg.ResFont
-function LoadFont(name, path, _, _)
+function LoadFont(name, path)
     return _LoadFont(name, path, false)
 end
 lstg.LoadFont = LoadFont
@@ -458,14 +461,18 @@ function LoadFontAsync(name, path, callback)
     return _LoadFont(name, path, true, callback)
 end
 
---- 设置字体的混合模式、颜色。具体混合选项见SetImageState
-function SetFontState(name, blend_mode, color)
+--- 设置字体的混合模式、颜色
+--- 具体混合选项见SetImageState
+---@param name string
+---@param blendMode string
+---@param color lstg.Color
+function SetFontState(name, blendMode, color)
     local font = FindResFont(name)
     if not font then
         error(string.format("can't find font %q", name))
     end
-    if blend_mode then
-        font:setBlendMode(blend_mode)
+    if blendMode then
+        font:setBlendMode(blendMode)
     end
     if color then
         font:setColor(color)
@@ -484,9 +491,9 @@ local function _LoadTTF(name, path, size, async, callback)
 end
 
 --- 加载TTF字体
----@param name string @资源名称
----@param path string @加载路径
----@param size number @字形大小
+---@param name string 资源名称
+---@param path string 加载路径
+---@param size number 字形大小
 ---@return lstg.ResFont
 function LoadTTF(name, path, size)
     return _LoadTTF(name, path, size, false)
@@ -511,11 +518,11 @@ end
 
 --- 装载音效
 --- 仅支持wav或ogg，推荐使用wav格式
---->  细节
---->    音效将被装载进入内存。请勿使用较长的音频文件做音效。
---->    对于wav格式，由于受限于目前的实现，不支持非标准的、带压缩的格式。
----@param name string @资源名
----@param path string @文件路径
+---  细节
+--->    音效将被装载进入内存。请勿使用较长的音频文件做音效
+--->    对于wav格式，由于受限于目前的实现，不支持非标准的、带压缩的格式
+---@param name string 资源名
+---@param path string 文件路径
 ---@return lstg.ResSound
 function LoadSound(name, path)
     return _LoadSound(name, path, false)
@@ -542,12 +549,12 @@ end
 --- 加载音乐
 --- 仅支持wav或ogg，推荐使用ogg格式
 --->  细节
---->    音乐将以流的形式装载进入内存，不会一次性完整解码放入内存。故不推荐使用wav格式，请使用ogg作为音乐格式。
---->    通过描述循环节可以设置音乐的循环片段。当音乐位置播放到end时会衔接到start。这一步在解码器中进行，以保证完美衔接。
----@param name string @资源名
----@param path string @文件路径
----@param loop_end number @循环结束（秒）
----@param loop_duration number @循环时长（秒）
+--->    音乐将以流的形式装载进入内存，不会一次性完整解码放入内存
+--->    通过描述循环节可以设置音乐的循环片段。当音乐位置播放到end时会衔接到start。这一步在解码器中进行，以保证完美衔接
+---@param name string 资源名
+---@param path string 文件路径
+---@param loop_end number 循环结束（秒）
+---@param loop_duration number 循环时长（秒）
 ---@return lstg.ResMusic
 function LoadMusic(name, path, loop_end, loop_duration)
     return _LoadMusic(name, path, loop_end, loop_duration, false)
@@ -560,28 +567,43 @@ end
 
 --
 
+local _default_fshader = 'shader/ColorMulti.frag'
+local _default_vshader = 'shader/Common.vert'
+
 --- 载入FX文件(shader特效)
 ---@param name string
----@param fpath string @fragment shader path, optional
----@param vpath string @vertex shader path, optional
+---@param fShader string fragment shader路径/内容，默认为shader/ColorMulti.frag
+---@param vShaderpath string vertex shader路径/内容，默认为shader/Common.vert
+---@param isString boolean 指示fShader和vShader为shader内容还是路径
 ---@return lstg.ResFX
-function LoadFX(name, fpath, vpath)
+function LoadFX(name, fShader, vShader, isString)
     local map = _getMap(ENUM_RES_TYPE.fx)
     local old = map:at(name)
     if old then
         return old
     end
-    fpath = fpath or 'src/shader/ColorMulti.frag'
-    vpath = vpath or 'src/shader/Common.vert'
-    fpath = string.path_uniform(fpath)
-    vpath = string.path_uniform(vpath)
-    local res = lstg.ResFX:create(name, vpath, fpath)
-    _check(res, 'fx', { name, fpath, vpath })
+    local res
+    if isString then
+        fShader = fShader or cc.FileUtils:getInstance():getStringFromFile(_default_fshader)
+        vShader = vShader or cc.FileUtils:getInstance():getStringFromFile(_default_vshader)
+        res = lstg.ResFX:createWithString(name, vShader, fShader)
+    else
+        fShader = fShader or _default_fshader
+        vShader = vShader or _default_vshader
+        fShader = string.path_uniform(fShader)
+        vShader = string.path_uniform(vShader)
+        res = lstg.ResFX:create(name, vShader, fShader)
+    end
+    _check(res, 'fx', { name, fShader, vShader })
     map:insert(name, res)
     return res
 end
 lstg.LoadFX = LoadFX
 
+--- 创建一个名为name的RenderTarget
+--- 可以像纹理那样使用
+---@param name string
+---@return lstg.ResRenderTarget
 function CreateRenderTarget(name)
     local map = _getMap(ENUM_RES_TYPE.rt)
     local old = map:at(name)
@@ -595,7 +617,8 @@ function CreateRenderTarget(name)
 end
 lstg.CreateRenderTarget = CreateRenderTarget
 
---- deprecated
+--- 检查一个纹理是否为RenderTarget
+---@deprecated
 function IsRenderTarget(name)
     if FindResRenderTarget(name) then
         return true
@@ -609,7 +632,6 @@ lstg.IsRenderTarget = IsRenderTarget
 -- graph api
 ------------------------------------------------------------
 
----@param res lstg.ResFX
 local function _setResFX(res, t)
     for k, v in pairs(t) do
         local ty = type(v)
@@ -625,15 +647,34 @@ local function _setResFX(res, t)
     end
 end
 
+---
+--- 将一个RenderTarget作为屏幕缓冲区，并推入栈
+---   细节
+--->    引擎底层使用栈来管理RenderTarget，这意味着可以嵌套使用
+---@param name string
 function PushRenderTarget(name)
     assert(FindResRenderTarget(name):push())
 end
 lstg.PushRenderTarget = PushRenderTarget
 
+--- 将当前使用的RenderTarget从堆栈中移除
+---@param name string
 function PopRenderTarget(name)
     assert(FindResRenderTarget(name):pop())
 end
 
+---
+--- 应用PostEffect(不论是否处于渲染状态)。参数指定传递给FX的参数表，将会影响后续对该FX的使用
+--- 其中blend指定posteffect要以什么样的形式绘制到屏幕上，此时blend的第一分量无效
+---  细节
+---> 可以在PostEffect中使用下列语义注释(不区分大小写)捕获对象：
+--->   POSTEFFECTTEXTURE获取posteffect的捕获纹理(texture2d类型)
+--->   VIEWPORT获取视口大小(vector类型)
+--->   SCREENSIZE获取屏幕大小(vector类型)
+---@param rt lstg.ResRenderTarget|string
+---@param fx lstg.ResFX|string
+---@param blend lstg.BlendMode|string
+---@param param table
 function PostEffect(rt, fx, blend, param)
     fx = FindResFX(fx)
     _setResFX(fx, param or {})
@@ -643,10 +684,26 @@ lstg.PostEffect = PostEffect
 
 local _temp_rt = '::temp_rt::'
 
+---
+--- 开始捕获绘制数据
+--- 从这一步开始，所有后续渲染操作都将在PostEffect缓冲区中进行
+--- 这一操作等价于PushRenderTarget(InternalPostEffectBuffer)
 function PostEffectCapture()
     assert(FindResRenderTarget(_temp_rt):push())
 end
 
+---
+--- 结束屏幕捕获并应用PostEffect
+--- 这一操作等价于：
+---> PopRenderTarget(InternalPostEffectBuffer)
+---> PostEffect(InternalPostEffectBuffer, fx_name, blend, args)
+--- 代码必须满足：
+---> PostEffectCapture(...)
+---> ...  --配对的Push/PopRenderTarget操作
+---> PostEffectApply(...)
+---@param fx lstg.ResFX|string
+---@param blend_mode lstg.BlendMode|string
+---@param param table 其中key表示uniform变量名，value可以是数值、字符串（纹理名）、颜色
 function PostEffectApply(fx, blend_mode, param)
     fx = FindResFX(fx)
     _setResFX(fx, param or {})
@@ -656,16 +713,22 @@ function PostEffectApply(fx, blend_mode, param)
 end
 lstg.PostEffectApply = PostEffectApply
 
+--- 设置shader中的uniform变量
+---@param fx string
+---@param param table
 function SetShaderUniform(fx, param)
     _setResFX(FindResFX(fx), param)
 end
 
 --- 设置全局图像渲染缩放
+---@param scale number
 function SetImageScale(scale)
     LRES:setGlobalImageScaleFactor(scale)
 end
 lstg.SetImageScale = SetImageScale
 
+--- 获取全局图像渲染缩放
+---@return number
 function GetImageScale()
     return LRES:getGlobalImageScaleFactor()
 end
@@ -676,17 +739,55 @@ end
 
 --TODO: method on ResFont?
 local _RenderText = lstg.RenderText
+
+---
+---使用纹理字体渲染一段文字
+---name: 纹理名称，text: 字符串，x、y: 坐标，align: 对齐模式
+---该函数受全局图像缩放系数影响
+---  细节
+---    对齐模式指定渲染中心，对齐模式可取值：
+---> 左上 0 中上 1 右上 2
+---> 左中 4 中中 5 右中 6
+---> 左下 8 中下 9 右下 10
+---    由于使用了新的布局机制，在渲染HGE字体时在横向上会有少许误差，请手动调整
+---@param name string
+---@param text string
+---@param x number
+---@param y number
+---@param scale number
+---@param align number
 function RenderText(name, text, x, y, scale, align)
     return _RenderText(FindResFont(name), text, x, y, scale, align)
 end
 lstg.RenderText = RenderText
 
 local _RenderTTF = lstg.RenderTTF
+
+---
+---渲染TTF字体
+---该函数受全局图像缩放系数影响
+---  细节
+---> 暂时不支持渲染格式设置
+---若省略从fmt开始的参数，则值为字体资源设置的值
+---@param name string
+---@param text string
+---@param left number
+---@param right number
+---@param bottom number
+---@param top number
+---@param fmt number
+---@param color lstg.Color
+---@param scale number
 function RenderTTF(name, text, left, right, bottom, top, fmt, color, scale)
     return _RenderTTF(FindResFont(name), text, left, right, bottom, top, fmt, color, scale)
 end
 lstg.RenderTTF = RenderTTF
 
+---
+--- 计算文字渲染后的尺寸
+---@param name string
+---@param str string
+---@return number,number
 function CalcTextSize(name, str)
     local sz = FindResFont(name):calcSize(str)
     return sz.x, sz.y
@@ -698,6 +799,13 @@ end
 
 --TODO: reset factor when needed
 local _se_factor = 1
+
+---
+--- 传入1个参数时，设置全局音效音量，将影响后续播放音效的音量
+--- 传入2个参数时，设置指定音效音量
+--- 音量值范围为[0, 1]
+---@param arg1 number|string
+---@param arg2 number
 function SetSEVolume(arg1, arg2)
     if not arg2 then
         _se_factor = tonumber(arg1) or 1
@@ -708,6 +816,13 @@ end
 lstg.SetSEVolume = SetSEVolume
 
 local _bgm_factor = 1
+
+---
+--- 传入1个参数时，设置全局音乐音量，将影响后续播放音效的音量
+--- 传入2个参数时，设置指定音乐音量
+--- 音量值范围为[0, 1]
+---@param arg1 number|string
+---@param arg2 number
 function SetBGMVolume(arg1, arg2)
     if not arg2 then
         _bgm_factor = tonumber(arg1) or 1
@@ -717,26 +832,43 @@ function SetBGMVolume(arg1, arg2)
 end
 lstg.SetBGMVolume = SetBGMVolume
 
+---
+---@param name string 音效资源名
+---@param vol number 音量
+---@param pan number 声道平衡
 function PlaySound(name, vol, pan)
     FindResSound(name):play(vol * _se_factor, pan or 0)
 end
 lstg.PlaySound = PlaySound
 
+---
+--- 停止播放音效
+---@param name string
 function StopSound(name)
     FindResSound(name):stop()
 end
 lstg.StopSound = StopSound
 
+---
+--- 暂停播放音效
+---@param name string
 function PauseSound(name)
     FindResSound(name):pause()
 end
 lstg.PauseSound = PauseSound
 
+---
+--- 恢复播放音效
+---@param name string
 function ResumeSound(name)
     FindResSound(name):resume()
 end
 lstg.ResumeSound = ResumeSound
 
+---
+---获取音效播放状态
+---@param name string
+---@return string 返回paused/playing/stopped
 function GetSoundState(name)
     local res = FindResSound(name)
     if res:isPlaying() then
@@ -749,6 +881,11 @@ function GetSoundState(name)
 end
 lstg.GetSoundState = GetSoundState
 
+---
+--- 播放音乐
+---@param name string 资源名
+---@param vol number 音量系数，默认为1
+---@param position number 起始播放位置（秒），默认为0
 function PlayMusic(name, vol, position)
     local res = FindResMusic(name)
     assert(res, string.format("can't find music %q", name))
@@ -760,21 +897,34 @@ function PlayMusic(name, vol, position)
 end
 lstg.PlayMusic = PlayMusic
 
+---
+--- 停止播放音乐
+---@param name string
 function StopMusic(name)
     FindResMusic(name):stop()
 end
 lstg.StopMusic = StopMusic
 
+---
+--- 暂停播放音乐
+---@param name string
 function PauseMusic(name)
     FindResMusic(name):pause()
 end
 lstg.PauseMusic = PauseMusic
 
+---
+--- 恢复播放音乐
+---@param name string
 function ResumeMusic(name)
     FindResMusic(name):resume()
 end
 lstg.ResumeMusic = ResumeMusic
 
+---
+---获取音乐播放状态
+---@param name string
+---@return string 返回paused/playing/stopped
 function GetMusicState(name)
     local res = FindResMusic(name)
     if res:isPlaying() then
@@ -791,6 +941,14 @@ lstg.GetMusicState = GetMusicState
 -- render api
 ------------------------------------------------------------
 
+--- 渲染图像
+---@param name string 图像资源名
+---@param x number
+---@param y number 渲染位置
+---@param rot number 旋转角度（角度），默认为0
+---@param hscale number 水平缩放，默认为1
+---@param vscale number 垂直缩放，默认等于hscale
+---@param z number Z值，默认为0.5
 function Render(name, x, y, rot, hscale, vscale, z)
     hscale = hscale or 1
     vscale = vscale or hscale
@@ -799,23 +957,71 @@ function Render(name, x, y, rot, hscale, vscale, z)
 end
 lstg.Render = Render
 
+--- 在一个矩形范围渲染图像
+--- 此时z=0.5
+---@param name string
+---@param left number
+---@param right number
+---@param bottom number
+---@param top number
 function RenderRect(name, left, right, bottom, top)
     FindResSprite(name):renderRect(left, top, right, bottom)
 end
 lstg.RenderRect = RenderRect
 
+--- 给出四个顶点渲染图像
+---@param name string
+---@param x1 number
+---@param y1 number
+---@param z1 number
+---@param x2 number
+---@param y2 number
+---@param z2 number
+---@param x3 number
+---@param y3 number
+---@param z3 number
+---@param x4 number
+---@param y4 number
+---@param z4 number
 function Render4V(name, x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4)
     FindResSprite(name):render4v(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4)
 end
 lstg.Render4V = Render4V
 
 local _RenderTexture = lstg.RenderTexture
+
+--- 直接渲染纹理。
+---   细节
+---     vertex1~4指定各个顶点坐标，其中必须包含以下项：
+---> [1] = X坐标
+---> [2] = Y坐标
+---> [3] = Z坐标
+---> [4] = U坐标（以纹理大小为区间）
+---> [5] = V坐标（以纹理大小为区间）
+---> [6] = 顶点颜色
+--- 注意该函数效率较低，若要使用请考虑缓存顶点所用table
+---@param name string
+---@param blend string
+---@param vertex1 table
+---@param vertex2 table
+---@param vertex3 table
+---@param vertex4 table
 function RenderTexture(name, blend, vertex1, vertex2, vertex3, vertex4)
     _RenderTexture(FindResTexture(name) or FindResRenderTarget(name), blend, vertex1, vertex2, vertex3, vertex4)
 end
 lstg.RenderTexture = RenderTexture
 
 local _RenderSector = lstg.RenderSector
+
+--- 将图像渲染到扇形区域（可用于绘制圆环）
+---@param name string
+---@param x number
+---@param y number 圆心位置
+---@param start number 起始角度（角度）
+---@param end_ number 终止角度（角度）
+---@param r1 number 内圆半径
+---@param r2 number 外圆半径
+---@param seg number 每圆周分割段数，默认为60
 function RenderSector(name, x, y, start, end_, r1, r2, seg)
     _RenderSector(FindResSprite(name), x, y, start, end_, r1, r2, seg)
 end
@@ -858,9 +1064,9 @@ function ParticleGetn(object)
 end
 lstg.ParticleGetn = ParticleGetn
 
----获取绑定在对象上粒子发射器的发射密度（个/秒）
---- 细节
----　 更新粒子发射器的时钟始终为1/60s。
+--- 获取绑定在对象上粒子发射器的发射密度（个/秒）
+---   细节
+---　   更新粒子发射器的时钟始终为1/60s
 ---@param object object
 function ParticleGetEmission(object)
     local pp = GetParticlePool(object)
@@ -900,6 +1106,7 @@ end
 ---FindResource
 ---@param name string
 ---@param resType number|string
+---@return lstg.Resource
 function FindResource(name, resType)
     local ret = name
     if type(name) == 'string' then
@@ -965,12 +1172,15 @@ function FindResRenderTarget(name)
     end
     return _FindResource(name, 9)
 end
+
+--[[
 ---FindResVideo
 ---param name string
 ---return lstg.ResVideo
 --function FindResVideo(name)
 --    return FindResource(name, ResourceType.Video)
 --end
+]]
 
 ---@param name string
 ---@return cc.Texture2D

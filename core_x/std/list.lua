@@ -6,24 +6,19 @@
 
 std = std or {}
 
----@class std.list
----@field protected _begin std.list_iterator
----@field protected _end std.list_iterator
-local list = {}
-std.list = list
+
+-------------------------------------------------
+-- list_iterator
+-------------------------------------------------
+
+---
 ---@class std.list_iterator
----@field public prev std.list_iterator
----@field public next std.list_iterator
----@field public key string
----@field public val any
+---@field prev std.list_iterator
+---@field next std.list_iterator
+---@field key string
+---@field val any
 local list_iterator = {}
 std.list_iterator = list_iterator
-
-
--------------------------------------------------
----list_iterator
--------------------------------------------------
-
 
 local function iter_ctor(v, prev, next)
     local ret = {
@@ -75,9 +70,15 @@ end
 
 
 -------------------------------------------------
----list
+-- list
 -------------------------------------------------
 
+---
+---@class std.list
+---@field _begin std.list_iterator
+---@field _end std.list_iterator
+local list = {}
+std.list = list
 
 local function list_ctor(T)
     local ret = {

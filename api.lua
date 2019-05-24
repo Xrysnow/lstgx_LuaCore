@@ -3,7 +3,7 @@
 ---WARNING: deprecated
 ---该函数未指定窗口化分辨率，请使用ChangeVideoMode
 ---设置窗口化(true)/非窗口化(false)
----@param boolean boolean
+---@param b boolean
 function SetWindowed(b)
 end
 

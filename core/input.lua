@@ -31,12 +31,14 @@ end
 
 ---key是否被按下
 ---@param key string
+---@return boolean
 function KeyIsDown(key)
     return KeyState[key]
 end
 
 ---key是否刚刚被按下
 ---@param key string
+---@return boolean
 function KeyIsPressed(key)
     return KeyState[key] and (not KeyStatePre[key])
 end
@@ -49,6 +51,7 @@ KeyTrigger = KeyIsPressed
 
 ---key是否刚刚松开
 ---@param key string
+---@return boolean
 function KeyIsReleased(key)
     return KeyStatePre[key] and (not KeyState[key])
 end
@@ -58,22 +61,33 @@ end
 MouseState = {}
 MouseStatePre = {}
 
+---MouseIsDown
+---@param button number
+---@return boolean
 function MouseIsDown(button)
     return MouseState[button]
 end
 
+---MouseIsPressed
+---@param button number
+---@return boolean
 function MouseIsPressed(button)
     return MouseState[button] and (not MouseStatePre[button])
 end
 
+---MouseIsReleased
+---@param button number
+---@return boolean
 function MouseIsReleased(button)
     return MouseStatePre[button] and (not MouseState[button])
 end
 
+---@return number,number
 function MousePosition()
     return MouseState[4], MouseState[5]
 end
 
+---@return number,number
 function MousePositionPre()
     return MouseStatePre[4], MouseStatePre[5]
 end

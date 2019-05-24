@@ -1,5 +1,6 @@
 --
 
+---@class core.async
 local async = {}
 
 local tasks = std.list()

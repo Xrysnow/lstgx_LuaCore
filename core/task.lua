@@ -1,5 +1,6 @@
 ---@type task
 task = {}
+
 ---@class task
 local task = task
 task.stack = {}
@@ -19,7 +20,7 @@ local rawget = rawget
 -- merge task from ex
 
 ---新建任务 添加一个执行f的协程
----@param f function @要执行的函数
+---@param f function 要执行的函数
 function task:New(f)
     if not self.task then
         self.task = {}
@@ -31,7 +32,9 @@ function task:New(f)
     insert(self.task, rt)
     return rt
 end
+
 --TODO
+
 ---执行（resume）task中的协程
 function task:Do()
     local tsk = rawget(self, 'task')
@@ -80,6 +83,7 @@ function task:Clear(keepself)
 end
 
 ---延时t帧（挂起协程t次）,t省略则为1
+---@param t number
 function task.Wait(t)
     t = t or 1
     t = max(1, int(t))
@@ -89,6 +93,7 @@ function task.Wait(t)
 end
 
 ---延时至timer达到t（挂起协程）
+---@param t number
 function task.Until(t)
     t = int(t)
     while task.GetSelf().timer < t do

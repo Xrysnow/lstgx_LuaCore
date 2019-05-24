@@ -1,4 +1,5 @@
 --- distance from a point to another geometry
+---@class x.distance
 local M = {}
 local vec2 = require('core_x.math.vec2')
 

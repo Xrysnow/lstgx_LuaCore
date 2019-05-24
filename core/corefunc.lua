@@ -221,7 +221,7 @@ end
 function RenderFunc()
     e:dispatchEvent('onRenderFunc')
 end
-e:addListener('onRenderFunc',function()
+e:addListener('onRenderFunc', function()
     local stage = stage
     if not stage.current_stage then
         return
@@ -428,8 +428,8 @@ end
 
 local _capture = {}
 
----CaptureScreen
----### x,y,w,h are in ui coords
+---
+--- x,y,w,h are in ui coords
 ---@param obj object
 ---@param x number
 ---@param y number

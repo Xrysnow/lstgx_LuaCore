@@ -1,11 +1,16 @@
 ---------------------------------------------------FileStream
 
+---@class plus.FileSeekOrigin
+---@field Begin string
+---@field Current string
+---@field End string
 plus.FileSeekOrigin = {
     Begin   = "set",
     Current = "cur",
     End     = "end"
 }
 
+---@class plus.FileStream
 local FileStream = plus.Class()
 plus.FileStream = FileStream
 
@@ -96,6 +101,7 @@ end
 
 ------------------------------------------------------BinaryReader
 
+---@class plus.BinaryReader
 local BinaryReader = plus.Class()
 plus.BinaryReader = BinaryReader
 
@@ -206,6 +212,7 @@ end
 
 ------------------------------------------------------BinaryWriter
 
+---@class plus.BinaryWriter
 local BinaryWriter = plus.Class()
 plus.BinaryWriter = BinaryWriter
 
@@ -335,7 +342,7 @@ end
 
 ---@brief 写入一个字符串
 ---@param s string 字符串
----@param nullTerminate boolean '\0'结尾
+---@param nullTerminate boolean 是否以\0结尾
 function BinaryWriter:WriteString(s, nullTerminate)
     if nullTerminate then
         local len = string.len(s)

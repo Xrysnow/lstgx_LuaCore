@@ -1,4 +1,5 @@
 --- intersection between two geometries
+---@class x.intersection
 local M = {}
 local vec2 = require('core_x.math.vec2')
 local distance = require('core_x.math.distance_point')
@@ -12,8 +13,7 @@ end
 ---@param p1 math.vec2
 ---@param r number
 ---@return boolean
-function M.Point_Circle(p0,
-                        p1, r)
+function M.Point_Circle(p0, p1, r)
     local dx = p0.x - p1.x
     local dy = p0.y - p1.y
     return dx * dx + dy * dy <= r * r
@@ -27,8 +27,7 @@ end
 ---@param halfW1 number
 ---@param halfH1 number
 ---@return boolean
-function M.AABB_AABB(p0, halfW0, halfH0,
-                     p1, halfW1, halfH1)
+function M.AABB_AABB(p0, halfW0, halfH0, p1, halfW1, halfH1)
     return math.max(p0.x - halfW0, p1.x - halfW1) <= math.min(p0.x + halfW0, p1.x + halfW1) and
             math.max(p0.y - halfH0, p1.y - halfH1) <= math.min(p0.y + halfH0, p1.y + halfH1)
 end
@@ -40,8 +39,7 @@ end
 ---@param p1 math.vec2
 ---@param r number
 ---@return boolean
-function M.AABB_Circle(p0, halfW, halfH,
-                       p1, r)
+function M.AABB_Circle(p0, halfW, halfH, p1, r)
     local dw = math.max(0, math.abs(p0.x - p1.x) - halfW)
     local dh = math.max(0, math.abs(p0.y - p1.y) - halfH)
     return r * r >= dh * dh + dw * dw
@@ -53,8 +51,7 @@ end
 ---@param p1 math.vec2
 ---@param r1 number
 ---@return boolean
-function M.Circle_Circle(p0, r0,
-                         p1, r1)
+function M.Circle_Circle(p0, r0, p1, r1)
     local d = r0 + r1
     local dx = p0.x - p1.x
     local dy = p0.y - p1.y
@@ -164,8 +161,7 @@ end
 ---@param p1 math.vec2
 ---@param r number
 ---@return boolean
-function M.OBB_Circle(p0, halfW, halfH, rot,
-                      p1, r)
+function M.OBB_Circle(p0, halfW, halfH, rot, p1, r)
     local tSin, tCos = SinCos(rot)
     local d = p0 - p1
     local dw = math.max(0, math.abs(tCos * d.x + tSin * d.y) - halfW)
@@ -183,8 +179,7 @@ end
 ---@param halfH1 number
 ---@param rot1 number
 ---@return boolean
-function M.OBB_OBB(p0, halfW0, halfH0, rot0,
-                   p1, halfW1, halfH1, rot1)
+function M.OBB_OBB(p0, halfW0, halfH0, rot0, p1, halfW1, halfH1, rot1)
     local tSin0, tCos0 = SinCos(rot0)
     local tSin1, tCos1 = SinCos(rot1)
     local e = {
@@ -221,8 +216,7 @@ end
 ---@param p1 math.vec2
 ---@param rot1 number
 ---@return boolean
-function M.OBB_Line(p0, halfW0, halfH0, rot0,
-                    p1, rot1)
+function M.OBB_Line(p0, halfW0, halfH0, rot0, p1, rot1)
     local tSin0, tCos0 = SinCos(rot0)
     local tSin1, tCos1 = SinCos(rot1)
     local e00 = vec2(tCos0, tSin0)
@@ -246,8 +240,7 @@ end
 ---@param B math.vec2
 ---@param C math.vec2
 ---@return boolean
-function M.OBB_Triangle(p, halfW, halfH, rot,
-                        A, B, C)
+function M.OBB_Triangle(p, halfW, halfH, rot, A, B, C)
     local tSin, tCos = SinCos(rot)
     local hw = vec2(tCos * halfW, tSin * halfW)
     local hh = vec2(-tSin * halfH, tCos * halfH)
@@ -268,8 +261,7 @@ end
 ---@param b number
 ---@param rot1 number
 ---@return boolean
-function M.OBB_Diamond(p0, halfW, halfH, rot0,
-                       p1, a, b, rot1)
+function M.OBB_Diamond(p0, halfW, halfH, rot0, p1, a, b, rot1)
     local tSin0, tCos0 = SinCos(rot0)
     local tSin1, tCos1 = SinCos(rot1)
     local hw = vec2(tCos0 * halfW, tSin0 * halfW)
@@ -289,8 +281,7 @@ end
 ---@param b number
 ---@param rot1 number
 ---@return boolean
-function M.OBB_Ellipse(p0, halfW, halfH, rot0,
-                       p1, a, b, rot1)
+function M.OBB_Ellipse(p0, halfW, halfH, rot0, p1, a, b, rot1)
     if (a == b) then
         return M.OBB_Circle(p0, halfW, halfH, rot0, p1, a)
     end
@@ -320,8 +311,7 @@ end
 ---@param b number
 ---@param rot number
 ---@return boolean
-function M.Circle_Ellipse(p0, r,
-                          p1, a, b, rot)
+function M.Circle_Ellipse(p0, r, p1, a, b, rot)
     return distance.ellipse(p0, p1, a, b, rot) <= r
 end
 
@@ -333,8 +323,7 @@ end
 ---@param b number
 ---@param rot number
 ---@return boolean
-function M.Circle_Diamond(p0, r,
-                          p1, a, b, rot)
+function M.Circle_Diamond(p0, r, p1, a, b, rot)
     return distance.diamond(p0, p1, a, b, rot) <= r
 end
 
@@ -345,8 +334,7 @@ end
 ---@param B math.vec2
 ---@param C math.vec2
 ---@return boolean
-function M.Circle_Triangle(p, r,
-                           A, B, C)
+function M.Circle_Triangle(p, r, A, B, C)
     return distance.triangle(p, A, B, C) <= r
 end
 
@@ -360,9 +348,7 @@ end
 ---@param b1 number
 ---@param rot1 number
 ---@return boolean
-function M.Ellipse_Ellipse(
-        p0, a0, b0, rot0,
-        p1, a1, b1, rot1)
+function M.Ellipse_Ellipse(p0, a0, b0, rot0, p1, a1, b1, rot1)
     if (a0 == b0) then
         return M.Circle_Ellipse(p0, a0, p1, a1, b1, rot1)
     end
@@ -402,8 +388,7 @@ end
 ---@param b1 number
 ---@param rot1 number
 ---@return boolean
-function M.Ellipse_Diamond(p0, a0, b0, rot0,
-                           p1, a1, b1, rot1)
+function M.Ellipse_Diamond(p0, a0, b0, rot0, p1, a1, b1, rot1)
     if (a0 == b0) then
         return M.Circle_Diamond(p0, a0, p1, a1, b1, rot1)
     end
@@ -424,8 +409,7 @@ end
 ---@param B math.vec2
 ---@param C math.vec2
 ---@return boolean
-function M.Ellipse_Triangle(p, a, b, rot,
-                            A, B, C)
+function M.Ellipse_Triangle(p, a, b, rot, A, B, C)
     if (a == b) then
         return M.Circle_Triangle(p, a, A, B, C)
     end
@@ -446,8 +430,7 @@ end
 ---@param A1 math.vec2
 ---@param B1 math.vec2
 ---@return boolean
-function M.Segment_Segment(A0, B0,
-                           A1, B1)
+function M.Segment_Segment(A0, B0, A1, B1)
     local A0B0 = B0 - A0
     local A0A1 = A1 - A0
     local A0B1 = B1 - A0
@@ -481,8 +464,7 @@ end
 ---@param B1 math.vec2
 ---@param C1 math.vec2
 ---@return boolean
-function M.Triangle_Triangle(A0, B0, C0,
-                             A1, B1, C1)
+function M.Triangle_Triangle(A0, B0, C0, A1, B1, C1)
     local E00 = A0 - B0
     local E01 = C0 - B0
     for _, p in ipairs { A1, B1, C1 } do
@@ -515,9 +497,7 @@ end
 ---@param halfDiagA1 math.vec2
 ---@param halfDiagB1 math.vec2
 ---@return boolean
-function M.Parallelogram_Parallelogram(
-        p0, halfDiagA0, halfDiagB0,
-        p1, halfDiagA1, halfDiagB1)
+function M.Parallelogram_Parallelogram(p0, halfDiagA0, halfDiagB0, p1, halfDiagA1, halfDiagB1)
     local d01 = p1 - p0
     for _, e in ipairs {
         (halfDiagA0 + halfDiagB0),
@@ -544,9 +524,7 @@ end
 ---@param b1 number
 ---@param rot1 number
 ---@return boolean
-function M.Diamond_Diamond(
-        p0, a0, b0, rot0,
-        p1, a1, b1, rot1)
+function M.Diamond_Diamond(p0, a0, b0, rot0, p1, a1, b1, rot1)
     local tSin0, tCos0 = SinCos(rot0)
     local tSin1, tCos1 = SinCos(rot1)
     return M.Parallelogram_Parallelogram(
@@ -563,8 +541,7 @@ end
 ---@param B math.vec2
 ---@param C math.vec2
 ---@return boolean
-function M.Diamond_Triangle(p, a, b, rot,
-                            A, B, C)
+function M.Diamond_Triangle(p, a, b, rot, A, B, C)
     local tSin, tCos = SinCos(rot)
     local hd0 = vec2(tCos * a, tSin * a)
     local hd1 = vec2(-tSin * b, tCos * b)

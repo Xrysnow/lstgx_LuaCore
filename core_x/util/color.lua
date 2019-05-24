@@ -4,7 +4,8 @@
 --- Copyright (C) 2018-2019 Xrysnow. All rights reserved.
 ---
 
-
+---
+---@class x.color
 color = color or {}
 --local color = color
 local math = math
