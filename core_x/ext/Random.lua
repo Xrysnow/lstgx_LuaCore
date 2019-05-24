@@ -1,5 +1,7 @@
----@type lstg.XRandom
-local M = lstg.XRandom
+--
+
+---@type lstg.Random
+local M = lstg.Random
 local insert = table.insert
 local floor = math.floor
 
