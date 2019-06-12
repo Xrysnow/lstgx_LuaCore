@@ -74,7 +74,7 @@ function M.getSDCardPath()
     local sig = '()Ljava/lang/String;'
     local ret = jCall(andApp, methodName, {}, sig)
     if not ret or ret == '' then
-        SystemLog('getSDCardPath: failed')
+        lstg.SystemLog('getSDCardPath: failed')
     end
     return ret
 end
@@ -95,7 +95,7 @@ function M.setOrientation(ori)
         ori = ActivityInfo['SCREEN_ORIENTATION_' .. string.upper(ori)]
     end
     assert(type(ori) == 'number' and -1 <= ori and ori <= 14, 'wrong param')
-    SystemLog('setOrientation: set to ' .. ori)
+    lstg.SystemLog('setOrientation: set to ' .. ori)
     return jCall(andApp, methodName, { ori }, sig)
 end
 
