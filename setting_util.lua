@@ -43,7 +43,7 @@ end
 function M.compare(t1, t2)
     for k, v in pairs(t1) do
         local v2 = t2[k]
-        if not v2 then
+        if v2 == nil then
             return false
         end
         local ty = type(v)
