@@ -32,7 +32,7 @@ end
 --
 
 function M.enumPlayers()
-    return player_list
+    return table.clone(player_list)
 end
 
 function M.setPlayer(index)
@@ -59,7 +59,7 @@ function M.enumStages(rank)
                 for _, s in ipairs(stage.groups[sg]) do
                     if stage.stages[s].allow_practice then
                         table.insert(_stages[sg],
-                                string.match(s, "^[%w_][%w_ ]*"))
+                                     string.match(s, "^[%w_][%w_ ]*"))
                     end
                 end
             end
@@ -68,12 +68,22 @@ function M.enumStages(rank)
 
     local dif = rank or scoredata.difficulty_select or 1
     _stage_names = _stages[_stage_groups[dif]]
-    _stage_origin_names = stage.groups[_stage_groups[dif]]
+    _stage_origin_names = {}
+    local t = stage.groups[_stage_groups[dif]]
+    for k, v in pairs(_stage_names) do
+        _stage_origin_names[k] = t[k]
+    end
     return _stage_names, _stage_origin_names
 end
 
+function M.getStageGroup(rank)
+    local dif = rank or scoredata.difficulty_select or 1
+    local t = stage.groups[_stage_groups[dif]]
+    return t
+end
+
 function M.getStageGroups()
-    return _stage_groups
+    return stage.groups
 end
 
 function M.setStage(index)
