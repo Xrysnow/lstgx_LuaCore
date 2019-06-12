@@ -13,10 +13,10 @@ function Include(filename)
     filename = tostring(filename)
     filename = string.gsub(filename, '\\', '/')
     filename = string.gsub(filename, '//', '/')
-    filename = FU:fullPathForFilename(filename)
+    local f = filename
+    filename = FU:fullPathForFilename(f)
     if not plus.FileExists(filename) then
-        --error('找不到脚本 ' .. filename)
-        error(i18n("can't find script") .. ': ' .. filename)
+        error(string.format('%s: %s', i18n "can't find script", f))
     end
 
     if string.sub(filename, 1, 1) == '~' then
