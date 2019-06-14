@@ -69,6 +69,10 @@ function SetResLoadInfo(b)
     _log = b
 end
 
+function lstg.getResourcePool()
+    return pools
+end
+
 local CHECK_RES_INFO = {
     tex = { i18n "failed to load texture %q from %q",
             i18n "load texture %q from %q" },
