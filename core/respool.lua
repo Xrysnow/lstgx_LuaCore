@@ -57,7 +57,9 @@ local _stage = pools.stage
 local _cur
 ---@return cc.Map
 local function _getMap(resType)
-    return pools[_cur][assert(_toResType(resType), string.format('invalid resuorce type %q', resType))]
+    local cur_pool = pools[_cur]
+    assert(cur_pool, i18n "current resource pool not set")
+    return cur_pool[assert(_toResType(resType), string.format('invalid resuorce type %q', resType))]
 end
 local _log = false
 
