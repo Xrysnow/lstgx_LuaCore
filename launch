@@ -147,7 +147,11 @@ ChangeVideoMode(
         setting.windowed,
         setting.vsync
 )
-SetFPS(60)
+if setting.render_skip == 1 then
+    SetFPS(30)
+else
+    SetFPS(60)
+end
 SetSEVolume(setting.sevolume / 100)
 SetBGMVolume(setting.bgmvolume / 100)
 
@@ -166,7 +170,7 @@ function lstg.loadSetting(change_vm)
             setting.resx, setting.resy, cc.ResolutionPolicy.SHOW_ALL)
     SetTitle(setting.mod)
     --SetWindowed(setting.windowed)
-    SetFPS(60)
+    --SetFPS(60)
     --SetVsync(true)
     SetSEVolume(setting.sevolume / 100)
     SetBGMVolume(setting.bgmvolume / 100)

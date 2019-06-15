@@ -204,7 +204,20 @@ local function setGraph(lc)
         end
     end)
 
-    lc.fps_content:setVisible(false)--TODO
+    lc.fps_tg1:setSelected(setting.render_skip == 0)
+    lc.fps_tg1:addEventListener(function(t, e)
+        if e == 0 then
+            setting.render_skip = 0
+            SetFPS(60)
+        end
+    end)
+    lc.fps_tg2:setSelected(setting.render_skip == 1)
+    lc.fps_tg2:addEventListener(function(t, e)
+        if e == 0 then
+            setting.render_skip = 1
+            SetFPS(30)
+        end
+    end)
 end
 
 local ctr_btns = {

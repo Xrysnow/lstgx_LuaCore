@@ -147,7 +147,7 @@ end
 --local ObjOnFrame = ObjOnFrame
 --local ii = 0
 
-function DoFrame()
+function _DoFrame()
     --SetTitle(setting.mod .. ' | FPS=' .. GetFPS() .. ' | Nobj=' .. GetnObj())
     UpdateObjList()
     GetInput()
@@ -213,8 +213,17 @@ function DoFrame()
         --LPOOL.ResetPool 清空对象池
         ResetPool()
         SystemLog(i18n 'clear object pool')
-
         --LDEBUG()
+    end
+end
+
+function DoFrame()
+    local factor = 1
+    if setting.render_skip then
+        factor = int(setting.render_skip) + 1
+    end
+    for _ = 1, factor do
+        _DoFrame()
     end
 end
 

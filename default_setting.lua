@@ -29,14 +29,14 @@ return {
 
         toggle_collider = KEY.F8,
     },
-    --note: key codes in [keys] and [keysys] should be mutex
+    -- note: key codes in [keys] and [keysys] should be mutex
 
     posteffect     = true,
     res_ratio      = { 16, 9 },
-    --desktop
+    -- desktop
     windowsize_w   = 1708,
     windowsize_h   = 960,
-    --mobile
+    -- mobile
     orientation    = 'landscape',
     touchkey       = true,
 
@@ -58,4 +58,6 @@ return {
             snapshot = { 10 },
         },
     },
+    --
+    render_skip    = 0,
 }
