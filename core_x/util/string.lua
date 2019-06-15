@@ -86,6 +86,10 @@ function string.capwords(s, sep)
     return concat(c, sep)
 end
 
+--------------------------------------------------
+-- filename and path
+--------------------------------------------------
+
 --- filename from path
 ---@param s string
 ---@param with_ext boolean
@@ -120,4 +124,20 @@ end
 ---@return string
 function string.path_uniform(s)
     return s:gsub('\\', '/'):gsub('//', '/')
+end
+
+--------------------------------------------------
+
+---
+---@param s string
+---@param str string
+function string.starts_with(s, str)
+    return s:sub(1, #str) == str
+end
+
+---
+---@param s string
+---@param str string
+function string.ends_with(s, str)
+    return s:sub(-#str, -1) == str
 end
