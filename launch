@@ -80,6 +80,17 @@ if plus.isMobile() then
         end
         SystemLog(table.concat(args, '\t'))
     end
+else
+    _G['Print'] = function(...)
+        lstg.Print(...)
+        if lstg._onPrint then
+            lstg._onPrint(...)
+        end
+    end
+end
+
+if plus.isDesktop() then
+    require('imgui.__init__')
 end
 
 local setting_util = require('setting_util')
