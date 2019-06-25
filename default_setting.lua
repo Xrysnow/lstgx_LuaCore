@@ -60,4 +60,6 @@ return {
     },
     --
     render_skip    = 0,
+    --
+    imgui_visible  = false,
 }
