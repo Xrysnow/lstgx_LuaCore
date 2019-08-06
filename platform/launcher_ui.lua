@@ -476,8 +476,22 @@ local function CreateLauncherUI()
     if plus.platform ~= 'unknown' then
         inf = string.format('%s for %s', inf, plus.platform)
     end
+    ---@type cc.Label
     local inf_label = lc._warning:getChildren()[1]
     inf_label:setString(inf)
+
+    if imgui then
+        require('imgui.__init__')
+        local la = imgui.on()
+        imgui.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 16)
+        --la:addChild(imgui.showDemoWindow)
+        la:addChild(require('imgui.ui.Console')('Console'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.LogWindow')('Log'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.StyleSetting')('Setting'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.VariableWatch')('Watch'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.lstg.GameInfo')('Game Info'):setContentSize(cc.size(500, 500)))
+        imgui.setVisible(setting.imgui_visible)
+    end
     --lc._warning:setVisible(false)
     --print('---------------     load     ----------------')
     --local m=cc.Sprite3D:create('mod/obj_bindnode_test/model/out7.c3b')
