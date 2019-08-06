@@ -816,7 +816,7 @@ function SetSEVolume(arg1, arg2)
     if not arg2 then
         _se_factor = tonumber(arg1) or 1
     else
-        FindResSound(arg1):setVolume(arg2)
+        FindResSound(arg1):getSource():setVolume(arg2)
     end
 end
 lstg.SetSEVolume = SetSEVolume
@@ -833,7 +833,7 @@ function SetBGMVolume(arg1, arg2)
     if not arg2 then
         _bgm_factor = tonumber(arg1) or 1
     else
-        FindResMusic(arg1):setVolume(arg2)
+        FindResMusic(arg1):getSource():setVolume(arg2)
     end
 end
 lstg.SetBGMVolume = SetBGMVolume
@@ -898,7 +898,7 @@ function PlayMusic(name, vol, position)
     res:play((vol or 1) * _bgm_factor, 0)
     position = position or 0
     if position > 0 then
-        res:setTime(position)
+        res:getSource():setTime(position)
     end
 end
 lstg.PlayMusic = PlayMusic
