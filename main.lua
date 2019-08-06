@@ -11,6 +11,7 @@ require('cc.ext.__init__')
 require('cc.to_string')
 require('cc.color')
 require('i18n.__init__')
+require('audio.__init__')
 
 local _path = {}
 local _path_rec = {}

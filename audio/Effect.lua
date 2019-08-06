@@ -1,5 +1,5 @@
---
-local M = {}
+---@type audio.Effect
+local M = audio.Effect
 require('audio.enum')
 
 --- chorus: Plays multiple copies of the sound with slight pitch and time variation. Used to make sounds sound "fuller" or "thicker".
