@@ -1,11 +1,14 @@
+---@type audio
+local a = audio
+
 local SourceType = {}
-audio.SourceType = SourceType
+a.SourceType = SourceType
 SourceType.STATIC = 0     --- play from SoundData
 SourceType.STREAM = 1     --- play from Decoder
 SourceType.QUEUE = 2      --- play with queue
 
 local DistanceModel = {}
-audio.DistanceModel = DistanceModel
+a.DistanceModel = DistanceModel
 DistanceModel.NONE = 0
 DistanceModel.INVERSE = 1
 DistanceModel.INVERSE_CLAMPED = 2
@@ -15,14 +18,15 @@ DistanceModel.EXPONENT = 5
 DistanceModel.EXPONENT_CLAMPED = 6
 
 local DecoderType = {}
-audio.DecoderType = DecoderType
+a.DecoderType = DecoderType
 DecoderType.UNKNOWN = 0
 DecoderType.WAV = 1
 DecoderType.VORBIS = 2
 DecoderType.FLAC = 3
+DecoderType.MP3 = 4
 
 local EffectType = {}
-audio.EffectType = EffectType
+a.EffectType = EffectType
 EffectType.BASIC = 0          --- not a real type
 EffectType.REVERB = 1
 EffectType.CHORUS = 2         --- implemented in openal-soft-1.16.0
@@ -38,7 +42,7 @@ EffectType.COMPRESSOR = 11    --- implemented in openal-soft-1.16.0
 EffectType.EQUALIZER = 12     --- implemented in openal-soft-1.16.0
 
 local EffectParameter = {}
-audio.EffectParameter = EffectParameter
+a.EffectParameter = EffectParameter
 EffectParameter.TYPE = 0
 EffectParameter.VOLUME = 1
 EffectParameter.REVERB_GAIN = 2    --- [0.0, 1.0], 0.32
@@ -109,7 +113,7 @@ local EffectWaveform = {}
 --- TYPE_CHORUS: CHORUS_WAVEFORM
 --- TYPE_FLANGER: FLANGER_WAVEFORM
 --- TYPE_MORPHER: MORPHER_WAVEFORM
-audio.EffectWaveform = EffectWaveform
+a.EffectWaveform = EffectWaveform
 EffectWaveform.SINE = 0
 EffectWaveform.TRIANGLE = 1
 EffectWaveform.SAWTOOTH = 2
@@ -117,14 +121,14 @@ EffectWaveform.SQUARE = 3
 
 local EffectDirection = {}
 --- TYPE_FREQSHIFTER: FREQSHIFTER_LEFTDIR, FREQSHIFTER_RIGHTDIR
-audio.EffectDirection = EffectDirection
+a.EffectDirection = EffectDirection
 EffectDirection.NONE = 0
 EffectDirection.UP = 1
 EffectDirection.DOWN = 2
 
 local EffectPhoneme = {}
 --- TYPE_MORPHER: MORPHER_PHONEMEA, MORPHER_PHONEMEB
-audio.EffectPhoneme = EffectPhoneme
+a.EffectPhoneme = EffectPhoneme
 EffectPhoneme.A = 0
 EffectPhoneme.E = 1
 EffectPhoneme.I = 2
@@ -157,24 +161,30 @@ EffectPhoneme.V = 28
 EffectPhoneme.Z = 29
 
 local FilterType = {}
-audio.FilterType = FilterType
+a.FilterType = FilterType
 FilterType.BASIC = 0
 FilterType.LOWPASS = 1
 FilterType.HIGHPASS = 2
 FilterType.BANDPASS = 3
 
 local FilterParameter = {}
-audio.FilterParameter = FilterParameter
+a.FilterParameter = FilterParameter
 FilterParameter.TYPE = 0
 FilterParameter.VOLUME = 1
 FilterParameter.LOWGAIN = 2  --- HIGHPASS, BANDPASS
 FilterParameter.HIGHGAIN = 3 --- LOWPASS, BANDPASS
 
 local StreamSeekOrigin = {}
-audio.StreamSeekOrigin = StreamSeekOrigin
+a.StreamSeekOrigin = StreamSeekOrigin
 StreamSeekOrigin.BEGINNING = 0    --- Seek from the beginning.
 StreamSeekOrigin.CURRENT = 1    --- Seek from current position.
 StreamSeekOrigin.END = 2    --- Seek from the end.
 
----@class EffectWaveform:number audio.EffectWaveform
+---@class audio.EffectWaveform:number
 local EffectWaveform
+
+---@class audio.EffectDirection:number
+local EffectDirection
+
+---@class audio.EffectPhoneme:number
+local EffectPhoneme
