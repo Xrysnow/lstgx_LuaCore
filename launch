@@ -21,9 +21,16 @@ collectgarbage("setpause", 100)
 
 for _, ns in ipairs({ cc, ccui }) do
     for _, v in pairs(ns) do
-        if getmetatable(v) and v.create then
-            getmetatable(v).__call = function(t, ...)
-                return t:create(...)
+        local mt = getmetatable(v)
+        if mt and (v.create or v.new) then
+            if v.create then
+                mt.__call = function(t, ...)
+                    return t:create(...)
+                end
+            else
+                mt.__call = function(t, ...)
+                    return t:new(...)
+                end
             end
         end
     end
