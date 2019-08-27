@@ -66,14 +66,19 @@ if not plus.FileExists(fpath) then
 else
     -- score/mod_name/user_name.dat
     local fu = cc.FileUtils:getInstance()
+    local path_ = fpath
     fpath = fu:getSuitableFOpen(fpath)
-    --local tmp = assert(io.open(fpath, 'a+'), 'Can not open score file!')
-    --tmp:close()
     if not fu:isFileExist(fpath) then
-        error(string.format('%s: %s', i18n "Can't find score file", fpath))
+        if fu:isFileExist(path_) then
+            -- sometimes the conversion is redundant (reason still unknown)
+            fpath = path_
+        else
+            error(string.format('%s: %s', i18n "Can't find score file", fpath))
+        end
     end
-    local data = fu:getStringFromFile(fpath);
+    local data = fu:getStringFromFile(fpath)
     if not data or data == '' then
+        Print('invalid score data')
         data = [[{"_":0}]]
     end
     scoredata = DeSerialize(data)
