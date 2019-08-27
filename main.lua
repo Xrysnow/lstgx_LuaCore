@@ -87,7 +87,7 @@ local function traceback(msg, level)
             if info.what == 'm' or info.linedefined == 0 then
                 table.insert(msgs, ' in main chunk')
             elseif info.what == 'C' then
-                table.insert(msgs, string.format('%s', info.name))
+                table.insert(msgs, string.format(' at %s', tostring(info.func)))
             else
                 table.insert(msgs, string.format(' in function <%s:%d>', source, info.linedefined))
             end
