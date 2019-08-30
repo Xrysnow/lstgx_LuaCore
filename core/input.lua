@@ -92,6 +92,24 @@ function MousePositionPre()
     return MouseStatePre[4], MouseStatePre[5]
 end
 
+local _GetMousePosition = lstg.GetMousePosition
+local glv = cc.Director:getInstance():getOpenGLView()
+
+---获取鼠标的位置，以窗口左下角为原点，使用screen坐标系
+---@return number,number
+function GetMousePosition()
+    local res = glv:getDesignResolutionSize()
+    local rect = glv:getViewPortRect()
+    local x, y = _GetMousePosition()
+    y = res.height - y
+    x = x + rect.x / glv:getScaleX()
+    y = y + rect.y / glv:getScaleY()
+    local scale = screen.scale
+    x = x / scale
+    y = y / scale
+    return x, y
+end
+
 lstg.eventDispatcher:addListener('onGetInput', function()
     for i = 1, 5 do
         MouseStatePre[i] = MouseState[i]
