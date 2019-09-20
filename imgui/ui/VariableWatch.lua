@@ -93,7 +93,7 @@ local function get_ret(...)
 end
 
 function M:addItem(str)
-    local tokens = require('coding.ReplParser')(str):getSegments()
+    local tokens = require('util.ReplParser')(str):getSegments()
     -- treat as value
     local ret, msg = loadstring('return ' .. str)
     if not ret then

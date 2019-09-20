@@ -18,7 +18,7 @@ local _seg = {
 
 function M:ctor(code)
     self.code = code
-    self.lexer = require('coding.lexers.lua_')
+    self.lexer = require('util.lexers.lua_')
     local tokens = self.lexer:lex(code)
     self.tokens = tokens
     local segments = {}

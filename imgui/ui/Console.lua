@@ -55,7 +55,7 @@ function M:log(str, highlight, hinter)
     if type(highlight) == 'table' then
         str = { str, color = highlight }
     elseif highlight then
-        local tokens = require('coding.ReplParser')(str):getSegments()
+        local tokens = require('util.ReplParser')(str):getSegments()
         --Print(stringify(tokens))
         tokens.string = str
         tokens.hinter = hinter
