@@ -722,10 +722,10 @@ function M:transformVector(x, y, z, w)
     if type(x) == 'number' then
         y = y or 0
         z = z or 0
-        w = w or 0
+        w = w or 1
     else
         x, y, z, w = x.x, x.y, x.z, x.w
-        w = w or 0
+        w = w or 1
     end
     local xx = x * self[1] + y * self[5] + z * self[9] + w * self[13]
     local yy = x * self[2] + y * self[6] + z * self[10] + w * self[14]
