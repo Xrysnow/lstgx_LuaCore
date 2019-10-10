@@ -6,7 +6,6 @@ local glv = cc.Director:getInstance():getOpenGLView()
 local game_util = require('game.util')
 
 function Scene:onCreate()
-
     lstg.loadSetting()
 
     self:scheduleUpdateWithPriorityLua(function(dt)
@@ -16,7 +15,6 @@ function Scene:onCreate()
     if setting.touchkey and plus.isMobile() then
         self:addTouchKey()
     end
-    --self:addTouchKey()
 
     local scale = glv:getDesignResolutionSize().height / 480
     SystemLog(string.format(
@@ -124,11 +122,6 @@ function stage_menu:init()
     else
         inited = true
         --SystemLog('before enterStage')
-        --_test()
-        --_test()
-        --jit.off()
-        --jit.flush()
-        --_test()
         game_util.enterStage(stage_menu, false)
     end
 end
