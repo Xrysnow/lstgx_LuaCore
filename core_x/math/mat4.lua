@@ -3,6 +3,14 @@ local M = {}
 local vec3 = require('core_x.math.vec3')
 local vec4 = require('core_x.math.vec4')
 local quat = require('core_x.math.quaternion')
+local type = type
+local function xyz(x, y, z)
+    if type(x) == 'number' then
+        return x, y or x, z or y or x
+    else
+        return x.x, x.y, x.z
+    end
+end
 
 M.__index = M
 
@@ -18,8 +26,8 @@ setmetatable(M, { __call = function(_, t)
     end
 end })
 
-function M:__add(other)
-    local ret = M()
+function M:__add(other, out)
+    local ret = out or M()
     if type(other) == 'number' then
         for i = 1, 16 do
             ret[i] = self[i] + other
@@ -32,8 +40,8 @@ function M:__add(other)
     return ret
 end
 
-function M:__sub(other)
-    local ret = M()
+function M:__sub(other, out)
+    local ret = out or M()
     if type(other) == 'number' then
         for i = 1, 16 do
             ret[i] = self[i] - other
@@ -46,22 +54,31 @@ function M:__sub(other)
     return ret
 end
 
-function M:__mul(other)
-    local ret = M()
+function M:__mul(other, out)
+    local ret = out or M()
     if type(other) == 'number' then
         for i = 1, 16 do
             ret[i] = self[i] * other
         end
     else
-        for i = 1, 4 do
-            for j = 1, 4 do
-                local k = (i - 1) * 4
-                ret[k + j] = self[j] * other[k + 1] +
-                        self[j + 4] * other[k + 2] +
-                        self[j + 8] * other[k + 3] +
-                        self[j + 12] * other[k + 4]
-            end
-        end
+        local m1_1, m1_2, m1_3, m1_4, m1_5, m1_6, m1_7, m1_8, m1_9, m1_10, m1_11, m1_12, m1_13, m1_14, m1_15, m1_16 = self[1], self[2], self[3], self[4], self[5], self[6], self[7], self[8], self[9], self[10], self[11], self[12], self[13], self[14], self[15], self[16]
+        local m2_1, m2_2, m2_3, m2_4, m2_5, m2_6, m2_7, m2_8, m2_9, m2_10, m2_11, m2_12, m2_13, m2_14, m2_15, m2_16 = other[1], other[2], other[3], other[4], other[5], other[6], other[7], other[8], other[9], other[10], other[11], other[12], other[13], other[14], other[15], other[16]
+        ret[1] = m1_1 * m2_1 + m1_5 * m2_2 + m1_9 * m2_3 + m1_13 * m2_4
+        ret[2] = m1_2 * m2_1 + m1_6 * m2_2 + m1_10 * m2_3 + m1_14 * m2_4
+        ret[3] = m1_3 * m2_1 + m1_7 * m2_2 + m1_11 * m2_3 + m1_15 * m2_4
+        ret[4] = m1_4 * m2_1 + m1_8 * m2_2 + m1_12 * m2_3 + m1_16 * m2_4
+        ret[5] = m1_1 * m2_5 + m1_5 * m2_6 + m1_9 * m2_7 + m1_13 * m2_8
+        ret[6] = m1_2 * m2_5 + m1_6 * m2_6 + m1_10 * m2_7 + m1_14 * m2_8
+        ret[7] = m1_3 * m2_5 + m1_7 * m2_6 + m1_11 * m2_7 + m1_15 * m2_8
+        ret[8] = m1_4 * m2_5 + m1_8 * m2_6 + m1_12 * m2_7 + m1_16 * m2_8
+        ret[9] = m1_1 * m2_9 + m1_5 * m2_10 + m1_9 * m2_11 + m1_13 * m2_12
+        ret[10] = m1_2 * m2_9 + m1_6 * m2_10 + m1_10 * m2_11 + m1_14 * m2_12
+        ret[11] = m1_3 * m2_9 + m1_7 * m2_10 + m1_11 * m2_11 + m1_15 * m2_12
+        ret[12] = m1_4 * m2_9 + m1_8 * m2_10 + m1_12 * m2_11 + m1_16 * m2_12
+        ret[13] = m1_1 * m2_13 + m1_5 * m2_14 + m1_9 * m2_15 + m1_13 * m2_16
+        ret[14] = m1_2 * m2_13 + m1_6 * m2_14 + m1_10 * m2_15 + m1_14 * m2_16
+        ret[15] = m1_3 * m2_13 + m1_7 * m2_14 + m1_11 * m2_15 + m1_15 * m2_16
+        ret[16] = m1_4 * m2_13 + m1_8 * m2_14 + m1_12 * m2_15 + m1_16 * m2_16
     end
     return ret
 end
@@ -258,6 +275,7 @@ end
 
 function M:createScale(x, y, z)
     local m = M.identity()
+    x, y, z = xyz(x, y, z)
     m[1] = x
     m[6] = y
     m[11] = z
@@ -384,9 +402,40 @@ end
 
 function M:createTranslation(x, y, z)
     local m = M.identity()
+    x, y, z = xyz(x, y, z)
     m[13] = x
     m[14] = y
     m[15] = z
+    return m
+end
+
+function M:createTransform(translation, scale, quaternion)
+    local m = M.identity()
+    if quaternion then
+        m:rotateByQuaternion(quaternion)
+    end
+    if translation then
+        m[13] = translation.x
+        m[14] = translation.y
+        m[15] = translation.z
+    end
+    if scale and scale ~= 1 then
+        local sx, sy, sz
+        if type(scale) == 'number' then
+            sx, sy, sz = scale, scale, scale
+        else
+            sx, sy, sz = scale.x, scale.y, scale.z
+        end
+        for i = 1, 3 do
+            m[i] = m[i] * sx
+        end
+        for i = 5, 7 do
+            m[i] = m[i] * sy
+        end
+        for i = 9, 11 do
+            m[i] = m[i] * sz
+        end
+    end
     return m
 end
 
@@ -410,19 +459,21 @@ end
 --------------------------------------------------
 
 function M:add(other)
-    self:set(self + other)
+    self:__add(other, self)
 end
 
 function M:subtract(other)
-    self:set(self - other)
+    self:__sub(other, self)
 end
 
 function M:multiply(other)
-    self:set(self * other)
+    self:__mul(other, self)
 end
 
 function M:negate()
-    self:set(-self)
+    for i = 1, 16 do
+        self[i] = -self[i]
+    end
 end
 
 function M:getNegated()
@@ -650,49 +701,30 @@ end
 --------------------------------------------------
 
 function M:scale(x, y, z)
-    if type(x) == 'number' then
-        y = y or x
-        z = z or y
-    else
-        x, y, z = x.x, x.y, x.z
-    end
     self:multiply(M:createScale(x, y, z))
 end
 
 function M:getScaled(x, y, z)
-    if type(x) == 'number' then
-        y = y or x
-        z = z or y
-    else
-        x, y, z = x.x, x.y, x.z
-    end
     return self * M:createScale(x, y, z)
 end
 
 function M:translate(x, y, z)
-    if type(x) == 'number' then
-        y = y or x
-        z = z or y
-    else
-        x, y, z = x.x, x.y, x.z
-    end
     self:multiply(M:createTranslation(x, y, z))
 end
 
 function M:getTranslated(x, y, z)
-    if type(x) == 'number' then
-        y = y or x
-        z = z or y
-    else
-        x, y, z = x.x, x.y, x.z
-    end
     return self * M:createTranslation(x, y, z)
 end
 
 --------------------------------------------------
 
 function M:transpose()
-    self:set(self:getTransposed())
+    self[2], self[5] = self[5], self[2]
+    self[3], self[9] = self[9], self[3]
+    self[4], self[13] = self[13], self[4]
+    self[7], self[10] = self[10], self[7]
+    self[8], self[14] = self[14], self[8]
+    self[12], self[15] = self[15], self[12]
 end
 
 function M:getTransposed()
