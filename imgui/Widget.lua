@@ -43,7 +43,9 @@ function M:getReturn(idx)
 end
 
 function M:setHandler(f)
-    self._handler = f
+    self._handler = function()
+        f()
+    end
 end
 
 function M:setContentSize(size)
@@ -97,19 +99,25 @@ function M.Bullet()
 end
 
 ---@return im.Button
-function M.Button(label_or_id, size_or_dir, style)
+function M.Button(label_or_id, onClick, size_or_dir, style)
     local ret = require('imgui.widgets.Button')(label_or_id, size_or_dir)
     if style then
         ret:setStyle(style)
+    end
+    if onClick then
+        ret:setOnClick(onClick)
     end
     return ret
 end
 
 ---@return im.Checkbox
-function M.Checkbox(label, checked, onCheck)
+function M.Checkbox(label, checked, onChange, onCheck)
     local ret = require('imgui.widgets.Checkbox')(label, checked)
+    if onChange then
+        ret:setOnChange(onChange)
+    end
     if onCheck then
-        ret:setOnClick(onCheck)
+        ret:setOnCheck(onCheck)
     end
     return ret
 end
