@@ -258,4 +258,10 @@ function M:subtract(other)
     self.y = self.y - other.y
 end
 
+--
+
+function M:isFinite()
+    return math.isfinite(self.x) and math.isfinite(self.y)
+end
+
 return M

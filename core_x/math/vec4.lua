@@ -224,4 +224,11 @@ function M:subtract(other)
     self.w = self.w - other.w
 end
 
+--
+
+function M:isFinite()
+    return math.isfinite(self.x) and math.isfinite(self.y)
+            and math.isfinite(self.z) and math.isfinite(self.w)
+end
+
 return M

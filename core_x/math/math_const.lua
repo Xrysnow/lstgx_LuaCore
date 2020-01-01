@@ -22,3 +22,13 @@ math.M_SQRT1_2  = 0.707106781186547524401  ---# 1/sqrt(2)
 math.M_PIx2     = 6.28318530717958647693   ---# pi*2
 math.M_PIx4     = 12.5663706143591729538   ---# pi*4
 
+--- Base of natural logarithms
+math.e = 2.71828182845904523536
+
+--- IEEE 754 floating point representation of Not a Number (NaN).
+math.nan = 0 / 0
+--- IEEE 754 floating point representation of (positive) infinity.
+math.inf = 1 / 0
+--- IEEE 754 floating point representation of negative infinity.
+math.ninf = -1 / 0
+

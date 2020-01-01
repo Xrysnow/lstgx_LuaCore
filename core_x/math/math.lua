@@ -113,7 +113,9 @@ function math.solveLiner(a1, b1, c1, a2, b2, c2)
     return (c2 * b1 - c1 * b2) / den, (c1 * a2 - c2 * a1) / den, den == 0
 end
 
----from Microsoft.Xna.Framework.MathHelper--------
+--------------------------------------------------
+-- from Microsoft.Xna.Framework.MathHelper
+--------------------------------------------------
 
 ---C# MathHelper.Barycentric
 ---@param v1 number
@@ -150,7 +152,9 @@ function math.wrapangle(v)
     end
 end
 
---metrics-----------------------------------------
+--------------------------------------------------
+-- metrics
+--------------------------------------------------
 
 function math.EuclideanDistance(v1, v2)
     local sum = 0
@@ -186,5 +190,28 @@ function math.MinkowskiDistance(v1, v2, p)
         sum = sum + pow(abs(v1[i] - v2[i]), p)
     end
     return pow(sum, 1 / p)
+end
+
+--------------------------------------------------
+-- special number
+--------------------------------------------------
+
+local inf = 1 / 0
+local ninf = -1 / 0
+
+--TODO: cdata float
+
+--- v == +/-inf
+function math.isinf(v)
+    return v == inf or v == ninf
+end
+
+--- v is not positive infinity, negative infinity, or NaN
+function math.isfinite(v)
+    return v ~= inf and v ~= ninf and v == v
+end
+
+function math.isnan(v)
+    return v ~= v
 end
 
