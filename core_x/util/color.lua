@@ -57,9 +57,9 @@ end
 ---@return number,number,number
 function color.fromYUV(c)
     local y, u, v = c.y, c.u, c.v
-    local r = math.clamp(y + 1.402 * (v - 128))
-    local g = math.clamp(y - 0.344 * (u - 128) - 0.714 * (v - 128))
-    local b = math.clamp(y + 1.772 * (u - 128))
+    local r = y + 1.402 * (v - 128)
+    local g = y - 0.344 * (u - 128) - 0.714 * (v - 128)
+    local b = y + 1.772 * (u - 128)
     return r, g, b
 end
 
