@@ -24,7 +24,7 @@ function TouchKey:containsTouchLocation(x, y)
     return b
 end
 
----@param aTexture Texture2D
+---@param aTexture cc.Texture2D
 ---@param keyCode number
 ---@return TouchKey
 function TouchKey:create(aTexture, keyCode, isLock)
