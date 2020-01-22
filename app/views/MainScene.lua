@@ -22,8 +22,10 @@ end
 
 function MainScene:onEnter()
     if not skip_setting then
-        --require('editor.main'):create():showWithScene()
-        require('platform.launcher_ui')()
+        local ok, _ = pcall(require, 'main_scene')
+        if not ok then
+            require('platform.launcher_ui')()
+        end
     elseif not skip_selection then
         local scene = require('app.views.GameScene'):create(nil, setting.mod)
         lstg.loadMod()
