@@ -11,6 +11,8 @@ uniform vec4 color;
 uniform float colorsize;
 uniform float timer;
 
+uniform sampler2D u_texture;
+
 vec2 Distortion(vec2 xy, vec2 delta, float deltaLen)
 {
     float k = deltaLen / size;
@@ -37,7 +39,7 @@ void main()
         uv += distDelta / screen_size;
     }
 
-	gl_FragColor = v_fragmentColor * texture2D(CC_Texture0, uv);
+	gl_FragColor = v_fragmentColor * texture2D(u_texture, uv);
     
     if (deltaLen <= colorsize) {
         float k = deltaLen / colorsize;

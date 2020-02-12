@@ -20,6 +20,8 @@ attribute vec2 a_texCoord;
 //attribute vec3 a_binormal;
 varying vec2 TextureCoordOut;
 
+uniform mat4 u_MVPMatrix;
+
 attribute vec4 a_color;
 #ifdef GL_ES
 varying lowp vec4 v_fragmentColor;
@@ -85,5 +87,5 @@ void main(void)
 
     TextureCoordOut = a_texCoord;
 //    TextureCoordOut.y = 1.0 - TextureCoordOut.y;
-    gl_Position = CC_PMatrix * a_position;
+    gl_Position = u_MVPMatrix * a_position;
 }

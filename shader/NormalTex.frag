@@ -19,6 +19,8 @@ uniform float u_SpotLightSourceRangeInverse[MAX_SPOT_LIGHT_NUM];
 #endif
 uniform vec3 u_AmbientLightSourceColor;
 
+uniform sampler2D u_texture;
+
 #ifdef GL_ES
     varying mediump vec2 TextureCoordOut;
 
@@ -111,8 +113,8 @@ void main(void)
 #endif
 
 #if ((MAX_DIRECTIONAL_LIGHT_NUM > 0) || (MAX_POINT_LIGHT_NUM > 0) || (MAX_SPOT_LIGHT_NUM > 0))
-    gl_FragColor = texture2D(CC_Texture0, TextureCoordOut) * v_fragmentColor * combinedColor;
+    gl_FragColor = texture2D(u_texture, TextureCoordOut) * v_fragmentColor * combinedColor;
 #else
-    gl_FragColor = texture2D(CC_Texture0, TextureCoordOut) * v_fragmentColor;
+    gl_FragColor = texture2D(u_texture, TextureCoordOut) * v_fragmentColor;
 #endif
 }
