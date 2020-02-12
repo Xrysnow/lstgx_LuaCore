@@ -4,7 +4,7 @@ local function init()
     local code = cc.Application:getInstance():getCurrentLanguageCode()
     local f = string.format('i18n/%s/__init__.lua', code)
     if cc.FileUtils:getInstance():isFileExist(f) then
-        return require(string.format('i18n.%s.__init__', code))
+        return require(string.format('i18n.%s', code))
     end
 end
 

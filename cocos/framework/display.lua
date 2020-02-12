@@ -66,7 +66,7 @@ local function checkResolution(r)
     r.height = checknumber(r.height)
     r.autoscale = string.upper(r.autoscale)
     assert(r.width > 0 and r.height > 0,
-            string.format("display - invalid design resolution size %d, %d", r.width, r.height))
+           string.format("display - invalid design resolution size %d, %d", r.width, r.height))
 end
 
 local function setDesignResolution(r, framesize)

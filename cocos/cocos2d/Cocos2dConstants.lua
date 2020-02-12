@@ -207,6 +207,7 @@ cc.LANGUAGE_TURKISH = 15
 cc.LANGUAGE_UKRAINIAN = 16
 cc.LANGUAGE_ROMANIAN = 17
 cc.LANGUAGE_BULGARIAN = 18
+cc.LANGUAGE_BELARUSIAN = 19
 
 cc.NODE_ON_ENTER = 0
 cc.NODE_ON_EXIT = 1
@@ -623,13 +624,6 @@ cc.AsyncTaskPool.TaskType = {
     TASK_OTHER    = 2,
     TASK_MAX_TYPE = 3,
 }
-
---cc.RED = cc.c3b(255, 0, 0)
---cc.GREEN = cc.c3b(0, 255, 0)
---cc.BLUE = cc.c3b(0, 0, 255)
---cc.BLACK = cc.c3b(0, 0, 0)
---cc.WHITE = cc.c3b(255, 255, 255)
---cc.YELLOW = cc.c3b(255, 255, 0)
 
 cc.RED = cc.c4b(255, 0, 0, 255)
 cc.GREEN = cc.c4b(0, 255, 0, 255)

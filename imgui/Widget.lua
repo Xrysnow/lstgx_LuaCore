@@ -1,5 +1,5 @@
 ---@class im.Widget:cc.Node
-local M = class('imgui.widget', cc.Node)
+local M = class('imgui.Widget', cc.Node)
 
 function M:ctor(...)
     self._param = { ... }

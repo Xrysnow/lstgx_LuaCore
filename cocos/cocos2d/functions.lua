@@ -207,9 +207,6 @@ function class(classname, ...)
                 cls.__create = function()
                     return super:create()
                 end
-                --if not cls.super then
-                --    cls.super = super
-                --end
             else
                 -- super is pure lua class
                 cls.__supers = cls.__supers or {}
@@ -261,18 +258,19 @@ function class(classname, ...)
         instance.class = cls
         instance['.classname'] = classname
         -- for super is native class
-        if not instance.super then
-            instance.super = {}
-            setmetatable(instance.super, {
-                __index = function(_, k)
-                    local log = cls[k]
-                    cls[k] = nil
-                    local ret = instance[k]
-                    cls[k] = log
-                    return ret
-                end
-            })
-        end
+        --[[
+            if not instance.super then
+                instance.super = {}
+                setmetatable(instance.super, {
+                    __index = function(_, k)
+                        local log = cls[k]
+                        cls[k] = nil
+                        local ret = instance[k]
+                        cls[k] = log
+                        return ret
+                    end
+                })
+            end]]
 
         instance:ctor(...)
         return instance

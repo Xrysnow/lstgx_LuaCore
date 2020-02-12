@@ -394,55 +394,6 @@ end
 local nowlocal, nowutc, sleep
 
 if jit.os == "Windows" then -- On Windows sizeof(long) == 4 on both x86 and x64.
-    ffi.cdef[[
-  typedef unsigned long    DWORD;
-  typedef unsigned short   WORD;
-  typedef unsigned __int64 ULONGLONG;
-
-  typedef struct _SYSTEMTIME {
-    WORD wYear;
-    WORD wMonth;
-    WORD wDayOfWeek;
-    WORD wDay;
-    WORD wHour;
-    WORD wMinute;
-    WORD wSecond;
-    WORD wMilliseconds;
-  } SYSTEMTIME, *PSYSTEMTIME;
-
-  typedef union _ULARGE_INTEGER {
-    struct {
-      DWORD LowPart;
-      DWORD HighPart;
-    };
-    struct {
-      DWORD LowPart;
-      DWORD HighPart;
-    } u;
-    ULONGLONG QuadPart;
-  } ULARGE_INTEGER, *PULARGE_INTEGER;
-
-  typedef struct _FILETIME {
-    DWORD dwLowDateTime;
-    DWORD dwHighDateTime;
-  } FILETIME, *PFILETIME;
-
-  void GetLocalTime(
-    PSYSTEMTIME lpSystemTime
-  );
-  //void GetSystemTime(
-  //  PSYSTEMTIME lpSystemTime
-  //);
-  void GetSystemTimeAsFileTime(
-    PFILETIME lpSystemTimeAsFileTime
-  );
-  void GetSystemTimeAsPreciseFileTime(
-    PFILETIME lpSystemTimeAsFileTime
-  );
-  void Sleep(
-    DWORD dwMilliseconds
-  );
-  ]]
 
     local st = ffi.new("SYSTEMTIME")
     local ft = ffi.new("FILETIME")

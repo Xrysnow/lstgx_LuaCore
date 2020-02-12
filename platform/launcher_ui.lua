@@ -482,7 +482,7 @@ local function CreateLauncherUI()
 
     if imgui then
         require('imgui.__init__')
-        local la = imgui.on()
+         local la = imgui.on(launcher_scene)
         imgui.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 16)
         --la:addChild(imgui.showDemoWindow)
         la:addChild(require('imgui.ui.Console')('Console'):setContentSize(cc.size(500, 500)))

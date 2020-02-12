@@ -245,7 +245,7 @@ function LoadImage(name, tex_name, x, y, w, h, a, b, colliType)
     colliType = assert(_toColliType(colliType))
     local res = lstg.ResSprite:create(name, tex, x, y, w, h, a or 0, b or 0, colliType)
     _check(res, 'img', { name, tex_name })
-    res:setBlendMode(assert(lstg.BlendMode:getDefault()))
+    res:setRenderMode(assert(lstg.RenderMode:getDefault()))
     map:insert(name, res)
     return res
 end
@@ -271,7 +271,7 @@ function SetImageState(name, blendMode, color1, color2, color3, color4)
         error(string.format("can't find image %q", name))
     end
     if blendMode then
-        sp:setBlendMode(blendMode)
+        sp:setRenderMode(blendMode)
     end
     if color2 then
         sp:setColor(color1, 0):setColor(color2, 1):setColor(color3, 3):setColor(color4, 2)
@@ -345,7 +345,7 @@ function LoadAnimation(name, tex_name, x, y, w, h, nCol, nRow, interval, a, b, c
     local res = lstg.ResAnimation:create(
             name, tex, x, y, w, h, nCol, nRow, interval, a or 0, b or 0, colliType)
     _check(res, 'ani', { name, tex_name })
-    res:setBlendMode(assert(lstg.BlendMode:getDefault()))
+    res:setRenderMode(assert(lstg.RenderMode:getDefault()))
     map:insert(name, res)
     return res
 end
@@ -359,7 +359,7 @@ function SetAnimationState(name, blendMode, color1, color2, color3, color4)
         error(string.format("can't find animation %q", name))
     end
     if blendMode then
-        ani:setBlendMode(blendMode)
+        ani:setRenderMode(blendMode)
     end
     if color2 then
         ani:setColor(color1, 0):setColor(color2, 1):setColor(color3, 3):setColor(color4, 2)
@@ -478,7 +478,7 @@ function SetFontState(name, blendMode, color)
         error(string.format("can't find font %q", name))
     end
     if blendMode then
-        font:setBlendMode(blendMode)
+        font:setRenderMode(blendMode)
     end
     if color then
         font:setColor(color)
@@ -642,7 +642,7 @@ local function _setResFX(res, t)
     for k, v in pairs(t) do
         local ty = type(v)
         if ty == 'number' then
-            res:setValue(k, v)
+            res:setFloat(k, v)
         elseif ty == 'string' then
             res:setTexture(k, assert(FindTexture2D(v)))
         elseif ty == 'userdata' then
@@ -679,7 +679,7 @@ end
 --->   SCREENSIZE获取屏幕大小(vector类型)
 ---@param rt lstg.ResRenderTarget|string
 ---@param fx lstg.ResFX|string
----@param blend lstg.BlendMode|string
+---@param blend lstg.RenderMode|string
 ---@param param table
 function PostEffect(rt, fx, blend, param)
     fx = FindResFX(fx)
@@ -708,7 +708,7 @@ end
 ---> ...  --配对的Push/PopRenderTarget操作
 ---> PostEffectApply(...)
 ---@param fx lstg.ResFX|string
----@param blend_mode lstg.BlendMode|string
+---@param blend_mode lstg.RenderMode|string
 ---@param param table 其中key表示uniform变量名，value可以是数值、字符串（纹理名）、颜色
 function PostEffectApply(fx, blend_mode, param)
     fx = FindResFX(fx)

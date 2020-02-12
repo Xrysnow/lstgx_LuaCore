@@ -87,12 +87,18 @@ if plus.isMobile() then
     end
 else
     _G['Print'] = function(...)
-        lstg.Print(...)
+        local args = { ... }
+        local narg = select('#', ...)
+        for i = 1, narg do
+            args[i] = tostring(args[i])
+        end
+        lstg.Print(table.concat(args, '\t'))
         if lstg._onPrint then
             lstg._onPrint(...)
         end
     end
 end
+print = Print
 
 if plus.isDesktop() then
     require('imgui.__init__')

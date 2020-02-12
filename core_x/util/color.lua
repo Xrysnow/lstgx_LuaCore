@@ -268,3 +268,4 @@ function color.normFloats(...)
     return unpack(ret)
 end
 
+return color

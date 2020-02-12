@@ -139,6 +139,7 @@ function M:fromHSV(h, s, v)
     return self:setFloat(r1 + m, g1 + m, b1 + m)
 end
 
+---@return number,number,number
 function M:toHSL()
     local r, g, b = norm(self)
     local max = math.max(r, g, b)
@@ -203,6 +204,7 @@ end
 
 --- Convert RGB to CIEXYZ.
 --- Gamma=2.2, sRGB
+---@return number,number,number
 function M:toXYZ()
     local r, g, b = norm(self)
     r, g, b = _toXYZ(r), _toXYZ(g), _toXYZ(b)
@@ -226,6 +228,7 @@ local WP_Y = 100
 local WP_Z = 108.883
 
 --- Gamma=2.2, sRGB, white point D65
+---@return number,number,number
 function M:toLAB()
     local x, y, z = self:toXYZ()
     x, y, z = x * 100, y * 100, z * 100

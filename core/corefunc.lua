@@ -9,7 +9,7 @@ function BeforeRender()
     lstg.forceSetViewMode('ui')
     --TODO: fix this
     for k, _ in pairs(forward.Fonts) do
-        RenderText(k, '', 0, 0)
+        RenderText(k, ' ', 0, 0)
     end
     e:dispatchEvent('onBeforeRender')
 end
@@ -24,7 +24,6 @@ local sin = sin
 local hypot = hypot
 local pairs = pairs
 local rawget = rawget
-local rawset = rawset
 
 local ot = ObjTable()
 
@@ -356,9 +355,10 @@ end, 9)
 --
 
 function Screenshot()
-    local path = 'snapshot/' .. os.date("!%Y-%m-%d-%H-%M-%S", os.time() + setting.timezone * 3600) .. '.png'
+    local time = os.date("!%Y-%m-%d-%H-%M-%S", os.time() + setting.timezone * 3600)
+    local path = 'snapshot/' .. time .. '.png'
     lstg.Snapshot(path)
-    SystemLog(string.format('%s: %s', i18n('save screenshot to'), path))
+    SystemLog(string.format('%s %q', i18n('save screenshot to'), path))
 end
 
 function BentLaserData()
@@ -367,8 +367,6 @@ end
 
 --
 
-local fu = cc.FileUtils:getInstance()
-local glc = cc.GLProgramCache:getInstance()
 local shader_path = "src/shader/"
 local internalShaders = {
     add   = { "Common.vert", "ColorAdd.frag" },
@@ -380,64 +378,130 @@ local internalShaders = {
     mulF2 = { "Fog_Exp1.vert", "ColorMulti_Fog.frag" },
     mulF3 = { "Fog_Exp2.vert", "ColorMulti_Fog.frag" },
 }
-for k, v in pairs(internalShaders) do
-    local glp = CreateGLProgramFromPath(shader_path .. v[1], shader_path .. v[2])
-    glc:addGLProgram(glp, 'lstg.' .. k)
-end
 
-local internalBM = {
-    ['add+add']   = { 'GL_FUNC_ADD', 'GL_SRC_ALPHA', 'GL_ONE' },
-    ['add+alpha'] = { 'GL_FUNC_ADD', 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA' },
-    ['add+sub']   = { 'GL_FUNC_SUBTRACT', 'GL_SRC_ALPHA', 'GL_ONE' },
-    ['add+rev']   = { 'GL_FUNC_REVERSE_SUBTRACT', 'GL_SRC_ALPHA', 'GL_ONE' },
+local _bop = ccb.BlendOperation
+local _bfac = ccb.BlendFactor
+local internalMode = {
+    ['add+add']   = { _bop.ADD, _bfac.SRC_ALPHA, _bfac.ONE },
+    ['add+alpha'] = { _bop.ADD, _bfac.SRC_ALPHA, _bfac.ONE_MINUS_SRC_ALPHA },
+    ['add+sub']   = { _bop.SUBTRACT, _bfac.SRC_ALPHA, _bfac.ONE },
+    ['add+rev']   = { _bop.RESERVE_SUBTRACT, _bfac.SRC_ALPHA, _bfac.ONE },
 
-    ['mul+add']   = { 'GL_FUNC_ADD', 'GL_SRC_ALPHA', 'GL_ONE' },
-    ['mul+alpha'] = { 'GL_FUNC_ADD', 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA' },
-    ['mul+sub']   = { 'GL_FUNC_SUBTRACT', 'GL_SRC_ALPHA', 'GL_ONE' },
-    ['mul+rev']   = { 'GL_FUNC_REVERSE_SUBTRACT', 'GL_SRC_ALPHA', 'GL_ONE' },
+    ['mul+add']   = { _bop.ADD, _bfac.SRC_ALPHA, _bfac.ONE },
+    ['mul+alpha'] = { _bop.ADD, _bfac.SRC_ALPHA, _bfac.ONE_MINUS_SRC_ALPHA },
+    ['mul+sub']   = { _bop.SUBTRACT, _bfac.SRC_ALPHA, _bfac.ONE },
+    ['mul+rev']   = { _bop.RESERVE_SUBTRACT, _bfac.SRC_ALPHA, _bfac.ONE },
 
-    ['']          = { 'GL_FUNC_ADD', 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA' },
+    ['']          = { _bop.ADD, _bfac.SRC_ALPHA, _bfac.ONE_MINUS_SRC_ALPHA },
 }
-for k, v in pairs(internalBM) do
+for k, v in pairs(internalMode) do
     local m = k:sub(1, 3)
     if m == '' then
         m = 'mul'
     end
-    local bm = lstg.BlendMode:createByNames(k, v[1], v[2], v[3], 'lstg.' .. m)
-    assert(bm, i18n 'failed to create BlendMode')
+    local s = internalShaders[m]
+    local p = CreateShaderProgramFromPath(
+            shader_path .. s[1], shader_path .. s[2])
+    assert(p)
+    local rm = lstg.RenderMode:create(k, v[1], v[2], v[3], p)
+    assert(rm, i18n 'failed to create RenderMode')
+    -- backup default RenderMode
+    rm:clone('_' .. k)
     for i = 1, 3 do
-        local glp_name = string.format('lstg.%sF%d', m, i)
-        local glp = glc:getGLProgram(glp_name)
-        assert(glp, 'failed to get GLProgram ' .. glp_name)
-        bm:setFogGLProgram(i, glp)
+        local k_fog = ('%sF%d'):format(m, i)
+        local s_fog = internalShaders[k_fog]
+        local p_fog = CreateShaderProgramFromPath(
+                shader_path .. s_fog[1], shader_path .. s_fog[2])
+        local name = ('%s+fog%d'):format(k, i)
+        local rm_fog = lstg.RenderMode:create(name, v[1], v[2], v[3], p_fog)
+        assert(rm_fog, i18n 'failed to create RenderMode')
     end
 end
-lstg.BlendMode:getByName(''):setAsDefault()
+lstg.RenderMode:getByName(''):setAsDefault()
 
-function CreateBlendMode(name, blendEquation, blendFuncSrc, blendFuncDst, shaderName)
-    local glProgram
+function CreateRenderMode(name, blendEquation, blendFuncSrc, blendFuncDst, shaderName)
+    local shaderProgram
     if not shaderName then
-        glProgram = 'lstg.mul'
+        shaderProgram = lstg.RenderMode:getDefault():getProgram()
     else
         local res = FindResFX(shaderName)
         if res then
-            local glp = res:getProgram()
-            glProgram = tostring(glp)
-            glc:addGLProgram(glp, glProgram)
-        else
-            glProgram = tostring(shaderName)
+            shaderProgram = res:getProgram()
         end
     end
-    local ret = lstg.BlendMode:createByNames(name, blendEquation, blendFuncSrc, blendFuncDst, glProgram)
-    assert(ret, i18n 'failed to create BlendMode')
+    assert(shaderProgram)
+    if type(blendEquation) == 'string' then
+        blendEquation = _bop[blendEquation:upper()]
+    end
+    if type(blendFuncSrc) == 'string' then
+        blendFuncSrc = _bfac[blendFuncSrc:upper()]
+    end
+    if type(blendFuncDst) == 'string' then
+        blendFuncDst = _bfac[blendFuncDst:upper()]
+    end
+    local ret = lstg.RenderMode:create(
+            name, blendEquation, blendFuncSrc, blendFuncDst, shaderProgram)
+    assert(ret, i18n 'failed to create RenderMode')
     return ret
 end
 
-local glp = CreateGLProgramFromPath(shader_path .. 'NormalTex.vert', shader_path .. 'NormalTex.frag')
-if glp then
-    glc:addGLProgram(glp, 'lstg.light')
-else
-    Print('failed to load NormalTex shader')
+local p_light = CreateShaderProgramFromPath(
+        shader_path .. 'NormalTex.vert', shader_path .. 'NormalTex.frag')
+if p_light then
+    local rm = lstg.RenderMode:create(
+            'lstg.light', _bop.ADD, _bfac.SRC_ALPHA, _bfac.ONE_MINUS_SRC_ALPHA, p_light)
+    assert(rm, i18n 'failed to create RenderMode')
+end
+
+---设置雾值
+---若参数为空，将关闭雾效果。否则设置一个从near到far的雾
+---@param near number
+---@param far number
+---@param color lstg.Color 默认为0xFF000000
+function SetFog(near, far, color)
+    local t = {}
+    local fog_type
+    if not near or near == far then
+        -- no fog
+        for k, _ in pairs(internalMode) do
+            t[k] = '_' .. k
+        end
+    elseif near == -1 then
+        -- exp1
+        fog_type = 2
+        for k, _ in pairs(internalMode) do
+            t[k] = k .. '+fog2'
+        end
+    elseif near == -2 then
+        -- exp2
+        fog_type = 3
+        for k, _ in pairs(internalMode) do
+            t[k] = k .. '+fog3'
+        end
+    else
+        -- linear
+        fog_type = 1
+        for k, _ in pairs(internalMode) do
+            t[k] = k .. '+fog1'
+        end
+    end
+    color = color or Color(0xff000000)
+    for k, v in pairs(t) do
+        local rm = lstg.RenderMode:getByName(k)
+        local rm_fog = lstg.RenderMode:getByName(v)
+        assert(rm, ("%q"):format(k))
+        assert(rm_fog, ("%q"):format(v))
+        rm:setProgram(rm_fog:getProgram())
+        if fog_type then
+            rm:setColor('u_fogColor', color)
+            if fog_type == 1 then
+                rm:setFloat('u_fogStart', near)
+                rm:setFloat('u_fogEnd', far)
+            else
+                rm:setFloat('u_fogDensity', far)
+            end
+        end
+    end
 end
 
 --
