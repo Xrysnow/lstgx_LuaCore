@@ -16,10 +16,70 @@ CC_DESIGN_RESOLUTION = {
     height    = 960,
     autoscale = "SHOW_ALL",
     callback  = function(framesize)
-        local ratio = framesize.width / framesize.height
-        if ratio <= 1.34 then
-            -- iPad 768*1024(1536*2048) is 4:3 screen
-            return { autoscale = "SHOW_ALL" }
-        end
+        return { autoscale = "SHOW_ALL" }
     end
 }
+
+--
+local M = {}
+
+require('cocos.cocos2d.json')
+local f = cc.FileUtils:getInstance():getStringFromFile('setting')
+local ok, ret = pcall(json.decode, f)
+if not ok then
+    ret = require('default_setting')
+end
+
+--- setting used for initialization
+---@type lstg.setting
+M.setting = ret
+
+M.setting.resizable = true
+M.setting.transparent = true
+
+if lstg.glfw and M.setting.transparent then
+    local g = require('platform.glfw')
+    -- Init() is necessary for following functions
+    g.Init()
+    g.WindowHint(g.GLFW_TRANSPARENT_FRAMEBUFFER, g.GLFW_TRUE)
+    cc.Director:getInstance():setClearColor({ r = 0, g = 0, b = 0, a = 0 })
+end
+
+local director = cc.Director:getInstance()
+local view = director:getOpenGLView()
+local title = 'LuaSTG-x'
+
+local function rect(_x, _y, _width, _height)
+    return { x = _x, y = _y, width = _width, height = _height }
+end
+if not view then
+    local setting = M.setting
+    local width = 960
+    local height = 640
+    if CC_DESIGN_RESOLUTION then
+        if CC_DESIGN_RESOLUTION.width then
+            width = CC_DESIGN_RESOLUTION.width
+        end
+        if CC_DESIGN_RESOLUTION.height then
+            height = CC_DESIGN_RESOLUTION.height
+        end
+    end
+    if setting then
+        local w = setting.windowsize_w or width
+        local h = setting.windowsize_h or height
+        if setting.windowed then
+            if setting.resizable then
+                view = cc.GLViewImpl:createWithRect(title, rect(0, 0, w, h), 1, true)
+            else
+                view = cc.GLViewImpl:createWithRect(title, rect(0, 0, w, h))
+            end
+        else
+            view = cc.GLViewImpl:createWithFullScreen(title)
+        end
+    else
+        view = cc.GLViewImpl:createWithRect(title, rect(0, 0, width, height))
+    end
+    director:setOpenGLView(view)
+end
+
+return M
