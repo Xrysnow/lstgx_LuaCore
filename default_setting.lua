@@ -1,5 +1,5 @@
---
-return {
+---@class lstg.setting
+local M = {
     allowsnapshot  = true,
     username       = 'User',
     font           = '',
@@ -63,3 +63,5 @@ return {
     --
     imgui_visible  = false,
 }
+
+return M
