@@ -2,13 +2,13 @@
 --lstg.DoFile('jit_test.lua')
 local fu = cc.FileUtils:getInstance()
 fu:setPopupNotify(true)
--- note: opengl view is opened in display.lua by default,
+-- note: GLView is opened in display.lua
 -- it's necessary for FrameInit
 require('config')
-
 require('cocos.init')
 setmetatable(_G, nil)
-package.path = package.path .. '?/__init__.lua;'
+-- package.path may not end with ';'
+package.path = package.path .. ';?/__init__.lua;'
 require('cc.ext')
 require('cc.to_string')
 require('cc.color')
