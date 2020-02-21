@@ -1,19 +1,21 @@
 local base = require('imgui.Widget')
 
----@class im.CollapsingHeader:im.Widget
-local M = class('im.CollapsingHeader', base)
+---@class im.TabItem:im.Widget
+local M = class('im.TabItem', base)
+local im = imgui
 
 function M:ctor(...)
     base.ctor(self, ...)
     self._closable = type(self:getParam(2)) == 'boolean'
 end
 
-function M:setLabel(label)
-    self:setParam(1, label)
+function M:setName(name)
+    base.setName(self, name)
+    self:setParam(1, name)
     return self
 end
 
-function M:getLabel()
+function M:getName()
     return self:getParam(1)
 end
 
@@ -33,23 +35,21 @@ function M:isClosed()
 end
 
 function M:setFlags(flag, ...)
-    self:setParam(self:isClosable() and 3 or 2, bit.band(flag, ...))
+    self:setParam(3, bit.band(flag, ...))
     return self
 end
 
 function M:getFlags()
-    return self:getParam(self:isClosable() and 3 or 2)
+    return self:getParam(3)
 end
 
 function M:setClosable(b)
     b = b and true or false
     if self._closable ~= b then
         if b then
-            self:setParam(3, self:getParam(2))
             self:setParam(2, true)
         else
-            self:setParam(3, nil)
-            self:setParam(2, self:getParam(3))
+            self:setParam(2, nil)
         end
     end
     self._closable = b
@@ -59,34 +59,22 @@ function M:isClosable()
     return self._closable
 end
 
-function M:setOpen(b)
-    self._needopen = b
-    return self
-end
-
 function M:isOpen()
-    if self._needopen ~= nil then
-        return self._needopen
-    else
-        return self:getReturn(1)
-    end
+    return self:getReturn(1)
 end
 
 function M:_handler()
-    if self._needopen ~= nil then
-        imgui.setNextItemOpen(self._needopen)
-        self._needopen = nil
-    end
-    imgui.pushID(tostring(self))
-    local ret = { imgui.collapsingHeader(unpack(self._param)) }
-    imgui.popID()
+    im.pushID(tostring(self))
+    local ret = { im.beginTabItem(unpack(self._param)) }
+    im.popID()
+    self._ret = ret
     if ret[2] then
         -- closable
         self._param[2] = ret[2]
     end
-    self._ret = ret
     if ret[1] then
         base._handler(self)
+        im.endTabItem()
     end
 end
 

@@ -22,8 +22,8 @@ function M:isOpen()
     return self:getParam(2)
 end
 
-function M:setFlags(flags)
-    self:setParam(3, flags)
+function M:setFlags(flag, ...)
+    self:setParam(3, bit.band(flag, ...))
     return self
 end
 
@@ -53,9 +53,9 @@ function M:setContentSize(size)
 end
 
 function M:getContentSize()
-    local pos = self._size_
-    if pos then
-        return cc.size(pos.x, pos.y)
+    local size = self._size_
+    if size then
+        return cc.size(size.x, size.y)
     else
         return base.getContentSize(self)
     end
