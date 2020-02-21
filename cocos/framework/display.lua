@@ -29,29 +29,17 @@ local view = director:getOpenGLView()
 local title = 'LuaSTG-x'
 
 if not view then
-    if setting then
-        local w = setting.windowsize_w
-        local h = setting.windowsize_h
-        if setting.windowed then
-            view = cc.GLViewImpl:createWithRect(title, cc.rect(0, 0, w, h))
-            SystemLog(string.format('create glview with rect(%d, %d)', w, h))
-        else
-            view = cc.GLViewImpl:createWithFullScreen(title)
-            SystemLog('create glview with fullscreen')
+    local width = 960
+    local height = 640
+    if CC_DESIGN_RESOLUTION then
+        if CC_DESIGN_RESOLUTION.width then
+            width = CC_DESIGN_RESOLUTION.width
         end
-    else
-        local width = 960
-        local height = 640
-        if CC_DESIGN_RESOLUTION then
-            if CC_DESIGN_RESOLUTION.width then
-                width = CC_DESIGN_RESOLUTION.width
-            end
-            if CC_DESIGN_RESOLUTION.height then
-                height = CC_DESIGN_RESOLUTION.height
-            end
+        if CC_DESIGN_RESOLUTION.height then
+            height = CC_DESIGN_RESOLUTION.height
         end
-        view = cc.GLViewImpl:createWithRect(title, cc.rect(0, 0, width, height))
     end
+    view = cc.GLViewImpl:createWithRect(title, cc.rect(0, 0, width, height))
     director:setOpenGLView(view)
 end
 
