@@ -1,3 +1,5 @@
+--
+local KEY = require('keycode')
 ---@class lstg.setting
 local M = {
     allowsnapshot  = true,
