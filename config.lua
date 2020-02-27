@@ -25,9 +25,15 @@ local M = {}
 
 require('cocos.cocos2d.json')
 local f = cc.FileUtils:getInstance():getStringFromFile('setting')
-local ok, ret = pcall(json.decode, f)
-if not ok then
-    ret = require('default_setting')
+local ok, ret
+if #f > 0 then
+    ok, ret = pcall(json.decode, f)
+end
+if not ok or not ret then
+    ok, ret = pcall(require, 'default_setting')
+    if not ok or not ret then
+        lstg.SystemLog(tostring(ret))
+    end
 end
 
 --- setting used for initialization
@@ -35,7 +41,7 @@ end
 M.setting = ret
 
 M.setting.resizable = true
-M.setting.transparent = true
+--M.setting.transparent = true
 
 if lstg.glfw and M.setting.transparent then
     local g = require('platform.glfw')
@@ -68,7 +74,7 @@ if not view then
         local w = setting.windowsize_w or width
         local h = setting.windowsize_h or height
         if setting.windowed then
-            if setting.resizable then
+            if setting.resizable and lstg.glfw then
                 view = cc.GLViewImpl:createWithRect(title, rect(0, 0, w, h), 1, true)
             else
                 view = cc.GLViewImpl:createWithRect(title, rect(0, 0, w, h))
