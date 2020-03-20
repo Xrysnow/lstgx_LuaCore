@@ -320,7 +320,7 @@ local Director = cc.Director:getInstance()
 function GameExit()
     --require('jit.p').stop()
     lstg.saveSettingFile()
-    ex.OnExit()
+    lstg.FrameEnd()
     if plus and plus.isMobile() then
         Director:endToLua()
     else

@@ -824,7 +824,7 @@ lstg.SetSEVolume = SetSEVolume
 local _bgm_factor = 1
 
 ---
---- 传入1个参数时，设置全局音乐音量，将影响后续播放音效的音量
+--- 传入1个参数时，设置全局音乐音量，将影响后续播放音乐的音量
 --- 传入2个参数时，设置指定音乐音量
 --- 音量值范围为[0, 1]
 ---@param arg1 number|string
