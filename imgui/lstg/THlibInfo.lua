@@ -60,11 +60,13 @@ function M:_renderSpellInfo()
             im.nextColumn()
             im.separator()
 
-            for i, v in ipairs(spells_classified[name]) do
-                im.textUnformatted(string.format('%d', v.index))
-                im.nextColumn()
-                im.textUnformatted(v.name)
-                im.nextColumn()
+            if spells_classified[name] then
+                for i, v in ipairs(spells_classified[name]) do
+                    im.textUnformatted(string.format('%d', v.index))
+                    im.nextColumn()
+                    im.textUnformatted(v.name)
+                    im.nextColumn()
+                end
             end
             im.separator()
             im.columns(1)
