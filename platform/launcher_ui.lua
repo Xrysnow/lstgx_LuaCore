@@ -207,6 +207,7 @@ local function setGraph(lc)
     lc.fps_tg1:setSelected(setting.render_skip == 0)
     lc.fps_tg1:addEventListener(function(t, e)
         if e == 0 then
+            lc.fps_tg2:setSelected(false)
             setting.render_skip = 0
             SetFPS(60)
         end
@@ -214,6 +215,7 @@ local function setGraph(lc)
     lc.fps_tg2:setSelected(setting.render_skip == 1)
     lc.fps_tg2:addEventListener(function(t, e)
         if e == 0 then
+            lc.fps_tg1:setSelected(false)
             setting.render_skip = 1
             SetFPS(30)
         end
@@ -434,8 +436,6 @@ local function CreateLauncherUI()
     launcher_scene = launcher_reader:getSceneGraph()
     launcher_scene:setName('launcher_scene')
     lc = getChildrenWithName(launcher_scene)
-    --SystemLog(stringify(c))
-    --SystemLog(tostring(c.sound.active))
     hideContents()
     unsel_btns()
 
