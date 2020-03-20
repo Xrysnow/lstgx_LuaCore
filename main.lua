@@ -37,7 +37,7 @@ lstg.SystemLog(_sp .. '\n}')
 local function main()
     lstg.SystemLog('start main')
     lstg.FrameInit()
-    if ex.GetOSName() == 'android' then
+    if lstg.GetPlatform() == 'android' then
         local sd = require('platform.android.native').getSDCardPath()
         if sd and sd ~= '' then
             local src = sd .. '/lstg/src'
@@ -113,7 +113,7 @@ __G__TRACKBACK__ = function(msg)
     lstg.SystemLog(msg)
     if plus and plus.isMobile() then
         require('ui.MessageBox').OK('Error', msg, function()
-            ex.OnExit()
+            --ex.OnExit()
             cc.Director:getInstance():endToLua()
         end)
         for _, v in ipairs({ 'FrameFunc' }) do
@@ -121,8 +121,8 @@ __G__TRACKBACK__ = function(msg)
             end
         end
     else
-        ex.MessageBox(msg, 'ERROR')
-        ex.OnExit()
+        lstg.MessageBox(msg, 'ERROR')
+        lstg.FrameEnd()
         os.exit()
     end
     lstg.SystemLog('caught error in main')
