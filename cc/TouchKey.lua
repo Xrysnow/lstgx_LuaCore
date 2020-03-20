@@ -1,4 +1,4 @@
----@class TouchKey:Sprite
+---@class TouchKey:cc.Sprite
 local TouchKey = class("TouchKey", function(texture)
     return cc.Sprite:createWithTexture(texture)
 end)
@@ -28,7 +28,7 @@ end
 ---@param keyCode number
 ---@return TouchKey
 function TouchKey:create(aTexture, keyCode, isLock)
-    local tk = TouchKey.new(aTexture)
+    local tk = TouchKey(aTexture)
     tk._state = StateUngrabbed
     tk._keyCode = keyCode
     tk._isLock = isLock
@@ -114,6 +114,9 @@ function TouchKey:setLockMode(isLock)
 end
 
 function TouchKey:update()
+    if not ext then
+        return
+    end
     if ext.pause_menu and self._isLock then
         self._isLock = false
         self._setInactive()
