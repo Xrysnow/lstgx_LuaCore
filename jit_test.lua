@@ -15,7 +15,7 @@ status[1] = tostring(status[1])
 SystemLog('jit status: ' .. table.concat(status, ', '))
 SystemLog(string.format('lua memory: %.1fKB', collectgarbage('count')))
 
-local osname = ex.GetOSName()
+local osname = lstg.GetPlatform()
 local is_mobile = osname == 'android' or osname == 'ios'
 local N = is_mobile and 5e3 or 5e5
 
@@ -44,7 +44,7 @@ local mode = {
 
 mode.off()
 
-local tic = ex.Tic
+local sw = lstg.StopWatch()
 local n = 0
 
 local function test()
@@ -60,21 +60,21 @@ local function test()
         return ((n - 10) * 2 + 20) / 2
     end
 
-    tic()
+    sw:get()
     for i = 1, N * 0.1 do
         test1()
     end
-    t1 = tic()
+    t1 = sw:get()
 
     for i = 1, N * 1 do
         test2()
     end
-    t2 = tic()
+    t2 = sw:get()
 
     for i = 1, N * 1 do
         n = test3(n)
     end
-    t3 = tic()
+    t3 = sw:get()
 
     return t1, t2, t3, t1 + t2 + t3
 end
