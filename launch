@@ -17,7 +17,7 @@ math.mod = math.mod or math.fmod
 string.gfind = string.gfind or string.gmatch
 collectgarbage("setpause", 100)
 
-for _, ns in ipairs({ cc, ccui }) do
+for _, ns in ipairs({ cc, ccui, lstg }) do
     for _, v in pairs(ns) do
         local mt = getmetatable(v)
         if mt and (v.create or v.new) then
@@ -77,7 +77,6 @@ require('api')
 if plus.isMobile() then
     require('jit_test')
     _G['Print'] = function(...)
-        --lstg.Print(...)
         local args = { ... }
         local narg = select('#', ...)
         for i = 1, narg do
@@ -116,8 +115,7 @@ local setting_path = plus.getWritablePath() .. 'setting'
 local _setting = {}
 
 function lstg.loadSettingFile()
-    local f, msg
-    f = FU:getStringFromFile(setting_path)
+    local f = FU:getStringFromFile(setting_path)
     setting = DeSerialize(Serialize(default_setting))
     _setting = setting
     setting = {}
@@ -158,11 +156,18 @@ end
 
 lstg.loadSettingFile()
 
+if _ARGS and #_ARGS >= 2 then
+    assert(loadstring(_ARGS[2]))()
+    setting.mod_info = nil
+end
+if start_game then
+    require('app.views.MainScene').setSkip(true, true)
+end
+
 local glv = cc.Director:getInstance():getOpenGLView()
 
-SetSplash(true)--glv:setCursorVisible
+SetSplash(true)
 SetTitle('LuaSTG-x')
---SetWindowed(setting.windowed)
 ChangeVideoMode(
         setting.windowsize_w,
         setting.windowsize_h,
@@ -176,7 +181,6 @@ else
 end
 SetSEVolume(setting.sevolume / 100)
 SetBGMVolume(setting.bgmvolume / 100)
-
 
 --require('app.views.MainScene').setSkip(true, true)
 --cheat = true
