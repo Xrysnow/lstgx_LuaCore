@@ -75,7 +75,7 @@ function plus.EnumFiles(path)
                     isDirectory = true, name = f, fullPath = fullpath })
             end
         else
-            local access = lfs.attributes(ex.UTF8ToMultiByte(f), 'access') or 'UNKNOEN'
+            local access = lfs.attributes(FU:getSuitableFOpen(f), 'access') or 'UNKNOEN'
             local size = FU:getFileSize(f) or 'UNKNOEN'
             local pos = 1 - f:reverse():find('/')
             f = f:sub(pos)
@@ -128,7 +128,7 @@ function plus.getWritablePath()
     --return FU:getWritablePath()
 end
 
-local osname = ex.GetOSName()
+local osname = lstg.GetPlatform()
 plus.os = osname
 plus.is_mobile = osname == 'android' or osname == 'ios'
 --Android-----------------------------------------
@@ -250,9 +250,9 @@ function plus.error(msg, title, exit)
     exit = exit or (exit == nil)
     local emsg = exit and ', exit' or ''
     SystemLog(string.format('error: [%s]%s' .. emsg, title, msg))
-    ex.MessageBox(msg, title)
+    MessageBox(msg, title)
     if exit then
-        ex.OnExit()
+        lstg.FrameEnd()
         os.exit()
     end
 end
