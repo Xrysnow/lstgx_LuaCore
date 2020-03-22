@@ -1,17 +1,13 @@
 ---@class MainScene:ViewBase
 local MainScene = class("MainScene", cc.load("mvc").ViewBase)
 
---local ASSETS_PATH = 'src/mod/demo/assets/'
---local px          = ASSETS_PATH .. 'pixel.png'
---local wqy         = ASSETS_PATH .. 'font/WenQuanYiMicroHeiMono.ttf'
-
 for _, v in ipairs({ 'FocusLoseFunc', 'FocusGainFunc' }) do
     _G[v] = _G[v] or function()
     end
 end
 
-local skip_setting-- = true
-local skip_selection-- = true
+local skip_setting
+local skip_selection
 
 function MainScene.setSkip(skip_set, skip_sel)
     skip_setting, skip_selection = skip_set, skip_sel
