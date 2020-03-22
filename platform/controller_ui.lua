@@ -6,13 +6,14 @@
 
 
 local TouchKey = require('cc.TouchKey')
-local ASSETS_PATH = 'x/assets/'
 local tk_bg = 'res/touchkey_bg.png'
-local font = ASSETS_PATH .. 'font/WenQuanYiMicroHeiMono.ttf'
-local glv = cc.Director:getInstance():getOpenGLView()
+local font = 'font/WenQuanYiMicroHeiMono.ttf'
+--local glv = cc.Director:getInstance():getOpenGLView()
 
-local function CreateControllerUI(fatherNode)
-    local tex = cc.Director:getInstance():getTextureCache():addImage(tk_bg);
+local function CreateControllerUI(parent)
+    cc.Image:setPNGPremultipliedAlphaEnabled(true)
+    local tex = cc.Director:getInstance():getTextureCache():addImage(tk_bg)
+    cc.Image:setPNGPremultipliedAlphaEnabled(false)
 
     local scale_pos = screen.scale
     local scale_size = screen.scale * 0.65
@@ -29,10 +30,11 @@ local function CreateControllerUI(fatherNode)
     if setting then
         k5, k6, k7, k8 = setting.keysys.menu, setting.keys.slow, setting.keys.spell, setting.keys.shoot
     end
-    local bt5 = cc.SetNode(TouchKey:create(tex, k5), fatherNode, pESCAPE, tk_sc * 0.9)
-    local bt6 = cc.SetNode(TouchKey:create(tex, k6), fatherNode, pSHIFT, tk_sc * 1.4)
-    local bt7 = cc.SetNode(TouchKey:create(tex, k7), fatherNode, pX, tk_sc * 1.2)
-    local bt8 = cc.SetNode(TouchKey:create(tex, k8, true), fatherNode, pZ, tk_sc)
+
+    local bt5 = cc.SetNode(TouchKey:create(tex, k5), parent, pESCAPE, tk_sc * 0.9)
+    local bt6 = cc.SetNode(TouchKey:create(tex, k6), parent, pSHIFT, tk_sc * 1.4)
+    local bt7 = cc.SetNode(TouchKey:create(tex, k7), parent, pX, tk_sc * 1.2)
+    local bt8 = cc.SetNode(TouchKey:create(tex, k8, true), parent, pZ, tk_sc)
 
     local color = cc.c3b(255, 255, 0)
     local color_outline = cc.c3b(0, 0, 0)
@@ -41,16 +43,16 @@ local function CreateControllerUI(fatherNode)
     local lb6 = cc.Label:createWithTTF("SHIFT", font, fontsize * 0.8)
     local lb7 = cc.Label:createWithTTF("X", font, fontsize)
     local lb8 = cc.Label:createWithTTF("Z", font, fontsize)
-    cc.SetNode(lb5, fatherNode, pESCAPE, nil, color):enableOutline(color_outline, 1)
-    cc.SetNode(lb6, fatherNode, pSHIFT, nil, color):enableOutline(color_outline, 1)
-    cc.SetNode(lb7, fatherNode, pX, nil, color):enableOutline(color_outline, 1)
-    cc.SetNode(lb8, fatherNode, pZ, nil, color):enableOutline(color_outline, 1)
+    cc.SetNode(lb5, parent, pESCAPE, nil, color):enableOutline(color_outline, 1)
+    cc.SetNode(lb6, parent, pSHIFT, nil, color):enableOutline(color_outline, 1)
+    cc.SetNode(lb7, parent, pX, nil, color):enableOutline(color_outline, 1)
+    cc.SetNode(lb8, parent, pZ, nil, color):enableOutline(color_outline, 1)
 
     local stick = require('platform.controller_stick')
     local keys = { setting.keys.up, setting.keys.right, setting.keys.down, setting.keys.left }
     local pos = cc.pMul(cc.p(106, 106), scale_pos)
     stick = stick:create(keys, pos, scale_size)
-    cc.SetNode(stick, fatherNode, pos)
+    cc.SetNode(stick, parent, pos)
 end
 
 return CreateControllerUI

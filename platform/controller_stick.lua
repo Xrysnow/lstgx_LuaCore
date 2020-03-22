@@ -31,6 +31,8 @@ function M:onCreate(keys, position, scale)
     scale = scale or 1
     self.scale_ = scale
 
+    cc.Image:setPNGPremultipliedAlphaEnabled(true)
+
     local joystick_bg = cc.Sprite:create("res/joystick_bg.png")
     self.joystick_bg = joystick_bg
     joystick_bg:setScale(1.0 * scale)
@@ -40,6 +42,8 @@ function M:onCreate(keys, position, scale)
     joystick:setScale(1.8 * scale)
     self.joystick = joystick
     self:addChild(joystick)
+
+    cc.Image:setPNGPremultipliedAlphaEnabled(false)
 
     self.setter = require('cc.key_setter')(keys)
     local k1, k2, k3, k4 = keys[1], keys[2], keys[3], keys[4]
