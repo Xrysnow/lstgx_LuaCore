@@ -4,15 +4,17 @@
 --- Copyright (C) 2018-2019 Xrysnow. All rights reserved.
 ---
 
+--
+local M = {}
 
-ffi = ffi or require('ffi')
+local ffi = ffi or require('ffi')
 ffi.defines = ffi.defines or {}
 
 for _, v in ipairs({
-    [[union u_32ToU32{int32_t x;uint32_t i;}]],
-    [[union u_64ToU64{int64_t x;uint64_t i;}]],
-    [[union u_FloatToU32{float x;uint32_t i;}]],
-    [[union u_DoubleToU64{double x;uint64_t i;}]] }) do
+                       [[union u_32ToU32{int32_t x;uint32_t i;}]],
+                       [[union u_64ToU64{int64_t x;uint64_t i;}]],
+                       [[union u_FloatToU32{float x;uint32_t i;}]],
+                       [[union u_DoubleToU64{double x;uint64_t i;}]] }) do
     if not ffi.defines[v] then
         ffi.cdef(v)
         ffi.defines[v] = true
@@ -104,7 +106,8 @@ end
 
 ---
 ---@class math.Int
-Int = Int or {}
+local Int = {}
+M.Int = Int
 
 Int.max = 2 ^ 31 - 1
 Int.min = -2 ^ 31
@@ -140,7 +143,8 @@ end
 ---
 ---## Better use with ctype.
 ---@class math.Int64
-Int64 = Int64 or {}
+local Int64 = {}
+M.Int64 = Int64
 
 Int64.max = 2 ^ 63 - 1
 Int64.min = -2 ^ 63
@@ -178,7 +182,8 @@ end
 
 ---
 ---@class math.UInt
-UInt = UInt or {}
+local UInt = {}
+M.UInt = UInt
 
 UInt.max = 2 ^ 32 - 1
 UInt.min = 0
@@ -210,7 +215,8 @@ end
 ---
 ---## Better use with ctype.
 ---@class math.UInt64
-UInt64 = UInt64 or {}
+local UInt64 = {}
+M.UInt64 = UInt64
 
 UInt64.max = 2 ^ 64 - 1
 UInt64.min = 0
@@ -245,7 +251,8 @@ end
 ---
 ---## Possible loss of precision, be careful.
 ---@class math.Float
-Float = Float or {}
+local Float = {}
+M.Float = Float
 
 local f1 = unionF({ 1e39 })
 local f2 = unionF({ -1e39 })
@@ -290,7 +297,8 @@ end
 
 ---
 ---@class math.Double
-Double = Double or {}
+local Double = {}
+M.Double = Double
 
 local d1 = unionD({ 1e309 })
 local d2 = unionD({ -1e309 })
@@ -328,10 +336,11 @@ end
 
 ---
 
-math.int32_t = ffi.typeof('int32_t')     ---## ctype for int32_t from ffi
-math.uint32_t = ffi.typeof('uint32_t')    ---## ctype for uint32_t from ffi
-math.int64_t = ffi.typeof('int64_t')     ---## ctype for int64_t from ffi
-math.uint64_t = ffi.typeof('uint64_t')    ---## ctype for uint64_t from ffi
-math.float = ffi.typeof('float')       ---## ctype for float from ffi
-math.double = ffi.typeof('double')      ---## ctype for double from ffi
+M.int32_t = ffi.typeof('int32_t')     ---## ctype for int32_t from ffi
+M.uint32_t = ffi.typeof('uint32_t')    ---## ctype for uint32_t from ffi
+M.int64_t = ffi.typeof('int64_t')     ---## ctype for int64_t from ffi
+M.uint64_t = ffi.typeof('uint64_t')    ---## ctype for uint64_t from ffi
+M.float = ffi.typeof('float')       ---## ctype for float from ffi
+M.double = ffi.typeof('double')      ---## ctype for double from ffi
 
+return M
