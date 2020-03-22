@@ -36,71 +36,64 @@ local sqrt = math.sqrt
 local tan = math.tan
 local tanh = math.tanh
 
----@param v number
----@return number
-function math.cbrt(v)
-    return pow(v, 1 / 3)
-end
-
----@param v number
----@param lo number
----@param hi number
----@return number
-function math.clamp(v, lo, hi)
-    --if v < min then
-    --    return min
-    --elseif v > max then
-    --    return max
-    --else
-    --    return v
-    --end
-    return min(hi, max(v, lo))
-end
-
----@param v1 number
----@param v2 number
----@return number
-function math.hypot(v1, v2)
-    return sqrt(v1 * v1 + v2 * v2)
-end
-
----@param v1 number
----@param v2 number
----@param a number
----@return number
-function math.lerp(v1, v2, a)
-    return v1 + (v2 - v1) * a
-end
-
----C++ std::remainder
----C# Math.IEEERemainder
----@param v1 number
----@param v2 number
----@return number
-function math.remainder(v1, v2)
-    return v1 - v2 * math.round(v1 / v2)
-end
-
----@param v number
----@return number
-function math.round(v)
-    local f, c = floor(v), ceil(v)
-    if v - f < c - v then
-        return f
-    else
-        return c
+if not math.cbrt then
+    ---@param v number
+    ---@return number
+    function math.cbrt(v)
+        return pow(v, 1 / 3)
     end
 end
 
----@param v number
----@return number
-function math.sign(v)
-    if v > 0 then
-        return 1
-    elseif v < 0 then
-        return -1
-    else
-        return 0
+if not math.clamp then
+    ---@param v number
+    ---@param lo number
+    ---@param hi number
+    ---@return number
+    function math.clamp(v, lo, hi)
+        return min(hi, max(v, lo))
+    end
+end
+
+if not math.hypot then
+    ---@param v1 number
+    ---@param v2 number
+    ---@return number
+    function math.hypot(v1, v2)
+        return sqrt(v1 * v1 + v2 * v2)
+    end
+end
+
+if not math.lerp then
+    ---@param v1 number
+    ---@param v2 number
+    ---@param a number
+    ---@return number
+    function math.lerp(v1, v2, a)
+        return v1 + (v2 - v1) * a
+    end
+end
+
+if not math.remainder then
+    ---C++ std::remainder
+    ---C# Math.IEEERemainder
+    ---@param v1 number
+    ---@param v2 number
+    ---@return number
+    function math.remainder(v1, v2)
+        return v1 - v2 * math.round(v1 / v2)
+    end
+end
+
+if not math.round then
+    ---@param v number
+    ---@return number
+    function math.round(v)
+        local f, c = floor(v), ceil(v)
+        if v - f < c - v then
+            return f
+        else
+            return c
+        end
     end
 end
 
@@ -201,17 +194,22 @@ local ninf = -1 / 0
 
 --TODO: cdata float
 
---- v == +/-inf
-function math.isinf(v)
-    return v == inf or v == ninf
+if not math.isinf then
+    --- v == +/-inf
+    function math.isinf(v)
+        return v == inf or v == ninf
+    end
 end
 
---- v is not positive infinity, negative infinity, or NaN
-function math.isfinite(v)
-    return v ~= inf and v ~= ninf and v == v
+if not math.isfinite then
+    --- v is not positive infinity, negative infinity, or NaN
+    function math.isfinite(v)
+        return v ~= inf and v ~= ninf and v == v
+    end
 end
 
-function math.isnan(v)
-    return v ~= v
+if not math.isnan then
+    function math.isnan(v)
+        return v ~= v
+    end
 end
-
