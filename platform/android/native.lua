@@ -7,7 +7,7 @@
 local M = {}
 local luaj = require('cocos.cocos2d.luaj')
 local call = luaj.callStaticMethod
-local osname = ex.GetOSName()
+local osname = lstg.GetPlatform()
 
 local function jCall(...)
     if osname == 'android' then
