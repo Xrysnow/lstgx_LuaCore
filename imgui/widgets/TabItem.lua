@@ -7,10 +7,11 @@ local im = imgui
 function M:ctor(...)
     base.ctor(self, ...)
     self._closable = type(self:getParam(2)) == 'boolean'
+    cc.Node.setName(self, self:getName())
 end
 
 function M:setName(name)
-    base.setName(self, name)
+    cc.Node.setName(self, name)
     self:setParam(1, name)
     return self
 end
