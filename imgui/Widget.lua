@@ -158,6 +158,24 @@ function M.RadioButtonGroup(labels, handlers, initIndex, sameLine)
     return require('imgui.widgets.RadioButtonGroup')(labels, handlers, initIndex, sameLine)
 end
 
+---@return im.Selectable
+function M.Selectable(label, selected, flags, size, onSelect)
+    local ret = require('imgui.widgets.Selectable')(label, selected, flags, size)
+    if onSelect then
+        ret:setOnSelect(onSelect)
+    end
+    return ret
+end
+
+---@return im.SelectableGroup
+function M.SelectableGroup(labels, current, flags, sizes, onSelect)
+    local ret = require('imgui.widgets.SelectableGroup')(labels, current, flags, sizes)
+    if onSelect then
+        ret:setOnSelect(onSelect)
+    end
+    return ret
+end
+
 ---@return im.TabBar
 function M.TabBar(id, flags)
     return require('imgui.widgets.TabBar')(id, flags)
