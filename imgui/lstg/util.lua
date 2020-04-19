@@ -1,11 +1,69 @@
 --
 local M = {}
+local im = imgui
+
+local docking_window_flags = 0
+if im then
+    docking_window_flags = bit.bor(
+    --im.WindowFlags.MenuBar,
+            im.WindowFlags.NoDocking,
+            im.WindowFlags.NoTitleBar,
+            im.WindowFlags.NoCollapse,
+            im.WindowFlags.NoResize,
+            im.WindowFlags.NoMove,
+            im.WindowFlags.NoBringToFrontOnFocus,
+            im.WindowFlags.NoNavFocus,
+            im.WindowFlags.NoBackground
+    )
+end
+
+function M.load(target, docking, no_tool, no_font)
+    if not im then
+        return
+    end
+    require('imgui.__init__')
+    local la = im.on(target or cc.Director:getInstance():getRunningScene())
+    if docking then
+        im.clear()
+        local wi = require('imgui.Widget')
+        local dock
+        dock = wi.Widget(function()
+            local viewport = im.getMainViewport()
+            im.setNextWindowPos(viewport.Pos)
+            im.setNextWindowSize(viewport.Size)
+            im.setNextWindowViewport(viewport.ID)
+            im.pushStyleVar(im.StyleVar.WindowRounding, 0)
+            im.pushStyleVar(im.StyleVar.WindowBorderSize, 0)
+            im.pushStyleVar(im.StyleVar.WindowPadding, im.p(0, 0))
+            im.begin('Dock Space', nil, docking_window_flags)
+            im.popStyleVar(3)
+            im.dockSpace(im.getID(tostring(docking)), im.p(0, 0), im.DockNodeFlags.PassthruCentralNode)
+            wi._handler(dock)
+            im.endToLua()
+        end)
+        la:addChild(dock)
+    end
+    if not no_font then
+        im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 16)
+    end
+    if not no_tool then
+        --la:addChild(im.showDemoWindow)
+        la:addChild(require('imgui.ui.Console')('Console'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.LogWindow')('Log'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.StyleSetting')('Setting'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.VariableWatch')('Watch'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.lstg.GameInfo')('Game Info'):setContentSize(cc.size(500, 500)))
+    end
+    im.setVisible(setting.imgui_visible)
+end
 
 function M.loadFont()
-    local im = imgui
+    if not im then
+        return
+    end
     local cfg = im.ImFontConfig()
-    --cfg.OversampleH = 1
-    --cfg.PixelSnapH = true
+    cfg.OversampleH = 1
+    cfg.PixelSnapH = true
     im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 14, cfg, {
         --0x0080, 0x00FF, -- Basic Latin + Latin Supplement
         0x2000, 0x206F, -- General Punctuation
