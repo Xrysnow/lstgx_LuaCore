@@ -13,5 +13,5 @@ uniform sampler2D u_texture;
 void main()
 {
     gl_FragColor = v_fragmentColor * texture2D(u_texture, v_texCoord);
-	gl_FragColor.rgb = mix(u_fogColor.rgb, gl_FragColor.rgb, v_fogFactor);
+    gl_FragColor.rgb = mix(u_fogColor.rgb, gl_FragColor.rgb, v_fogFactor);
 }
