@@ -130,7 +130,7 @@ function M:_renderItem(idx)
         imgui.textUnformatted(item)
     elseif t == 'table' then
         if item.color then
-            imgui.textColored(im.color(t.color, t[1]))
+            imgui.textColored(im.color(item.color), item[1])
         else
             if item.hinter then
                 im.textUnformatted('> ')
