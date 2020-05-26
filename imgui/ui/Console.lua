@@ -43,6 +43,22 @@ function M:ctor(...)
     self:addChild(function()
         self:_render()
     end)
+
+    -- print in console
+    self._print = function(...)
+        local args = { ... }
+        local narg = select('#', ...)
+        for i = 1, narg do
+            args[i] = tostring(args[i])
+        end
+        self:log(table.concat(args, '\t'))
+    end
+    self._env = setmetatable(
+            {},
+            { __index = _G })
+    self._fenv = setmetatable(
+            { print = self._print },
+            { __index = self._env, __newindex = self._env })
 end
 
 function M:clear()
@@ -70,6 +86,14 @@ function M:log(str, highlight, hinter)
     end
 end
 
+function M:logArray(t, n)
+    for i = 1, n do
+        t[i] = tostring(t[i])
+    end
+    t = table.concat(t, ',\t')
+    self:log(t)
+end
+
 function M:getContent()
     local t = {}
     for i, v in ipairs(self.Items) do
@@ -95,24 +119,26 @@ function M:exec(str)
     self:log(str, true, true)
     -- treat as value
     local ret, msg = loadstring('return ' .. str)
+    local n, result
     if not ret then
         -- treat as statement
         ret, msg = loadstring(str)
         if not ret then
             -- error
             self:log(msg, self.style.error)
-        else
-            ret()
         end
-    else
-        local n
-        n, ret = get_ret(ret())
-        if n > 0 then
-            for i = 1, n do
-                ret[i] = tostring(ret[i])
-            end
-            ret = table.concat(ret, ',\t')
-            self:log(ret)
+    end
+    if ret then
+        setfenv(ret, self._fenv)
+        n, result = get_ret(pcall(ret))
+    end
+    if result then
+        if not result[1] then
+            -- error
+            self:log(result[2], self.style.error)
+        elseif n > 1 then
+            table.remove(result, 1)
+            self:logArray(result, n - 1)
         end
     end
     self.InputBuf = ''
