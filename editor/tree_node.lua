@@ -3,7 +3,7 @@ local M
 M = class('editor.TreeNode', function(type, icon, text)
     --Print(tostring(type))
     --Print(tostring(icon))
-    local ret = require('ui.TreeNode'):create(icon, text)
+    local ret = require('cc.ui.TreeNode'):create(icon, text)
     M.ctor(ret, type)
     for k, v in pairs(M) do
         ret[k] = v

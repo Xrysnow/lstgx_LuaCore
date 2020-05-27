@@ -12,7 +12,7 @@ function M:ctor(size)
     bg:addTo(self):alignTop(0):alignLeft(0)
     self._bg = bg
 
-    local wbg = require('ui.sprite').White(self.size)
+    local wbg = require('cc.ui.sprite').White(self.size)
     wbg:addTo(self):alignCenter():setVisible(false)
     self._wbg = wbg
 end

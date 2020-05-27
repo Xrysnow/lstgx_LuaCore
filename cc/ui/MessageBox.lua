@@ -8,7 +8,7 @@ function M:ctor(title, msg, param)
     local sc = dir:getRunningScene()
     local glv = dir:getOpenGLView()
     local sz = glv:getDesignResolutionSize()
-    local helper = require('ui.helper')
+    local helper = require('cc.ui.helper')
 
     local size_min = param.minSize or cc.size(200 - 24, 40)
     local size_max = param.maxSize or cc.size(600 - 24, 300)
@@ -28,7 +28,7 @@ function M:ctor(title, msg, param)
     end
     self:setLocalZOrder(99)
 
-    local btn = require('ui.button').ButtonNull(sz)
+    local btn = require('cc.ui.button').ButtonNull(sz)
     btn:setOpacity(127)
     btn:setSwallowTouches(true)
     btn:setAnchorPoint(cc.p(0, 0))
@@ -37,13 +37,13 @@ function M:ctor(title, msg, param)
     --    Print('click')
     --end)
 
-    local lb = require('ui.label').TTF(msg or 'Massage', param.fontSize)
+    local lb = require('cc.ui.label').TTF(msg or 'Massage', param.fontSize)
     lb:setTextColor(cc.BLACK)
-    require('ui.label').clampWidth(lb, size_max.width)
+    require('cc.ui.label').clampWidth(lb, size_max.width)
     local sz = lb:getContentSize()
     local txt = lb
     if sz.height > size_max.height then
-        txt = require('ui.label').toScroll(lb, size_max)
+        txt = require('cc.ui.label').toScroll(lb, size_max)
     else
         lb:arrangeLeftBottom()
     end
@@ -66,7 +66,7 @@ function M:ctor(title, msg, param)
         txt:setPosition(12, 46 + 12)
     end
 
-    local shadow = require('ui.sprite').FrameShadow(la_sz)
+    local shadow = require('cc.ui.sprite').FrameShadow(la_sz)
     shadow:addTo(la):setLocalZOrder(-2)
     helper.alignCenter(shadow)
 
@@ -76,7 +76,7 @@ function M:ctor(title, msg, param)
     la2:addTo(la)
     helper.alignInner(la2, 0.5, 0)
 
-    local cap = require('ui.Caption')(title or 'Message', nil, la_sz.width, 22)
+    local cap = require('cc.ui.Caption')(title or 'Message', nil, la_sz.width, 22)
     self._cap = cap
     cap:addTo(la)
     helper.alignInner(cap, 0.5, 1)
@@ -95,7 +95,7 @@ function M:ctor(title, msg, param)
 end
 
 function M:addButton(title, pos, callback, autoRemove)
-    local btn = require('ui.button').Button1()
+    local btn = require('cc.ui.button').Button1()
     btn:setTitleText(title)
     btn:addClickEventListener(function()
         if callback then
@@ -106,7 +106,7 @@ function M:addButton(title, pos, callback, autoRemove)
         end
     end)
     btn:addTo(self._la):setPosition(pos)
-    require('ui.helper').fixButtonLabel(btn)
+    require('cc.ui.helper').fixButtonLabel(btn)
     return btn
 end
 

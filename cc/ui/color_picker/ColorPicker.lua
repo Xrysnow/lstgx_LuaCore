@@ -31,39 +31,39 @@ function M:ctor(init_val, onConfirm, onCancel)
     hinter:addTo(cir_w)
     self.cir_hinter = hinter
 
-    self._rgb = require('ui.color_picker.EditRGB')(eb_sz, std.bind(self._onRGBEdit, self))
+    self._rgb = require('cc.ui.color_picker.EditRGB')(eb_sz, std.bind(self._onRGBEdit, self))
     self._rgb:addTo(self):setPosition(40, 128)
 
-    self._a = require('ui.color_picker.EditAlpha')(eb_sz, std.bind(self._onAlphaEdit, self))
+    self._a = require('cc.ui.color_picker.EditAlpha')(eb_sz, std.bind(self._onAlphaEdit, self))
     self._a:addTo(self):setPosition(292, 128)
 
-    self._sa = require('ui.color_picker.SliderAlpha')(std.bind(self._onAlphaSlide, self))
+    self._sa = require('cc.ui.color_picker.SliderAlpha')(std.bind(self._onAlphaSlide, self))
     self._sa:addTo(self):setPosition(360, yy - 220)
 
-    self._sg = require('ui.color_picker.SliderGray')(std.bind(self._onBrightnessSlide, self))
+    self._sg = require('cc.ui.color_picker.SliderGray')(std.bind(self._onBrightnessSlide, self))
     self._sg:addTo(self):setPosition(330, yy - 220)
 
-    self._hex = require('ui.color_picker.EditHex')(nil, std.bind(self._onHexEdit, self))
+    self._hex = require('cc.ui.color_picker.EditHex')(nil, std.bind(self._onHexEdit, self))
     self._hex:addTo(self):setPosition(40, 84)
 
     --self.lb = require('ui.label').create('_')
     --self.lb:addTo(self):setPosition(64, 300)
-    self._pr = require('ui.color_picker.Present')(init_val)
+    self._pr = require('cc.ui.color_picker.Present')(init_val)
     self._pr:addTo(self):setPosition(48, yy - 72)
 
-    self._cap = require('ui.Caption')('Select Color', nil, sz.width, 22)
+    self._cap = require('cc.ui.Caption')('Select Color', nil, sz.width, 22)
     self._cap:addTo(self):setPosition(0, sz.height - 22)
 
     self._onConfirm = onConfirm
     self._onCancel = onCancel
-    self._bt1 = require('ui.button').Button1(cc.size(71, 24), function()
+    self._bt1 = require('cc.ui.button').Button1(cc.size(71, 24), function()
         if self._onConfirm then
             self._onConfirm()
         end
     end)
     self._bt1:setTitleText('OK'):setTitleFontSize(16):addTo(self):setPosition(200, 24 + 20)
 
-    self._bt2 = require('ui.button').Button1(cc.size(71, 24), function()
+    self._bt2 = require('cc.ui.button').Button1(cc.size(71, 24), function()
         if self._onCancel then
             self._onCancel()
         end

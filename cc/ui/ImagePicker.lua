@@ -23,7 +23,7 @@ function M:ctor(title, images, btn_size, nCol, init_idx, onConfirm)
             nRow * (btn_size.height + btn_margin) - btn_margin + margin * 2 + caption_h
     )
     self:setContentSize(sz)
-    local cap = require('ui.Caption')(title, nil, sz.width, caption_h)
+    local cap = require('cc.ui.Caption')(title, nil, sz.width, caption_h)
     cap:addTo(self):setPosition(0, sz.height - caption_h)
 
     for i = 1, nRow do
@@ -43,7 +43,7 @@ function M:ctor(title, images, btn_size, nCol, init_idx, onConfirm)
         end
     end
 
-    local hinter = require('ui.sprite').Frame(
+    local hinter = require('cc.ui.sprite').Frame(
             cc.size(btn_size.width, btn_size.height),
             cc.c4b(0, 127, 255, 255), 1.5
     )
@@ -64,7 +64,7 @@ function M:getIndex()
 end
 
 function M:_createButton(size, idx, img)
-    local ret = require('ui.button').Button1(size, function()
+    local ret = require('cc.ui.button').Button1(size, function()
         self:select(idx)
         if self._onConfirm then
             self._onConfirm()

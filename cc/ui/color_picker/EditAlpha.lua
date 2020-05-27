@@ -30,7 +30,7 @@ function M:getValue()
 end
 
 function M:_createLabel(str, fontSize)
-    return require('ui.label').create(str, fontSize)
+    return require('cc.ui.label').create(str, fontSize)
 end
 
 function M:_createEditBox(size, onEdit)

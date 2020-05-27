@@ -1,7 +1,7 @@
 ---@class editor.TabContent:ccui.Layout
 local M = class('editro.TabContent', ccui.Layout)
 local btn_size = cc.size(56, 48)
-local helper = require('ui.helper')
+local helper = require('cc.ui.helper')
 local margin = 8
 
 function M:ctor(size, param)
@@ -22,7 +22,7 @@ function M:ctor(size, param)
 end
 
 function M:addContent(title, ico, cb)
-    local btn = require('ui.button').BaseButton(self.btn_size, cb)
+    local btn = require('cc.ui.button').BaseButton(self.btn_size, cb)
     btn:setColor(self.color)
     btn:setAnchorPoint(cc.p(0.5, 0.5))
     local sp = cc.Sprite:create(ico)

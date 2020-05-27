@@ -1,5 +1,5 @@
 ---@class editor.dialog.EditText:ui.DialogBase
-local M = class('editor.dialog.EditText', require('ui.DialogBase'))
+local M = class('editor.dialog.EditText', require('cc.ui.DialogBase'))
 
 function M:ctor()
     self.size = cc.size(420, 420)
@@ -7,14 +7,14 @@ function M:ctor()
     local wi = self:getWidget()
     wi:setBackGroundColor(cc.c3b(240, 240, 240))
 
-    local lb = require('ui.label').create('Edit text')
+    local lb = require('cc.ui.label').create('Edit text')
     lb:addTo(wi):alignLeft(20):alignTop(30)
     self._lb = lb
 
-    local eb = require('ui.prefab.EditBox').String(cc.size(380, 300))
+    local eb = require('cc.ui.prefab.EditBox').String(cc.size(380, 300))
     eb:addTo(wi):alignCenter()
     self._eb = eb
-    require('ui.helper').addFrame(eb, cc.c3b(122, 122, 122), 1)
+    require('cc.ui.helper').addFrame(eb, cc.c3b(122, 122, 122), 1)
 
     self:addConfirmButton():alignRight(92):alignBottom(8)
     self:addCancelButton():alignRight(10):alignBottom(8)

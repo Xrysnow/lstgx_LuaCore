@@ -32,7 +32,7 @@ function M.addLabel(checkBox, text)
     end)
     lb:setTextColor(cc.BLACK):addTo(checkBox):alignLeft(24):alignVCenter()
     --require('ui.label').fixPosition(lb)
-    require('ui.label').fixPosition(lb:getVirtualRenderer())
+    require('cc.ui.label').fixPosition(lb:getVirtualRenderer())
     return lb
 end
 

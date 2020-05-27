@@ -184,7 +184,7 @@ function M:addHideTask(f)
 end
 
 function M.createBase(w, h, contents, defaultIdx)
-    local btn = require('ui.ButtonToggle'):createBase(
+    local btn = require('cc.ui.ButtonToggle'):createBase(
             cc.size(w, h), contents[defaultIdx or 1] or '')
     btn:setTitleFontName('Arial'):setTitleFontSize(h * 0.6)
     btn:setTitleColor(cc.c3b(0, 0, 0))

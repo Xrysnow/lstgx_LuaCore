@@ -20,7 +20,7 @@ function M:ctor(icon, text, onSelect, onUnselect, param)
     ico:addTo(self):setPosition(cc.p(28, self._h / 2))
 
     ---@type button.toggle
-    local toggle = require('ui.ButtonToggle'):create(
+    local toggle = require('cc.ui.ButtonToggle'):create(
             'editor/tree_toggle_on.png',
             'editor/tree_toggle_off.png',
             'editor/tree_toggle_off.png', 0)
@@ -45,7 +45,7 @@ function M:ctor(icon, text, onSelect, onUnselect, param)
     lb:setTextColor(self._unselectTextColor)
     self.lb = lb
 
-    local btn = require('ui.button').ButtonNull(cc.size(16, self._h), function()
+    local btn = require('cc.ui.button').ButtonNull(cc.size(16, self._h), function()
         self:select()
     end)
     btn:addTo(self):setAnchorPoint(cc.p(0, 0.5)):setPosition(cc.p(xx - 2, self._h / 2))
@@ -181,8 +181,9 @@ function M:deleteChild(child)
     self._children:remove_if(function(v)
         return type(v) == type(child) and tostring(v) == tostring(child)
     end)
-    if self:getView() and self:getView():getCurrent() == child then
-        self:getView():setCurrent(nil)
+    local view = self:getView()
+    if view and view:getCurrent() == child then
+        view:setCurrent(nil)
     end
     if child._onDelete then
         child:_onDelete()
@@ -197,8 +198,9 @@ end
 function M:deleteChildAt(idx)
     idx = self:_checkChildIndex(idx)
     local child = self._children:at(idx)
-    if self:getView() and self:getView():getCurrent() == child then
-        self:getView():setCurrent(nil)
+    local view = self:getView()
+    if view and view:getCurrent() == child then
+        view:setCurrent(nil)
     end
     if child._onDelete then
         child:_onDelete()

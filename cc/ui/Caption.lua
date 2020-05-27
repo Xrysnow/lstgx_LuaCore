@@ -10,7 +10,7 @@ function M:ctor(title, bg_color, w, h, fontSize, fontColor)
     end
     self._bg = cc.LayerColor:create(bg_color, w, h)
     self._bg:addTo(self)
-    self._lb = require('ui.label').create(title, fontSize)
+    self._lb = require('cc.ui.label').create(title, fontSize)
     self._lb:addTo(self):setPosition(4, h / 2)
     self._lb:setTextColor(fontColor)
     self:setAnchorPoint(cc.p(0.5, 0.5))

@@ -77,7 +77,7 @@ function M:setString(idx, str)
 end
 
 function M:_setEditBox(eb)
-    require('ui.handler').setEditBox(eb)
+    require('cc.ui.handler').setEditBox(eb)
     table.insert(eb.handler.ended, function()
         self:_reformat()
     end)

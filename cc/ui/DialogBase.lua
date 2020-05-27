@@ -6,7 +6,7 @@ function M:ctor(title, size)
     local sc = dir:getRunningScene()
     local glv = dir:getOpenGLView()
     local sz = glv:getDesignResolutionSize()
-    local helper = require('ui.helper')
+    local helper = require('cc.ui.helper')
 
     --self:setContentSize(sz)
     local ch = sc:getChildren()
@@ -23,7 +23,7 @@ function M:ctor(title, size)
     end
     self:setLocalZOrder(99)
 
-    local btn = require('ui.button').ButtonNull(sz)
+    local btn = require('cc.ui.button').ButtonNull(sz)
     btn:setOpacity(127)
     btn:setSwallowTouches(true)
     btn:setAnchorPoint(cc.p(0, 0))
@@ -48,11 +48,11 @@ function M:ctor(title, size)
     la:addTo(self)
     helper.alignCenter(la)
 
-    local shadow = require('ui.sprite').FrameShadow(la_sz)
+    local shadow = require('cc.ui.sprite').FrameShadow(la_sz)
     shadow:addTo(la):setLocalZOrder(-2)
     helper.alignCenter(shadow)
 
-    local cap = require('ui.Caption')(title or 'Dialog', nil, la_sz.width, 22)
+    local cap = require('cc.ui.Caption')(title or 'Dialog', nil, la_sz.width, 22)
     self._cap = cap
     cap:addTo(la)
     helper.alignInner(cap, 0.5, 1)
@@ -63,12 +63,12 @@ function M:ctor(title, size)
     dr:setLineWidth(1)
     dr:drawRect(cc.p(0, 0), cc.p(la_sz.width, la_sz.height), cc.convertColor(clr, '4f'))
 
-    require('ui.helper').makeDraggable(la)
+    require('cc.ui.helper').makeDraggable(la)
     self:setContentSize(sz)
 end
 
 function M:addButton(title, pos, callback, autoClose)
-    local btn = require('ui.button').Button1()
+    local btn = require('cc.ui.button').Button1()
     btn:setTitleText(title)
     btn:addClickEventListener(function()
         if callback then
@@ -82,7 +82,7 @@ function M:addButton(title, pos, callback, autoClose)
     if pos then
         btn:setPosition(pos)
     end
-    require('ui.helper').fixButtonLabel(btn)
+    require('cc.ui.helper').fixButtonLabel(btn)
     return btn
 end
 

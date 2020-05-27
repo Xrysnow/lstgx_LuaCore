@@ -1,5 +1,5 @@
 --
-local Base = require('ui.ImagePicker')
+local Base = require('cc.ui.ImagePicker')
 
 ---@class editor.EnemyStyleEnumPicker:ui.ImagePicker
 local M = class('editor.EnemyStyleEnumPicker', Base)

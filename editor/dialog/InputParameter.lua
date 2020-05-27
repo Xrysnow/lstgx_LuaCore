@@ -1,5 +1,5 @@
 ---@class editor.dialog.InputParameter:ui.DialogBase
-local M = class('editor.dialog.InputParameter', require('ui.DialogBase'))
+local M = class('editor.dialog.InputParameter', require('cc.ui.DialogBase'))
 
 function M:ctor()
     self.super.ctor(self, 'Input Parameter', cc.size(650, 350))
@@ -13,13 +13,13 @@ function M:ctor()
     for _, xx in ipairs({ 0, 320 }) do
         for i = 1, 8 do
             local yy = 36 + (i - 1) * 32
-            local lb = require('ui.label').create('N/A')
+            local lb = require('cc.ui.label').create('N/A')
             lb:addTo(wi):alignLeft(xx + 20):alignTop(yy)
             table.insert(self._labels, lb)
-            local eb = require('ui.prefab.EditBox').String(cc.size(192, 22))
+            local eb = require('cc.ui.prefab.EditBox').String(cc.size(192, 22))
             eb:addTo(wi):alignLeft(xx + 120):alignTop(yy)
             table.insert(self._inputs, eb)
-            require('ui.helper').addFrame(eb, cc.c3b(122, 122, 122))
+            require('cc.ui.helper').addFrame(eb, cc.c3b(122, 122, 122))
         end
     end
     self._num = 0

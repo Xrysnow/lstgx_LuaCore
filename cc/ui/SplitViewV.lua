@@ -32,7 +32,7 @@ end
 function M:setTop(widget, param)
     CC_SET_PROP_CHILDREN(self, '_top', widget)
     if param then
-        self._tparam = require('ui.helper').parseConstrainParam(param)
+        self._tparam = require('cc.ui.helper').parseConstrainParam(param)
     end
     self:updateLayout()
 end
@@ -40,7 +40,7 @@ end
 function M:setBottom(widget, param)
     CC_SET_PROP_CHILDREN(self, '_bottom', widget)
     if param then
-        self._bparam = require('ui.helper').parseConstrainParam(param)
+        self._bparam = require('cc.ui.helper').parseConstrainParam(param)
     end
     self:updateLayout()
 end
@@ -103,7 +103,7 @@ function M:setContentSize(size)
     if bpref then
         bpref = math.clamp(bpref, bmin, bmax)
     end
-    local th, bh = require('ui.helper').solveConstrain(hh, tpref, tmin, tmax, bpref, bmin, bmax)
+    local th, bh = require('cc.ui.helper').solveConstrain(hh, tpref, tmin, tmax, bpref, bmin, bmax)
     self:_setSize(th, bh, ww)
 end
 

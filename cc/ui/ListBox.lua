@@ -9,7 +9,7 @@ function M:ctor(size, item_h)
     ---@type ccui.Button[]
     self._children = {}
 
-    local hinter = require('ui.sprite').White(self.item_size)
+    local hinter = require('cc.ui.sprite').White(self.item_size)
     hinter:addTo(self):setVisible(false):alignHCenter()
     hinter:setColor(cc.BLUE)
     self._hinter = hinter
@@ -17,12 +17,12 @@ end
 
 function M:addItem(text)
     local idx = self:getItemCount() + 1
-    local btn = require('ui.button').ButtonNull(self.item_size, function()
+    local btn = require('cc.ui.button').ButtonNull(self.item_size, function()
         self:_select(idx)
     end)
     btn:addTo(self)
     table.insert(self._children, btn)
-    local lb = require('ui.label').create(text, 13)
+    local lb = require('cc.ui.label').create(text, 13)
     lb:addTo(btn):alignVCenter():alignLeft(6)
     btn.label = lb
     self:_updateLayout()

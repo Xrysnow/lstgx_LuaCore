@@ -8,7 +8,7 @@ function M:ctor(param, size)
     Base.ctor(self, param)
     self.type = 'enum'
     self.enum = param.enum
-    local ddl = require('ui.DropDownList').createBase(size.width, size.height, self.enum)
+    local ddl = require('cc.ui.DropDownList').createBase(size.width, size.height, self.enum)
     ddl:addTo(self):setAnchorPoint(cc.p(0, 0.5)):setPosition(cc.p(0, 0))
     self._ddl = ddl
     self._str = {}

@@ -12,7 +12,7 @@ function M:ctor(param)
         item_select_color = cc.c3b(187, 187, 187),
     })
     self:setBackGroundColorType(1):setBackGroundColor(self.color)
-    self._title = require('ui.label').create(i18n 'Project Files')
+    self._title = require('cc.ui.label').create(i18n 'Project Files')
     self._title:addTo(self):alignTop(12):alignLeft(20)
     self._title:setTextColor(cc.BLACK)
 
@@ -29,10 +29,10 @@ function M:ctor(param)
         text_color = cc.BLACK,
         item_h     = 24,
     }
-    self.tree = require('ui.TreeView')()
+    self.tree = require('cc.ui.TreeView')()
     self.tree:addTo(self):setContentSize(self.view_size):alignCenter()
     self.tree:setBackGroundColor(self.view_color)
-    self.root = require('ui.TreeNode')('null.png', 'res://', function()
+    self.root = require('cc.ui.TreeNode')('null.png', 'res://', function()
         self.tree:setCurrent(self.root)
     end, nil, self.node_param)
     self.root:setSelectColor(self.item_select_color)
@@ -93,7 +93,7 @@ end
 
 function M:createItem(ico, str)
     local ret
-    ret = require('ui.TreeNode')(
+    ret = require('cc.ui.TreeNode')(
             ico or 'null.png', str or 'N/A', function()
                 self.tree:setCurrent(ret)
             end, nil, self.node_param)

@@ -1,5 +1,5 @@
 ---@class editor.dialog.SelectImage:ui.DialogBase
-local M = class('editor.dialog.SelectImage', require('ui.DialogBase'))
+local M = class('editor.dialog.SelectImage', require('cc.ui.DialogBase'))
 
 function M:ctor()
     self.super.ctor(self, 'Select Image', cc.size(480, 340))
@@ -7,16 +7,16 @@ function M:ctor()
     wi:setBackGroundColor(cc.c3b(243, 243, 243))
 
     local box_size = cc.size(192, 256)
-    local _box = require('ui.sprite').White(box_size)
+    local _box = require('cc.ui.sprite').White(box_size)
     _box:setColor(cc.c3b(255, 200, 200))
     _box:addTo(wi):alignLeft(10):alignTop(30)
-    require('ui.helper').addFrame(_box, cc.c3b(122, 122, 122), 1)
+    require('cc.ui.helper').addFrame(_box, cc.c3b(122, 122, 122), 1)
 
-    local box = require('ui.ListBox')(box_size, 16)
+    local box = require('cc.ui.ListBox')(box_size, 16)
     box:addTo(wi):alignLeft(10):alignTop(30)
     self._box = box
 
-    local pr = require('ui.ImagePreviewer')(cc.size(256, 256))
+    local pr = require('cc.ui.ImagePreviewer')(cc.size(256, 256))
     pr:addTo(wi):alignRight(10):alignTop(30)
     self._pr = pr
 

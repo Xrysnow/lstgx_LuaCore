@@ -68,7 +68,7 @@ end
 function M.fixButtonLabel(btn)
     local lb = btn:getTitleRenderer()
     if lb then
-        require('ui.label').fixPosition(lb)
+        require('cc.ui.label').fixPosition(lb)
     end
 end
 

@@ -1,6 +1,6 @@
 ---@class editor.ToolPanel:ccui.Layout
 local M = class('editor.ToolPanel', ccui.Layout)
-local helper = require('ui.helper')
+local helper = require('cc.ui.helper')
 local _blue = cc.c3b(43, 87, 154)
 local _green = cc.c3b(33, 115, 70)
 
@@ -24,7 +24,7 @@ function M:ctor(param)
     self._title = {}
     self._panel = {}
     self._label = {}
-    self.hinter = require('ui.sprite').White(self.sel_size)
+    self.hinter = require('cc.ui.sprite').White(self.sel_size)
     self.hinter:addTo(self):setVisible(false):setAnchorPoint(cc.p(0, 1)):setColor(self.sel_bg_color)
     if self.dir == 'left' then
         self.hinter:alignRight(0)
@@ -46,13 +46,13 @@ function M:createTab(title, icon)
         panel:alignRight(0)
     end
     self._panel[title] = panel
-    local btn = require('ui.button').ButtonNull(self.sel_size, function()
+    local btn = require('cc.ui.button').ButtonNull(self.sel_size, function()
         --Print('select ' .. title)
         self:select(title)
     end)
     btn:addTo(self):setAnchorPoint(cc.p(0, 1)):setLocalZOrder(2)
     table.insert(self._sel, btn)
-    local lb = require('ui.label').create(title, 13)
+    local lb = require('cc.ui.label').create(title, 13)
     lb:setTextColor(cc.WHITE)
     lb:addTo(btn):setPosition(6, self.sel_size.height / 2)
     if self.param.verticle then

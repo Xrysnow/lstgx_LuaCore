@@ -112,7 +112,7 @@ __G__TRACKBACK__ = function(msg)
     print(msg)
     lstg.SystemLog(msg)
     if plus and plus.isMobile() then
-        require('ui.MessageBox').OK('Error', msg, function()
+        require('cc.ui.MessageBox').OK('Error', msg, function()
             --ex.OnExit()
             cc.Director:getInstance():endToLua()
         end)

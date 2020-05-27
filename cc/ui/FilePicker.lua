@@ -12,13 +12,13 @@ function M:ctor(filter, default_path, is_save, input_size, btn_size)
     self:setContentSize(sz)
     --self:setBackGroundColorType(1):setBackGroundColor(cc.c3b(2555, 200, 200))
 
-    local input = require('ui.prefab.EditBox').String(input_size)
+    local input = require('cc.ui.prefab.EditBox').String(input_size)
     input:addTo(self):alignLeft(margin):alignVCenter()
     self._eb = input
 
     local fd = require('platform.FileDialog')
     local func = is_save and fd.save or fd.open
-    local btn = require('ui.button').Button1(btn_size, function()
+    local btn = require('cc.ui.button').Button1(btn_size, function()
         local path = func(filter, default_path)
         if path then
             self._eb:setString(0, path)

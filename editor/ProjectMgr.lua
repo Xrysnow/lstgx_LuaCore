@@ -289,7 +289,7 @@ function M.CloseProj(onFinish)
         if M.IsNeedSave() then
             --local msg = 'Save file "' .. curProjFile .. '" ?'
             local msg = string.format('%s "%s" ?', i18n('Save file'), curProjFile)
-            require('ui.MessageBox').Yes_No_Cancel('', msg, onConfirm, onReject, onCancel)
+            require('cc.ui.MessageBox').Yes_No_Cancel('', msg, onConfirm, onReject, onCancel)
         else
             onReject()
         end
@@ -325,7 +325,7 @@ function M.NewProj()
             local fileName = di:getPath()
             if fileName == "" then
                 --require('ui.MessageBox').OK('Error', "Please specify file path!")
-                require('ui.MessageBox').OK('Error', string.format('%s!', i18n('Please specify file path')))
+                require('cc.ui.MessageBox').OK('Error', string.format('%s!', i18n('Please specify file path')))
                 return
             end
             local templates = { 'empty', 'singlestage', 'spellcard', 'touhou' }

@@ -44,7 +44,7 @@ function M:ctor(title, types, param)
             cur_idx = self:_getTypeIndex(param.cur_type) or 1
         end
         self.inputs[cur_idx]:setVisible(true)
-        local sel = require('ui.DropDownList').createBase(64, 28, self.types, cur_idx)
+        local sel = require('cc.ui.DropDownList').createBase(64, 28, self.types, cur_idx)
         sel:addTo(self):setAnchorPoint(cc.p(0, 0.5)):setPosition(cc.p(64, yy))
         sel:addHideTask(function()
             self:_select(sel:getCurrentIndex())
@@ -52,7 +52,7 @@ function M:ctor(title, types, param)
         self.sel = sel
     end
     self._onAdvEdit = std.fvoid
-    local btn = require('ui.button').Button1(self.edit_btn_size, function()
+    local btn = require('cc.ui.button').Button1(self.edit_btn_size, function()
         self._onAdvEdit()
     end, '...')
     local hh = (self.size.height - self.cap_h) / 2 + self.cap_h - self.edit_btn_size.height / 2

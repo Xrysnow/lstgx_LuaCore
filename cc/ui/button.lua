@@ -6,7 +6,7 @@ local default_size = cc.size(75, 25)
 ------@param size size_table
 local function set_size(btn, size)
     btn:setContentSize(size)
-    require('ui.helper').fixButtonLabel(btn)
+    require('cc.ui.helper').fixButtonLabel(btn)
 end
 
 ---@return ccui.Button

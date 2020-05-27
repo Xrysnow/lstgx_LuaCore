@@ -11,7 +11,7 @@ function M:ctor(param)
         size = cc.size(500, 600),
     })
     ---@type ui.TreeView
-    local view = require('ui.TreeView'):create()
+    local view = require('cc.ui.TreeView'):create()
     view:addTo(self):setContentSize(self.size)
     local root = require('editor.tree_node'):create('root', 'editor/images/16x16/folder.png', 'project')
     view:_setRoot(root)

@@ -2,7 +2,7 @@
 local M = class("EditorScene", cc.load("mvc").ViewBase)
 
 local glv = cc.Director:getInstance():getOpenGLView()
-local DropDownList = require('ui.DropDownList')
+local DropDownList = require('cc.ui.DropDownList')
 local _touchmask
 local _touchmask_task = {}
 local white = cc.c4b(255, 255, 255, 255)
@@ -96,6 +96,8 @@ function M:onEnter()
     --input1:setFontColor(cc.c3b(0, 0, 0))
     --input1:setFont('Arial', 20)
 
+    --local dd = require('ui.color_picker.ColorPicker').create()
+    --dd:addTo(self):setPosition(cc.p(300, 150)):setLocalZOrder(1)
     --local dd = require('ui.DropDownList').createBase(96, 24, { 'Item_A', 'Item_B', 'Item_C' })
     --dd:addTo(self):setPosition(cc.p(300, 150))
     --local chb = require('ui.checkbox_prefab').createBase()
@@ -120,8 +122,8 @@ function M:onEnter()
     tab1:setContentSize(cc.size(300, 720)):alignLeft(-300)
     tab1:setBackGroundColor(cc.WHITE)
     self.property_panel:addTo(tab1):setContentSize(cc.size(280, 640)):alignCenter()
-    local pp_frame = require('ui.helper').makeFrame(self.property_panel, cc.c4b(214, 214, 214, 255))
-                                         :addTo(tab1):setPosition((300 - 280) / 2, (720 - 640) / 2)
+    local pp_frame = require('cc.ui.helper').makeFrame(self.property_panel, cc.c4b(214, 214, 214, 255))
+                                            :addTo(tab1):setPosition((300 - 280) / 2, (720 - 640) / 2)
 
     tab1:setOnResize(function(this, size)
         local sz = cc.size(size.width - 20, size.height - 80)
@@ -150,18 +152,18 @@ function M:onEnter()
     self:_initColorPicker()
 
     local color_bg = cc.c4b(224, 224, 224, 255)
-    self.sv = require('ui.SplitViewH')(nil, nil, { size = cc.size(1280, 720), color = color_bg })
+    self.sv = require('cc.ui.SplitViewH')(nil, nil, { size = cc.size(1280, 720), color = color_bg })
     self.sv:addTo(self)
     self.sv:setMargin(8)
     local toolbar = self:_createToolbar()
     self.sv:setLeft(toolbar, { 104 })
 
-    self.svr = require('ui.SplitViewH')(nil, nil, { color = color_bg })
+    self.svr = require('cc.ui.SplitViewH')(nil, nil, { color = color_bg })
     self.svr.margin.m = 8
     self.sv:setRight(self.svr)
     self.svr:setRight(tpr, { 320 })
 
-    self.svrl = require('ui.SplitViewH')(nil, nil, { color = color_bg })
+    self.svrl = require('cc.ui.SplitViewH')(nil, nil, { color = color_bg })
     self.svrl.margin.m = 8
     self.svr:setLeft(self.svrl)
     self.svrl:setLeft(tp, { 128 })
@@ -182,6 +184,13 @@ function M:onEnter()
         glv:setDesignResolutionSize(fsize.width, fsize.height, cc.ResolutionPolicy.SHOW_ALL)
         self.sv:setContentSize(fsize)
     end)
+
+    require('cc.ui.hover_manager').start(self)
+    --require('ui.hover_manager').register(toolbar, function()
+    --    toolbar:setBackGroundColor(cc.RED)
+    --end, function()
+    --    toolbar:setBackGroundColor(cc.BLUE)
+    --end)
 end
 
 function M.addMaskClickTask(sender, task)
@@ -237,7 +246,7 @@ function M:_createToolbar()
 
     local toolbar_data = require('editor.toolbar_data')
     for i, v in ipairs(toolbar_data) do
-        local btn = require('ui.button').BaseButton(cc.size(hh - 4, hh - 4))
+        local btn = require('cc.ui.button').BaseButton(cc.size(hh - 4, hh - 4))
         btn:addTo(toolbar)
         btn:alignTop((math.floor((i - 1) / 2)) * hh + 1):alignLeft((i + 1) % 2 * hh + 1)
         local icon = cc.Sprite:create('editor/x2/images/toolbar/' .. v.bitmap)
@@ -265,7 +274,7 @@ end
 
 local _color_picker
 function M:_initColorPicker()
-    local cp = require('ui.color_picker.ColorPicker')()
+    local cp = require('cc.ui.color_picker.ColorPicker')()
     local sz = cp:getContentSize()
     cp:addTo(self):setPosition(640 - sz.width / 2, 360 - sz.height / 2)
     cp:setVisible(false)

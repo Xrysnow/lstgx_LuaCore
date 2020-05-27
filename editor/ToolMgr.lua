@@ -238,7 +238,7 @@ local function GoToLineNum()
     if curProjFile then
         lineNum = tonumber(lineNumText:GetValue())
         if lineNum == nil then
-            require('ui.MessageBox').OK('Error', "Must input an integer")
+            require('cc.ui.MessageBox').OK('Error', "Must input an integer")
             --lineNumText:SetValue("")
             return
         end
@@ -256,7 +256,7 @@ local function GoToLineNum()
                 return
             end
         end
-        require('ui.MessageBox').OK('Info', "End of project is reached")
+        require('cc.ui.MessageBox').OK('Info', "End of project is reached")
     end
 end
 
