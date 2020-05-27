@@ -1,8 +1,8 @@
 --- collision check
 ---@class x.collision
 local M = {}
-local intersect = require('core_x.math.intersection')
-local vec2 = require('core_x.math.vec2')
+local intersect = require('math.intersection')
+local vec2 = require('math.vec2')
 
 local func = {}
 for i = 0, 5 do

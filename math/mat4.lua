@@ -1,8 +1,8 @@
 ---@class math.mat4
 local M = {}
-local vec3 = require('core_x.math.vec3')
-local vec4 = require('core_x.math.vec4')
-local quat = require('core_x.math.quaternion')
+local vec3 = require('math.vec3')
+local vec4 = require('math.vec4')
+local quat = require('math.quaternion')
 local type = type
 local function xyz(x, y, z)
     if type(x) == 'number' then

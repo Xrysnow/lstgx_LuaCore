@@ -4,7 +4,7 @@
 ---@field z number
 ---@field w number
 local M = {}
-local vec3 = require('core_x.math.vec3')
+local vec3 = require('math.vec3')
 
 M.__index = M
 

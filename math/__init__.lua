@@ -5,14 +5,14 @@
 ---
 
 for _, n in ipairs({ 'math', 'math_const', 'math_types' }) do
-    require('core_x.math.' .. n)
+    require('math.' .. n)
 end
 
-math.Vec2 = require('core_x.math.vec2')
-math.Vec3 = require('core_x.math.vec3')
-math.Vec4 = require('core_x.math.vec4')
-math.Mat4 = require('core_x.math.mat4')
-math.Quat = require('core_x.math.quaternion')
+math.Vec2 = require('math.vec2')
+math.Vec3 = require('math.vec3')
+math.Vec4 = require('math.vec4')
+math.Mat4 = require('math.mat4')
+math.Quat = require('math.quaternion')
 
 ---@return math.vec2
 function math.vec2(...)

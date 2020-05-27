@@ -6,14 +6,10 @@
 
 Include('core_x/import.lua')
 
---import 'std'
---import 'table'
---import 'math'
---import 'util'
-
-for _, n in ipairs({ 'std', 'table', 'math', 'util', 'ext' }) do
+for _, n in ipairs({ 'std', 'table', 'util', 'ext' }) do
     require('core_x.' .. n)
 end
+require('math.__init__')
 
 lstg.eventDispatcher = require('core_x.EventDispatcher').create()
 lstg.fs = require('core_x.fs')

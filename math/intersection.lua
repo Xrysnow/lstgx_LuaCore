@@ -1,8 +1,8 @@
 --- intersection between two geometries
 ---@class x.intersection
 local M = {}
-local vec2 = require('core_x.math.vec2')
-local distance = require('core_x.math.distance_point')
+local vec2 = require('math.vec2')
+local distance = require('math.distance_point')
 
 local function SinCos(angle)
     return math.sin(angle), math.cos(angle)
