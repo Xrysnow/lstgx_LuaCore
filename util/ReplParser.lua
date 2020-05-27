@@ -17,6 +17,21 @@ local _seg = {
 }
 
 function M:ctor(code)
+    local code_ori = code
+    -- replace none-ascii chars for lexer
+    local replaced_chars = {}
+    local replace = { '_', '__', '___', '____' }
+    if utf8.len(code) ~= #code then
+        for p, c in utf8.codes(code) do
+            local char = utf8.char(c)
+            if #char > 1 then
+                table.insert(replaced_chars, replace[#char])
+            else
+                table.insert(replaced_chars, char)
+            end
+        end
+        code = table.concat(replaced_chars)
+    end
     self.code = code
     self.lexer = require('util.lexers.lua_')
     local tokens = self.lexer:lex(code)
@@ -29,7 +44,7 @@ function M:ctor(code)
     for i = 1, num do
         local type = tokens[(i - 1) * 2 + 1]
         local idx = tokens[i * 2]
-        local s = code:sub(cur, idx - 1)
+        local s = code_ori:sub(cur, idx - 1)
         -- shared in 2 tables
         local seg = { type, s }
         table.insert(segments, seg)
