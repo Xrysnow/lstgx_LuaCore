@@ -298,6 +298,20 @@ function M.styleColor(idx, color)
             { idx, color })
 end
 
+function M.wrapper(onPush, onPop)
+    local ret = M()
+    ret:setHandler(function()
+        if onPush then
+            onPush()
+        end
+        M._handler(ret)
+        if onPop then
+            onPop()
+        end
+    end)
+    return ret
+end
+
 --------------------------------------------------
 -- prefabs
 --------------------------------------------------
