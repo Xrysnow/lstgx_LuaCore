@@ -85,6 +85,19 @@ end
 --------------------------------------------------
 
 ---@return im.Widget
+local function begin_end_wrapper(begin, end_, args)
+    local ret = M(unpack(args or {}))
+    ret:setHandler(function()
+        if begin(unpack(ret._param)) then
+            M._handler(ret)
+            end_()
+        end
+    end)
+    return ret
+end
+M._begin_end_wrapper = begin_end_wrapper
+
+---@return im.Widget
 function M.Widget(handler)
     local ret = M()
     if handler then
@@ -222,6 +235,7 @@ local function push_pop_wrapper(push, pop, pushArgs)
     end)
     return ret
 end
+M._push_pop_wrapper = push_pop_wrapper
 
 ---   allow focusing using TAB/Shift-TAB, enabled by default but you can disable it for certain widgets
 ---@param allow_keyboard_focus boolean
@@ -284,13 +298,6 @@ function M.textWrapPos(pos)
             { pos })
 end
 
-function M.styleVar(idx, value)
-    return push_pop_wrapper(
-            imgui.pushStyleVar,
-            imgui.popStyleVar,
-            { idx, value })
-end
-
 function M.styleColor(idx, color)
     return push_pop_wrapper(
             imgui.pushStyleColor,
@@ -298,6 +305,42 @@ function M.styleColor(idx, color)
             { idx, color })
 end
 
+function M.styleColors(t)
+    local on_push = function()
+        for k, v in pairs(t) do
+            imgui.pushStyleColor(k, v)
+        end
+    end
+    local on_pop = function()
+        for _, _ in pairs(t) do
+            imgui.popStyleColor()
+        end
+    end
+    return M.wrapper(on_push, on_pop)
+end
+
+function M.styleVar(idx, value)
+    return push_pop_wrapper(
+            imgui.pushStyleVar,
+            imgui.popStyleVar,
+            { idx, value })
+end
+
+function M.styleVars(t)
+    local on_push = function()
+        for k, v in pairs(t) do
+            imgui.pushStyleVar(k, v)
+        end
+    end
+    local on_pop = function()
+        for _, _ in pairs(t) do
+            imgui.popStyleVar()
+        end
+    end
+    return M.wrapper(on_push, on_pop)
+end
+
+---@return im.Widget
 function M.wrapper(onPush, onPop)
     local ret = M()
     ret:setHandler(function()
