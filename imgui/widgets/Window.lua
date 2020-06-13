@@ -23,7 +23,7 @@ function M:isOpen()
 end
 
 function M:setFlags(flag, ...)
-    self:setParam(3, bit.band(flag, ...))
+    self:setParam(3, bit.bor(flag, ...))
     return self
 end
 
