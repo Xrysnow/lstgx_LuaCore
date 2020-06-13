@@ -53,7 +53,9 @@ function M:_handler()
     if self._width then
         imgui.setNextItemWidth(self._width)
     end
+    imgui.pushID(tostring(self))
     local ret = { imgui.inputText(unpack(self._param)) }
+    imgui.popID()
     self._ret = ret
     self._param[2] = ret[2]
     if ret[1] and self._onChange then
