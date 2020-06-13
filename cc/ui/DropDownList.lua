@@ -58,22 +58,18 @@ function M:ctor(button, cell_h, cell_w_min, cell_w_max)
     self._onHideTask = {}
 
     self:enableNodeEvents()
-    --require('editor.main'):addMaskClickTask(self, function()
-    --    self:hide()
-    --    self.button:setClicked(false)
-    --end)
     self:hide()
 end
 
 function M:onEnter()
-    require('editor.main').addMaskClickTask(self, function()
-        self:hide()
-        self.button:setClicked(false)
-    end)
+    --require('editor.main').addMaskClickTask(self, function()
+    --    self:hide()
+    --    self.button:setClicked(false)
+    --end)
 end
 
 function M:onExit()
-    require('editor.main').removeMaskClickTask(self)
+    --require('editor.main').removeMaskClickTask(self)
 end
 
 local _btn_tag = 1

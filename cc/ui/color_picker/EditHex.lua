@@ -56,7 +56,7 @@ function M:_createLabel(str, fontSize)
 end
 
 function M:_createEditBox(size, onEdit)
-    local ret = require('editor.property_input.common').hex(
+    local ret = require('cc.ui.property_input.common').hex(
             {}, size
     )
     if onEdit then

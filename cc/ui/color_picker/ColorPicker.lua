@@ -210,7 +210,7 @@ function M:_onCircleTouch(sender, event)
 end
 
 function M:_createEditBox(size, min, max, cb)
-    local eb = require('editor.property_input.common').integer
+    local eb = require('cc.ui.property_input.common').integer
     local ret = eb({ min = min, max = max }, size)
     if cb then
         table.insert(ret._eb.handler.ended, function()
