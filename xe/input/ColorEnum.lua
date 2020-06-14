@@ -4,7 +4,7 @@ local M = class('xe.input.ColorEnum', base)
 local im = imgui
 local wi = require('imgui.Widget')
 local path = 'xe/color_enum/'
-local map = {
+local colors = {
     COLOR_DEEP_RED      = 1,
     COLOR_RED           = 2,
     COLOR_DEEP_PURPLE   = 3,
@@ -22,8 +22,9 @@ local map = {
     COLOR_DEEP_GRAY     = 15,
     COLOR_GRAY          = 16,
 }
-for k, v in pairs(map) do
-    map[v] = k
+M._colors = colors
+for i = 1, 16 do
+    colors[i] = table.keyof(colors, i)
 end
 
 ---@param node xe.SceneNode
@@ -31,16 +32,16 @@ function M:ctor(node, idx)
     base.ctor(self, node, idx, 'color_enum')
     local value = node:getAttrValue(idx)
     if type(value) ~= 'string' then
-        value = map[value] or ''
+        value = colors[value] or ''
     end
-    if not map[value] then
-        value = map[1]
+    if not colors[value] then
+        value = colors[1]
     end
     self._value = value
-    self._sel = map[value]
+    self._sel = colors[value]
 
     local images = {}
-    for i, v in ipairs(map) do
+    for i, v in ipairs(colors) do
         local f = path .. v .. '.png'
         local sp = cc.Sprite(f)
         sp:addTo(self):setVisible(false)
@@ -81,15 +82,15 @@ function M:_renderColorSelector(nCol)
     local dl = im.getWindowDrawList()
 
     local ret, any_ret
-    for i = 1, #map do
+    for i = 1, #colors do
         local p = im.getCursorScreenPos()
         local sp = self._img[i]
         ret = im.imageButton(sp, size, 0)
         if ret then
-            local old=self._sel
+            local old = self._sel
             if old ~= i then
                 self._sel = i
-                self._value = map[i]
+                self._value = colors[i]
                 self:submit()
             end
             any_ret = true
@@ -97,7 +98,7 @@ function M:_renderColorSelector(nCol)
         if self._sel == i then
             dl:addRect(p, cc.pAdd(p, size), im.getColorU32(im.Col.ButtonActive), 0, 0, 3)
         end
-        if i % nCol ~= 0 and i < #map then
+        if i % nCol ~= 0 and i < #colors then
             im.sameLine()
         end
     end
