@@ -73,7 +73,7 @@ M.resfile = {
     loadFX       = { "fx", "vert", "frag" },
 }
 M.selectenemystyle = {
-    'enemystyle'
+    'enemy_style'
 }
 M.selecttype = {
     -- SelectObjectClass
