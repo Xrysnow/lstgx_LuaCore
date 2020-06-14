@@ -216,6 +216,10 @@ function M:updatePosition()
 end
 
 function M:_handler()
+    self._cursor = im.getCursorScreenPos()
+    self:_renderIcon()
+    self:_renderIndentLine()
+
     if self._needopen ~= nil then
         im.setNextItemOpen(self._needopen)
         self._needopen = nil
@@ -233,6 +237,9 @@ function M:_handler()
     if str == '' then
         str = ('[%s] select: %s'):format(self:getType(), self._select)
     end
+    if self._icon then
+        str = '     ' .. str
+    end
     local ret = { im.treeNodeEx(tostring(self), flags, str) }
     if im.isItemClicked() then
         self:select()
@@ -244,6 +251,61 @@ function M:_handler()
         if not is_leaf then
             im.treePop()
         end
+    end
+end
+
+local round = math.round
+local function pAdd(p1, p2)
+    return { x = round(p1.x + p2.x), y = round(p1.y + p2.y) }
+end
+
+function M:_renderIcon()
+    if not self._icon then
+        return
+    end
+    local p = self._cursor
+    local h = im.getTextLineHeightWithSpacing()
+    local dl = im.getWindowDrawList()
+    local a = pAdd(p, cc.p(h, im.getTextLineHeight() / 2 - 16 / 2))
+    local b = pAdd(a, cc.p(16, 16))
+    dl:addImage(self._icon, a, b)
+end
+
+function M:_renderIndentLine()
+    if self:isFold() or self:getChildrenCount() == 0 then
+        return
+    end
+    local next = self:getBrotherNext()
+    if not next then
+        return
+    end
+    local p1 = self._cursor
+    local p2 = next._cursor
+    if not p1 or not p2 then
+        return
+    end
+    local color
+    if self:isSelected() then
+        color = im.getColorU32(im.Col.ButtonActive)
+    else
+        color = im.getColorU32(im.Col.Border)
+    end
+    local is_leaf = next:isLeaf()
+    local h = im.getTextLineHeightWithSpacing()
+    local xx = h / 2 + 1
+    local cc = cc
+    p1 = pAdd(p1, cc.p(xx, h * 0.9))
+    if is_leaf then
+        p2 = pAdd(p2, cc.p(xx, h * 0.4))
+    else
+        p2 = pAdd(p2, cc.p(xx, -h * 0.2))
+    end
+    local dl = im.getWindowDrawList()
+    dl:addLine(p1, p2, color, 1)
+    if is_leaf then
+        p2 = pAdd(p2, cc.p(1, 0))
+        local p3 = pAdd(p2, cc.p(h * 0.2, 0))
+        dl:addLine(p2, p3, color, 1)
     end
 end
 
