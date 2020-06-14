@@ -272,7 +272,6 @@ end
 
 ---@param node xe.SceneNode
 function M:submitAttr(node, values)
-    print('SceneTree:submitAttr')
     local changed = false
     local val = table.clone(values)
     local rec_old = {}
@@ -520,18 +519,6 @@ function M.getPicker(type, node, idx)
         typename         = function()
             print('show InputTypeName')
             --require('xe.input.InputTypeName').show(idx, node)
-        end,
-        selectenemystyle = function()
-            print('show EnemyStyleEnumPicker')
-            --require('xe.input.EnemyStyleEnumPicker').show(idx, node)
-        end,
-        bulletstyle      = function()
-            print('show BulletStyleEnumPicker')
-            --require('xe.input.BulletStyleEnumPicker').show(idx, node)
-        end,
-        color            = function()
-            print('show ColorEnumPicker')
-            --require('xe.input.ColorEnumPicker').show(idx, node)
         end,
     }
     return _picker[type]

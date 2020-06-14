@@ -96,7 +96,6 @@ function M:setOnDelete(cb)
 end
 
 function M:toggle_fold()
-    print('TreeNode:toggle_fold()', self)
     if self:isOpen() then
         self:unfold()
     else
@@ -105,17 +104,14 @@ function M:toggle_fold()
 end
 
 function M:fold()
-    print('TreeNode:fold()', self:getType())
     self:setOpen(false)
 end
 
 function M:unfold()
-    print('TreeNode:unfold()', self:getType())
     self:setOpen(true)
 end
 
 function M:unfoldToThis()
-    print('TreeNode:unfoldToThis()', self)
     tree.unfoldToThis(self)
 end
 
@@ -124,7 +120,6 @@ function M:isFold()
 end
 
 function M:toggle_select()
-    print('TreeNode:toggle_select()', self)
     tree.toggle_select(self)
 end
 
@@ -132,7 +127,6 @@ function M:select()
     if self._select then
         return
     end
-    print('TreeNode:select()', self:getType())
     self._select = true
     if self._onSelect then
         self:_onSelect()
@@ -143,7 +137,6 @@ function M:unselect()
     if not self._select then
         return
     end
-    print('TreeNode:unselect()', self:getType())
     self._select = false
     if self._onUnselect then
         self:_onUnselect()
