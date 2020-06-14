@@ -149,6 +149,22 @@ function M.CollapsingHeader(label, flags, closable)
     return ret
 end
 
+---@return im.Combo
+function M.Combo(label, items, current, flags)
+    local ret = require('imgui.widgets.Combo')(label, '', flags)
+    if items then
+        ret:setItems(items)
+    end
+    if current then
+        ret:setCurrent(current)
+    end
+    return ret
+end
+
+function M.MenuBar()
+    return begin_end_wrapper(imgui.beginMenuBar, imgui.endMenuBar)
+end
+
 ---@return im.ProgressBar
 function M.ProgressBar(fraction, size, overlay)
     return require('imgui.widgets.ProgressBar')(fraction, size, overlay)
