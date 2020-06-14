@@ -15,7 +15,7 @@ M.bool = {
     'bool'
 }
 M.bulletstyle = {
-    'bulletstyle'
+    'bullet_style'
 }
 M.color = {
     'color_enum',

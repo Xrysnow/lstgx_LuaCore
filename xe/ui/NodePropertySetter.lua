@@ -133,6 +133,8 @@ function M:_createInput(t)
         ret = require('xe.input.Bool')(self._node, self._idx)
     elseif t == 'color_enum' then
         ret = require('xe.input.ColorEnum')(self._node, self._idx)
+    elseif t == 'bullet_style' then
+        ret = require('xe.input.BulletStyleEnum')(self._node, self._idx)
     else
         ret = require('xe.input.String')(self._node, self._idx, true)
     end
