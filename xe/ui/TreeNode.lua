@@ -4,7 +4,11 @@ local M = class('xe.ui.TreeNode', base)
 local im = imgui
 local tree = require('cc.ui.TreeNode')
 local wi = require('imgui.Widget')
-local _flags = bit.bor(im.TreeNodeFlags.OpenOnArrow, im.TreeNodeFlags.OpenOnDoubleClick)
+local _flags = bit.bor(
+        im.TreeNodeFlags.OpenOnArrow,
+        im.TreeNodeFlags.OpenOnDoubleClick,
+        im.TreeNodeFlags.SpanAllAvailWidth,
+        im.TreeNodeFlags.AllowItemOverlap)
 
 function M:ctor(text)
     base.ctor(self, text or '...')
