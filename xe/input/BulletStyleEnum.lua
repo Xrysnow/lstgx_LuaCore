@@ -22,25 +22,7 @@ local colors = require('xe.input.ColorEnum')._colors
 ---@param node xe.SceneNode
 function M:ctor(node, idx)
     base.ctor(self, node, idx, 'bullet_style')
-    local main = require('xe.main'):getInstance()
-    local img = main._bullet_style
-    if not img then
-        img = {}
-        main._bullet_style = img
-        for k, v in pairs(M._img) do
-            local tex = cache:getTextureForKey(v.tex_path)
-            local sp = cc.Sprite:createWithTexture(tex, cc.rect(v.x, v.y, v.w, v.h))
-            sp:setVisible(false):addTo(main)
-            img[k] = sp
-        end
-        for k, v in pairs(M._ani) do
-            local tex = cache:getTextureForKey(v.tex_path)
-            local sp = cc.Sprite:createWithTexture(tex, cc.rect(v.x, v.y, v.w, v.h))
-            sp:setVisible(false):addTo(main)
-            img[k] = sp
-        end
-    end
-    self._img = img
+    self:_loadImage()
 
     local value = node:getAttrValue(idx, self._type)
     if not styles[value] then
@@ -53,6 +35,7 @@ function M:ctor(node, idx)
     self._value = value
     self._sel = styles[value]
     if node:getAttrCount() > idx and node:getAttrType(idx + 1) == 'color' then
+        -- enable dynamic color if next attr is color
         self._color = colors[node:getAttrValue(idx + 1)] or 1
     end
 
@@ -87,6 +70,28 @@ function M:ctor(node, idx)
             im.text(str)
         end
     end)
+end
+
+function M:_loadImage()
+    local main = require('xe.main'):getInstance()
+    local img = main._bullet_style
+    if not img then
+        img = {}
+        main._bullet_style = img
+        for k, v in pairs(M._img) do
+            local tex = cache:getTextureForKey(v.tex_path)
+            local sp = cc.Sprite:createWithTexture(tex, cc.rect(v.x, v.y, v.w, v.h))
+            sp:setVisible(false):addTo(main)
+            img[k] = sp
+        end
+        for k, v in pairs(M._ani) do
+            local tex = cache:getTextureForKey(v.tex_path)
+            local sp = cc.Sprite:createWithTexture(tex, cc.rect(v.x, v.y, v.w, v.h))
+            sp:setVisible(false):addTo(main)
+            img[k] = sp
+        end
+    end
+    self._img = img
 end
 
 function M:_render()
