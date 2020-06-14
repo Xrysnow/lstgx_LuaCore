@@ -42,9 +42,9 @@ function M:ctor(node, idx)
     end
     self._img = img
 
-    local value = node:getAttrEditValue(idx, self._type) or node:getAttrValue(idx)
+    local value = node:getAttrValue(idx, self._type)
     if not styles[value] then
-        value = node:getDefaultAttrValue(idx)
+        value = self:getEditValue()
         if not styles[value] then
             value = styles[1]
         end

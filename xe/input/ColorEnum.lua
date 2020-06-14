@@ -31,11 +31,8 @@ end
 function M:ctor(node, idx)
     base.ctor(self, node, idx, 'color_enum')
     local value = node:getAttrValue(idx)
-    if type(value) ~= 'string' then
-        value = colors[value] or ''
-    end
     if not colors[value] then
-        value = colors[1]
+        value = self:getEditValue() or colors[1]
     end
     self._value = value
     self._sel = colors[value]

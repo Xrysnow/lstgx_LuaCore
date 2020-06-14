@@ -41,4 +41,10 @@ function M:submit(value, str)
     require('xe.SceneTree').submit()
 end
 
+function M:getEditValue()
+    local node = self._node
+    local idx = self._idx
+    return node:getAttrEditValue(idx, self._type) or node:getDefaultAttrValue(idx) or ''
+end
+
 return M
