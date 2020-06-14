@@ -8,10 +8,10 @@ local DeSerialize = require('xe.TreeHelper').DeSerialize
 local nodeType = require('xe.node_def._def').getNodeType()
 
 local function _get_icon(type)
-    return string.format('xe/node_16/%s.png', type)
+    return string.format('xe/node_small/%s.png', type)
 end
 
-function M:ctor(type, icon)
+function M:ctor(type)
     base.ctor(self, tostring(type))
     assert(table.length(nodeType) > 0, 'node types not registered')
 
@@ -28,6 +28,12 @@ function M:ctor(type, icon)
     self:setOnDelete(function()
         self:getView():onSelChanged(nil)
     end)
+    local icon = _get_icon(type)
+    self._icon = cc.Sprite(icon)
+    if self._icon then
+        self._icon:addTo(self):setVisible(false)
+    end
+
     --TODO: keyboard event
 end
 
@@ -266,6 +272,7 @@ function M:getID()
 end
 
 local function _clone(node)
+    --TODO: only copy values
     local type = node.type
     local attr = table.clone(node.attr)
     local property = table.clone(node.property)
