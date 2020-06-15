@@ -44,7 +44,8 @@ function M:ctor(node, idx)
         local cur_idx = self:_getCurIndex() or 1
         self._cur = cur_idx
 
-        local edit_type_sel = wi.Combo('', types, self._cur):setFlags(im.ComboFlags.NoPreview)
+        M._makeTypeItems(type_items)
+        local edit_type_sel = wi.Combo('', type_items, self._cur):setFlags(im.ComboFlags.NoPreview)
         edit_type_sel:setOnChange(function(_, item, ii)
             if ii == 0 then
                 return
@@ -57,6 +58,22 @@ function M:ctor(node, idx)
     end
     for _, input in ipairs(self._inputs) do
         input:addTo(self)
+    end
+end
+
+function M._makeTypeItems(items)
+    -- xxx_xxx -> Xxx Xxx
+    for i = 1, #items do
+        local item = items[i]
+        if item == 'string' then
+            items[i] = 'Code'
+        else
+            local words = string.split(item, '_')
+            for j = 1, #words do
+                words[j] = string.capitalize(words[j])
+            end
+            items[i] = table.concat(words, ' ')
+        end
     end
 end
 
