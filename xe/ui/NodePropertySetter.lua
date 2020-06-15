@@ -154,6 +154,8 @@ function M:_createInput(t)
         ret = require('xe.input.BulletStyleEnum')(self._node, self._idx)
     elseif t == 'enemy_style' then
         ret = require('xe.input.EnemyStyleEnum')(self._node, self._idx)
+    elseif t == 'sound_effect' then
+        ret = require('xe.input.SoundEffect')(self._node, self._idx)
     else
         ret = require('xe.input.String')(self._node, self._idx, true)
     end

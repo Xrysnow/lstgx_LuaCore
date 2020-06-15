@@ -79,7 +79,7 @@ M.selecttype = {
     -- SelectObjectClass
 }
 M.sound = {
-    'sound'
+    'sound_effect'
 }
 M.stagegroup = {
     'stagegroup'
