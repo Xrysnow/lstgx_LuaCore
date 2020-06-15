@@ -56,6 +56,8 @@ function M:onEnter()
     cfg.OversampleH = 2
     cfg.OversampleV = 2
     cfg.MergeMode = true
+    cfg.GlyphMinAdvanceX = 12
+    cfg.GlyphMaxAdvanceX = 12
     im.addFontTTF('font/' .. fa.FontIconFileName, 14, cfg, {
         fa.IconMin, fa.IconMax, 0
     })
