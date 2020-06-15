@@ -1,5 +1,4 @@
 local base = require('xe.input.Base')
---local base = require('imgui.Widget')
 ---@class xe.input.String:xe.input.Base
 local M = class('xe.input.String', base)
 local im = imgui
