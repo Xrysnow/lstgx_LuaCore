@@ -160,6 +160,8 @@ function M:_createInput(t)
         ret = require('xe.input.ResImage')(self._node, self._idx)
     elseif t == 'type_name' then
         ret = require('xe.input.TypeName')(self._node, self._idx)
+    elseif t == 'type_define' then
+        ret = require('xe.input.TypeNameDefine')(self._node, self._idx, true)
     else
         ret = require('xe.input.String')(self._node, self._idx, true)
     end

@@ -88,6 +88,7 @@ M.string = {
 }
 M.typename = {
     -- define an editor class
+    'type_define'
 }
 M.vec2 = {
     'vec2'
