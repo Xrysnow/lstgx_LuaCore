@@ -76,7 +76,7 @@ M.selectenemystyle = {
     'enemy_style'
 }
 M.selecttype = {
-    -- SelectObjectClass
+    'type_name'
 }
 M.sound = {
     'sound_effect'
