@@ -156,6 +156,8 @@ function M:_createInput(t)
         ret = require('xe.input.EnemyStyleEnum')(self._node, self._idx)
     elseif t == 'sound_effect' then
         ret = require('xe.input.ResSound')(self._node, self._idx)
+    elseif t == 'image' then
+        ret = require('xe.input.ResImage')(self._node, self._idx)
     else
         ret = require('xe.input.String')(self._node, self._idx, true)
     end
