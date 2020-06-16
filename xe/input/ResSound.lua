@@ -1,9 +1,10 @@
-local base = require('xe.input.Base')
----@class xe.input.SoundEffect:xe.input.Base
-local M = class('xe.input.SoundEffect', base)
+local base = require('xe.input.ListBase')
+---@class xe.input.ResSound:xe.input.ListBase
+local M = class('xe.input.ResSound', base)
 local im = imgui
 local wi = require('imgui.Widget')
 local se_list
+local setting_sel_play = 'prop.se.sel_play'
 
 ---@param node xe.SceneNode
 function M:ctor(node, idx)
@@ -48,9 +49,8 @@ function M:ctor(node, idx)
     self._sel = map[value][1]
     self._path = map[value][2]
 
-    self._nameFilter = require('imgui.TextFilter')()
-    self._curPage = 1
-    self._perPage = 10
+    local sel_play = require('xe.main').getSetting(setting_sel_play)
+    self._sel_play = sel_play == nil and true or sel_play
 
     local btn, selector
     btn = wi.Button('', function()
@@ -69,71 +69,51 @@ function M:ctor(node, idx)
     self:addChild(btn):addChild(im.sameLine):addChild(function()
         im.text(self._value)
     end):addChild(selector)
+
+    self :addChild(wi.Button('Play', function()
+        self:_play()
+    end)):addChild(im.sameLine):addChild(wi.Button('Stop', function()
+        self:_stop()
+    end)):addChild(im.sameLine):addChild(wi.Checkbox('Play on select', self._sel_play, function(_, v)
+        self._sel_play = v
+        require('xe.main').setSetting(setting_sel_play, v)
+    end))
 end
 
 function M:_render()
-    local ret, filter_changed
     local last = self._sel
-
-    ret = self._nameFilter:inputText('Filter')
-    if ret then
-        filter_changed = true
+    local lst = {}
+    for i, v in ipairs(self._list) do
+        lst[i] = v[1]
     end
-
-    if filter_changed then
-        self._curPage = 1
-    end
-
-    local list = self._list
-    local filtered = {}
-    for i, v in ipairs(list) do
-        if self._nameFilter:filter(v[1]) then
-            table.insert(filtered, v)
-        end
-    end
-    local npage = 1
-    if #filtered > 0 then
-        npage = math.ceil(#filtered / self._perPage)
-    end
-    if self._curPage > npage then
-        self._curPage = npage
-    end
-    local lo = (self._curPage - 1) * self._perPage + 1
-    local hi = lo + self._perPage - 1
-
-    local hh = im.getTextLineHeightWithSpacing() * self._perPage + im.getStyle().ItemSpacing.y
-    im.beginChildFrame(im.getID(tostring(self)), im.vec2(0, hh))
-
-    for i = lo, math.min(#filtered, hi) do
-        local v = filtered[i]
-        im.pushID(i)
-        if im.selectable(v[1],
-                         self._sel == i,
-                         im.SelectableFlags.SpanAllColumns) then
-            self._sel = i
-        end
-        im.popID()
-    end
-    for i = #filtered + 1, hi do
-        im.selectable('', false, im.SelectableFlags.Disabled)
-    end
-
-    im.endChildFrame()
-
+    self:_renderList(lst)
     local sel = self._sel
     if sel ~= last then
-        self._value = list[sel][1]
-        self._path = list[sel][2]
+        self._value = self._list[sel][1]
+        self._path = self._list[sel][2]
         self:submit()
-        --TODO: play on select
+        -- play on select
+        if self._sel_play then
+            self:_play()
+        end
     end
+end
 
-    --im.separator()
-    -- page slider
-    if npage > 1 then
-        im.setNextItemWidth(-1)
-        ret, self._curPage = im.sliderInt('##', self._curPage, 1, npage)
+function M:_play()
+    self:_stop()
+    local dec = audio.Decoder:createFromFile(string.path_uniform(self._path), 4096)
+    if not dec then
+        return
     end
+    local src = audio.Source:createFromDecoder(dec)
+    if not src then
+        return
+    end
+    src:play()
+end
+
+function M:_stop()
+    audio.Engine:stop()
 end
 
 return M
