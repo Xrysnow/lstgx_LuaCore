@@ -19,15 +19,18 @@ function M:getInstance()
 end
 
 function M:onEnter()
+    if self._editor then
+        return
+    end
     --cc.Director:getInstance():setDisplayStats(false)
     --cc.Director:getInstance():setDisplayStats(true)
     lstg.loadData()
     SetResourceStatus('global')
-    Include('THlib.lua')
-    DoFile('core/score.lua')
-    RegistClasses()
+    --Include('THlib.lua')
+    --DoFile('core/score.lua')
+    --RegistClasses()
 
-    local la = im.on()
+    local la = im.get()
     im.show()
     im.clear()
     im.styleColorsLight()
@@ -150,6 +153,15 @@ end
 
 function M.setSetting(k, v)
     return require('xe.win.Setting').setVar(k, v)
+end
+
+function M:showWithScene(transition, time, more)
+    self:setVisible(true)
+    local scene = display.newScene('xe.main')
+    scene:addChild(self)
+    display.runScene(scene, transition, time, more)
+    im.on(scene)
+    return self
 end
 
 return M
