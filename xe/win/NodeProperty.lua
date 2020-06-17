@@ -11,7 +11,6 @@ function M:ctor()
 end
 
 function M:collectValues()
-    print('xe.NodeProperty:collectValues')
     local ret = {}
     for _, c in ipairs(self._setters) do
         table.insert(ret, c:getValue())

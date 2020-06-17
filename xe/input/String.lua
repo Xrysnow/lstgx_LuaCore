@@ -21,7 +21,6 @@ function M:ctor(node, idx, extra)
     self._input = input
     self:addChild(input)
     input:setString(value):setWidth(-1)
-
     self:addChild(function()
         if im.isItemDeactivatedAfterEdit() then
             self:submit()

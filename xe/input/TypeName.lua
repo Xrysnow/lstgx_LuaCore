@@ -15,7 +15,6 @@ local watch_map = {
 }
 
 function M:ctor(node, idx)
-    print('construct object_class')
     base.ctor(self, node, idx, 'type_name')
     local t = node:getType()
     local watch = watch_map[t]

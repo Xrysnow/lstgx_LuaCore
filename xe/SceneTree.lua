@@ -333,7 +333,6 @@ function M:editCurrentAttr(idx)
     self.cur_attr_idx = idx
     local node = self:getCurrent()
     if not node then
-        print('no current node')
         return
     end
     local enum = nodeType[node:getType()][idx][2]
@@ -499,29 +498,6 @@ function M.submit(self)
 end
 
 function M.getPicker(type, node, idx)
-    local _picker = {
-        sound            = function()
-            print('show SelectSoundEffect')
-            --require('xe.input.SelectSoundEffect').show(idx, node)
-        end,
-        image            = function()
-            print('show SelectImage')
-            --require('xe.input.SelectImage').show(idx, node)
-        end,
-        selecttype       = function()
-            print('show SelectObjectClass')
-            --require('xe.input.SelectObjectClass').show(idx, node)
-        end,
-        param            = function()
-            print('show InputParameter')
-            --require('xe.input.InputParameter').show(idx, node)
-        end,
-        typename         = function()
-            print('show InputTypeName')
-            --require('xe.input.InputTypeName').show(idx, node)
-        end,
-    }
-    return _picker[type]
 end
 
 return M

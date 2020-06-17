@@ -8,14 +8,8 @@ local wi = base
 function M:ctor(node, idx, value)
     base.ctor(self, node, idx, 'const')
     self._value = value or ''
-    --local once
     self:addChild(function()
         im.textWrapped(self._value)
-        -- submit once
-        --if not once then
-        --    once = true
-        --    self:submit()
-        --end
     end)
 end
 
