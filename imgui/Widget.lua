@@ -177,6 +177,24 @@ function M.MenuBar()
     return begin_end_wrapper(imgui.beginMenuBar, imgui.endMenuBar)
 end
 
+function M.CCNode(node, tint_color, border_color)
+    local ret = M()
+    node:addTo(ret):setVisible(false)
+    ret:setHandler(function()
+        imgui.ccNode(unpack { node, tint_color, border_color })
+    end)
+    return ret
+end
+
+function M.CCNodeButton(node, frame_padding, bg_color, tint_color)
+    local ret = M()
+    node:addTo(ret):setVisible(false)
+    ret:setHandler(function()
+        imgui.ccNodeButton(unpack { node, frame_padding, bg_color, tint_color })
+    end)
+    return ret
+end
+
 ---@return im.ProgressBar
 function M.ProgressBar(fraction, size, overlay)
     return require('imgui.widgets.ProgressBar')(fraction, size, overlay)
