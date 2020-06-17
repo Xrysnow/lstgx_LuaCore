@@ -5,8 +5,8 @@ local im = imgui
 local wi = require('imgui.Widget')
 
 ---@param node xe.SceneNode
-function M:ctor(node, idx)
-    base.ctor(self, node, idx, 'sound_effect')
+function M:ctor(node, idx, type)
+    base.ctor(self, node, idx, type)
     self._nameFilter = require('imgui.TextFilter')()
     self._curPage = 1
     self._perPage = 10
