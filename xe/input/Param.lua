@@ -23,6 +23,9 @@ local _init_node_type = {
 function M:ctor(node, idx)
     base.ctor(self, node, idx, 'param')
     -- NOTE: param depends on type name of node
+    self:addChild(function()
+        self:_update()
+    end)
     self:_update()
 end
 
@@ -41,10 +44,15 @@ function M:_update()
     end
 
     if ret == self._define then
+        local msg = tname == '' and 'Invalid type' or ('Invalid type %q'):format(tname)
+        im.textColored(im.getStyleColorVec4(im.Col.TextDisabled), msg)
         return
     else
         self._define = ret
         self:removeAllChildren()
+        self:addChild(function()
+            self:_update()
+        end)
     end
 
     local value = self:getEditValue()
@@ -73,7 +81,7 @@ function M:_update()
             end
         end
     else
-        local msg = ('Invalid type %q'):format(tname)
+        local msg = tname == '' and 'Invalid type' or ('Invalid type %q'):format(tname)
         self:addChild(function()
             im.textColored(im.getStyleColorVec4(im.Col.TextDisabled), msg)
         end)
@@ -118,11 +126,6 @@ function M:_updateValue()
         end
     end
     self._value = table.concat(val, ', ')
-end
-
-function M:_handler()
-    self:_update()
-    wi._handler(self)
 end
 
 ---@param node xe.SceneNode
