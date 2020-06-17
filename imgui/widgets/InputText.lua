@@ -59,7 +59,7 @@ function M:_handler()
     self._ret = ret
     self._param[2] = ret[2]
     if ret[1] and self._onChange then
-        self:_onChange()
+        self:_onChange(ret[2])
     end
     base._handler(self)
 end
