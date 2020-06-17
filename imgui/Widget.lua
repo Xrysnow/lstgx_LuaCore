@@ -161,6 +161,18 @@ function M.Combo(label, items, current, flags)
     return ret
 end
 
+---@return im.InputText
+function M.InputText(label, string, onChange, width)
+    local ret = require('imgui.widgets.InputText')(label, string)
+    if onChange then
+        ret:setOnChange(onChange)
+    end
+    if width then
+        ret:setWidth(width)
+    end
+    return ret
+end
+
 function M.MenuBar()
     return begin_end_wrapper(imgui.beginMenuBar, imgui.endMenuBar)
 end
