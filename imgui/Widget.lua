@@ -526,6 +526,9 @@ function M.propertyInput(label, data, k, params)
         else
             ret, data[k] = im.inputText(label, val, flags)
         end
+        if params.on_finish and im.isItemDeactivatedAfterEdit() then
+            params.on_finish()
+        end
     else
         im.text('N/A')
     end
