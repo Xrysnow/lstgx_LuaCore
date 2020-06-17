@@ -183,7 +183,7 @@ function M:setAttrEditValue(idx, type, value, str)
         a.edit = {}
     end
     a.edit[type] = value
-    self:setAttrValue(idx, str or tostring(value))
+    --self:setAttrValue(idx, str or tostring(value))
 end
 
 --
