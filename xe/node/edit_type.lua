@@ -4,12 +4,19 @@ local M = {}
 M.any = {
 }
 M.audio_pan = {
+    'string',
+    'const',
+    const = {
+        { 'default', "self.x / 256" },
+    },
 }
 M.bgstage = {
-    'bgstage'
+    'enum',
+    enum = require('xe.node.enum_type').bgstage
 }
 M.blend = {
-    'blend'
+    'enum',
+    enum = require('xe.node.enum_type').blend
 }
 M.bool = {
     'bool'
@@ -22,33 +29,44 @@ M.color = {
     --'color',
 }
 M.difficulty = {
-    -- enum
+    'enum',
+    enum = require('xe.node.enum_type').difficulty
 }
 M.directmode = {
-    -- enum
+    'enum',
+    enum = require('xe.node.enum_type').directmode
 }
 M.event = {
     -- only used in callbackfunc
+    'enum',
+    enum = require('xe.node.enum_type').event
 }
 M.gop = {
     -- game object property
 }
 M.group = {
-    'group'
+    'enum',
+    enum = require('xe.node.enum_type').group
 }
 M.image = {
     'image'
 }
 M.item = {
     -- used in dropitem
-    'item'
+    'enum',
+    enum = require('xe.node.enum_type').item
 }
 M.layer = {
+    'enum',
+    enum = require('xe.node.enum_type').layer
 }
 M.leftright = {
-    -- enum
+    'enum',
+    enum = require('xe.node.enum_type').leftright
 }
 M.movetomode = {
+    'enum',
+    enum = require('xe.node.enum_type').movetomode
 }
 M.number = {
     'number'
@@ -59,7 +77,12 @@ M.param = {
 M.pos = {
     'vec2',
     'const',
-    const = { { 'follow', "self.x, self.y" } }
+    const = {
+        { 'follow_self', "self.x, self.y" },
+        { 'follow_player', "player.x, player.y" },
+        { 'follow_boss', "_boss.x, _boss.y" },
+    },
+    vec2  = { 'x', 'y' }
 }
 M.resfile = {
     'path',
@@ -82,7 +105,8 @@ M.sound = {
     'sound_effect'
 }
 M.stagegroup = {
-    'stagegroup'
+    'enum',
+    enum = require('xe.node.enum_type').stagegroup
 }
 M.string = {
 }
@@ -94,13 +118,10 @@ M.vec2 = {
     'vec2'
 }
 
-local enum = require('xe.node.enum_type')
 for k, v in pairs(M) do
-    if enum[k] then
-        table.insert(v, 'enum')
-        v.enum = enum[k]
+    if not table.has(v, 'string') then
+        table.insert(v, 'string')
     end
-    table.insert(v, 'string')
 end
 
 return M
