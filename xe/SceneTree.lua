@@ -278,7 +278,8 @@ function M:submitAttr(node, values)
     local rec_new = {}
     if M.isValid(node) then
         for i = 1, node:getAttrCount() do
-            if not node:isAttrValueEqual(i, val[i]) then
+            -- NOTE: nil means not ready
+            if not node:isAttrValueEqual(i, val[i]) and val[i] ~= nil then
                 rec_old[i] = table.clone(node:getAttrValue(i))
                 node:setAttrValue(i, val[i])
                 rec_new[i] = table.clone(node:getAttrValue(i))
@@ -386,8 +387,7 @@ function M:editCurrentAttr(idx)
         end
         self:submitAttrToCurrent()
     else
-        require('xe.input.EditText').show(idx, node)
-        --self:addChild(require('xe.input.EditText')('Edit Text', node, idx))
+        --require('xe.input.EditText').show(idx, node)
     end
 end
 
@@ -412,6 +412,7 @@ function M:onSelChanged(next_node)
         panel:showNode(node)
         if node:getAttrValue(1) == "" and node:getConfig().editfirst then
             self:editCurrentAttr(1)
+            --TODO
         end
     end
 end
