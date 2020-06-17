@@ -154,6 +154,8 @@ function M:_createInput(t)
         ret = require('xe.input.TypeNameDefine')(self._node, self._idx, true)
     elseif t == 'param' then
         ret = require('xe.input.Param')(self._node, self._idx)
+    elseif t == 'vec2' then
+        ret = require('xe.input.Vec2')(self._node, self._idx, self._types[t])
     else
         ret = require('xe.input.String')(self._node, self._idx, true)
     end
