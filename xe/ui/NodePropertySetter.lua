@@ -166,12 +166,15 @@ function M:_createInput(t)
         ret = require('xe.input.String')(self._node, self._idx, true)
     end
     ret._master = self
+    -- submit here because init value may differ from current
+    require('xe.SceneTree').submit()
     return ret
 end
 
 function M:_createConst(v)
     local ret = require('xe.input.Const')(self._node, self._idx, v)
     ret._master = self
+    require('xe.SceneTree').submit()
     return ret
 end
 
