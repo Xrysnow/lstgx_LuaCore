@@ -248,6 +248,9 @@ function M:deleteCurrent()
     if not cur then
         return
     end
+    if cur:isRoot() then
+        return
+    end
     return self:deleteOp(cur:getID())
 end
 
