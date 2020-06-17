@@ -15,7 +15,7 @@ local CheckAnonymous = M.CheckAnonymous
 local MakeFullPath = M.MakeFullPath
 
 local bulletcleanrange = {
-    { 'Position', 'any', CheckPos },
+    { 'Position', 'pos', CheckPos },
     { 'Radius of Range', 'any', CheckExpr },
     { 'Time of Spreading out', 'any', CheckExpr },
     { 'Duration', 'any', CheckExpr },

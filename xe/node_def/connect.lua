@@ -37,7 +37,7 @@ local connect = {
     end,
 }
 local setrelpos = {
-    { 'Position', 'any', CheckPos },
+    { 'Position', 'pos', CheckPos },
     { 'Rotation', 'any', CheckExpr, 'self.rot' },
     { 'Follow master\'s rotation', 'bool', CheckExpr, 'false' },
     disptype     = 'set relative position',

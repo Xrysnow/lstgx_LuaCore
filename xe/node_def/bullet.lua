@@ -89,7 +89,7 @@ local bulletinit = {
 }
 local bulletcreate = {
     { 'Type name', 'selecttype', CheckNonBlank },
-    { 'Position', 'any', CheckPos },
+    { 'Position', 'pos', CheckPos },
     { 'Parameter', 'param', CheckExprOmit },
     disptype     = 'create bullet',
     editfirst    = true,
@@ -130,7 +130,7 @@ local bulletcreate = {
 local bulletcreatestraight = {
     { 'Style', 'bulletstyle', CheckExpr },
     { 'Color', 'color', CheckExpr },
-    { 'Position', 'any', CheckPos },
+    { 'Position', 'pos', CheckPos },
     { 'Velocity', 'any', CheckExpr },
     { 'Angle', 'any', CheckExpr },
     { 'Aim to player', 'bool', CheckExpr },

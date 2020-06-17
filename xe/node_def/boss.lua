@@ -57,9 +57,9 @@ _editor_class[%q].difficulty = %q
 local bossdefine = {
     { 'Type name', 'typename', CheckClassName },
     { 'Displayed name', 'string', CheckNonBlank },
-    { 'Position', 'any', CheckPos },
+    { 'Position', 'pos', CheckPos },
     { 'Spell Card Background', 'selecttype' },
-    { 'Image', 'resfile' },
+    { 'Image', 'resfile' },--TODO: should use 'image'
     { 'nCol', 'number', CheckExpr },
     { 'nRow', 'number', CheckExpr },
     { 'Collision size', 'vec2', CheckExpr },

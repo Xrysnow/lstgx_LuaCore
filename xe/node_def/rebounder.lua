@@ -71,7 +71,7 @@ local rebounderinit = {
 }
 local reboundercreate = {
     { 'Type name', 'selecttype', CheckNonBlank },
-    { 'Position', 'any', CheckPos },
+    { 'Position', 'pos', CheckPos },
     { 'Parameter', 'param', CheckExprOmit },
     { 'Length', 'any', CheckExpr },
     { 'Angle', 'any', CheckExpr },

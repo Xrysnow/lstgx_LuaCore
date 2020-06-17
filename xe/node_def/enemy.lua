@@ -107,7 +107,7 @@ local enemyinit = {
 }
 local enemycreate = {
     { 'Type name', 'selecttype', CheckNonBlank },
-    { 'Position', 'any', CheckPos },
+    { 'Position', 'pos', CheckPos },
     { 'Parameter', 'param', CheckExprOmit },
     disptype     = 'create enemy',
     editfirst    = true,
