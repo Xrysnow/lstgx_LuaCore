@@ -55,6 +55,7 @@ function imgui.on(target)
     if get then
         return get
     end
+    require('imgui.__init__')
     local la = imgui.create()
     if target then
         target:addChild(la, 1, layerName)
