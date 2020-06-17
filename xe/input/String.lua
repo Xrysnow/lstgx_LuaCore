@@ -7,7 +7,10 @@ local wi = require('imgui.Widget')
 ---@param node xe.SceneNode
 function M:ctor(node, idx, extra)
     base.ctor(self, node, idx, 'string')
-    local value = node:getAttrValue(idx) or ''
+    local value = self:getEditValue()
+    if value == '' then
+        value = node:getAttrValue(idx) or ''
+    end
 
     if extra then
         local icon = require('xe.ifont').Edit
