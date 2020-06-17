@@ -2,6 +2,7 @@ local base = require('imgui.Widget')
 ---@class xe.input.Base:im.Widget
 local M = class('xe.input.Base', base)
 
+---@param node xe.SceneNode
 function M:ctor(node, idx, type)
     base.ctor(self)
     assert(node and idx and type)

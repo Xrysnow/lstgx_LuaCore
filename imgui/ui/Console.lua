@@ -72,7 +72,6 @@ function M:log(str, highlight, hinter)
         str = { str, color = highlight }
     elseif highlight then
         local tokens = require('util.ReplParser')(str):getSegments()
-        --Print(stringify(tokens))
         tokens.string = str
         tokens.hinter = hinter
         str = tokens

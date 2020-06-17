@@ -112,8 +112,6 @@ function M:_select(idx)
     for _, v in ipairs(self._inputs) do
         v:setVisible(false)
     end
-    --local last = self._inputs[self._cur]
-    --last:submit()
     local input = self._inputs[idx]
     assert(input)
     input:setVisible(true)
@@ -133,16 +131,8 @@ end
 
 function M:_createInput(t)
     -- NOTE: input only submit its value when edit finished
-
-    --if t == 'vec2' then
-    --    return require('editor.property_input.vec2'):create(param, param.subtitle or { '1', '2' })
-    --elseif t == 'enum' then
-    --    return require('editor.property_input.enum'):create(param, self.input_size)
-    --end
-
     local nt = self._node:getType()
     local ret
-    --print('createInput', nt, t)
     if t == 'path' then
         --TODO: loadFX
         ret = require('xe.input.Path')(self._node, self._idx, self._types[nt])
