@@ -36,14 +36,12 @@ function M:ctor(node, idx, extra)
 
     local input = require('imgui.widgets.InputText')('')
     self._input = input
-    input:setString(value):setWidth(-1):setOnChange(function(_, s)
-        self._name = s
-        self:_updateValue()
-        self:submit()
-    end)
+    input:setString(value):setWidth(-1)
     self:addChild(input)
     self:addChild(function()
         if im.isItemDeactivatedAfterEdit() then
+            self._name = input:getString()
+            self:_updateValue()
             self:submit()
         end
     end)
