@@ -28,7 +28,7 @@ function M:ctor(node, idx, items)
     local selector = wi.Combo('', items, self._sel)
     selector:setOnChange(function(_, _, ii)
         self._sel = ii
-        self._value = items[ii] or ''
+        self._value = assert(items[ii])
         self:submit()
     end)
     self:addChild(function()
