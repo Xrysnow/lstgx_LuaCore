@@ -21,7 +21,7 @@ function M:ctor(node, idx)
     if not watch then
         self._value = ''
         self:addChild(function()
-            im.textColored(im.getStyleColorVec4(im.Col.TextDisabled), 'Unknown type')
+            im.textDisabled('Unknown type')
         end)
         return
     end
@@ -48,7 +48,7 @@ function M:ctor(node, idx)
     if #list == 0 then
         self._value = ''
         self:addChild(function()
-            im.textColored(im.getStyleColorVec4(im.Col.TextDisabled), 'No available type name')
+            im.textDisabled('No available type name')
         end)
         return
     end

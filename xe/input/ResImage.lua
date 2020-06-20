@@ -45,7 +45,7 @@ function M:ctor(node, idx)
     if #list == 0 then
         self._value = ''
         self:addChild(function()
-            im.textColored(im.getStyleColorVec4(im.Col.TextDisabled), 'No available image')
+            im.textDisabled('No available image')
         end)
         return
     end

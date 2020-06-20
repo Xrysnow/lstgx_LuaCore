@@ -45,7 +45,7 @@ function M:_update()
 
     if ret == self._define then
         local msg = tname == '' and 'Invalid type' or ('Invalid type %q'):format(tname)
-        im.textColored(im.getStyleColorVec4(im.Col.TextDisabled), msg)
+        im.textDisabled(msg)
         return
     else
         self._define = ret
@@ -67,7 +67,7 @@ function M:_update()
                 if #def == 0 then
                     local msg = 'No parameter'
                     self:addChild(function()
-                        im.textColored(im.getStyleColorVec4(im.Col.TextDisabled), msg)
+                        im.textDisabled(msg)
                     end)
                     return
                 end
@@ -83,7 +83,7 @@ function M:_update()
     else
         local msg = tname == '' and 'Invalid type' or ('Invalid type %q'):format(tname)
         self:addChild(function()
-            im.textColored(im.getStyleColorVec4(im.Col.TextDisabled), msg)
+            im.textDisabled(msg)
         end)
         return
     end
