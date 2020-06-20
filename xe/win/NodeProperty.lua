@@ -2,7 +2,7 @@ local base = require('xe.ui.Property')
 ---@class xe.NodeProperty:xe.ui.Property
 local M = class('xe.NodeProperty', base)
 local im = imgui
---local wi = require('imgui.Widget')
+local wi = require('imgui.Widget')
 
 function M:ctor()
     base.ctor(self)
@@ -37,7 +37,6 @@ end
 
 ---@param node xe.SceneNode
 function M:showNode(node)
-    print('NodeProperty:showNode', node)
     if self._node == node then
         return
     end
@@ -52,10 +51,19 @@ function M:showNode(node)
         im.separator()
         im.columns(2, 'xe.NodeProperty.input')
     end)
-    for i = 1, node:getAttrCount() do
-        local setter = require('xe.ui.NodePropertySetter')(node, i)
-        self:addChild(setter)
-        table.insert(self._setters, setter)
+
+    if not node:isRoot() then
+        for i = 1, node:getAttrCount() do
+            local setter = require('xe.ui.NodePropertySetter')(node, i)
+            self:addChild(setter)
+            table.insert(self._setters, setter)
+        end
+    else
+        local proj = require('xe.Project')
+        self:addChildren(wi.Text('Path'), im.nextColumn, function()
+            im.textWrapped(proj.getFile() or 'N/A')
+        end)
+        --TODO: show more info
     end
     self:addChild(function()
         im.columns(1)
