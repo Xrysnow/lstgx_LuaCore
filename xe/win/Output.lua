@@ -49,8 +49,9 @@ function M:ctor()
     --TODO: trace
 end
 
-function M:addLine(str, typ)
-    table.insert(self._lines, { str or '', typ })
+function M:addLine(str, typ, trace)
+    assert(type(str) == 'string')
+    table.insert(self._lines, { str, typ, trace })
     if #self._lines > self._max then
         table.remove(self._lines, 1)
     end
