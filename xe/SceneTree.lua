@@ -448,8 +448,19 @@ function M:pasteToCurrent()
     if M.isValid(cur) or cur:isRoot() then
         local cp = require('platform.ClipBoard').get()
         if cp and string.sub(cp, 1, 7) == "\001LuaSTG" then
-            --M.InsertNode(projectTree, curNode, Tree.DeSerialize(string.sub(cp, 8, -1)))
-            return self:insertToCurrent(self:deserialize(string.sub(cp, 8, -1)))
+            cp = cp:sub(8, -1)
+            local t = require('xe.TreeHelper').DeSerialize(cp)
+            if not t then
+                log('Failed to deserialize node', 'error')
+                return
+            end
+            local f = require('xe.SceneNode').deserialize
+            local node = f(cp)()
+            if not node then
+                log('Failed to deserialize node', 'error')
+                return
+            end
+            return self:insertToCurrent(node)
         end
     end
 end
