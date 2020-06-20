@@ -10,7 +10,7 @@ local function get_tree()
 end
 
 local function check_return(msg)
-    if msg then
+    if type(msg) == 'string' then
         logger.log(msg, "Error")
         return msg
     end
@@ -27,23 +27,11 @@ function M.open()
 end
 
 function M.save()
-    if not proj.getFile() then
-        print('[ToolSave] no project')
-        return
-    end
     return check_return(proj.save())
 end
 
 function M.close()
-    if not proj.getFile() then
-        print('[ToolClose] no project')
-        return
-    end
-    return proj.close(function(closed)
-        if closed then
-            logger.log('project closed', 'Info')
-        end
-    end)
+    return check_return(proj.close())
 end
 
 --
@@ -52,8 +40,8 @@ function M.merge()
     if not proj.getFile() then
         return
     end
-    local path = require('xe.win.Setting').getVar('projpath')
-    local fileName, err = require('platform.FileDialog').open('luastg', path)
+    local path = require('xe.Project').getDir()
+    local fileName, err = require('platform.FileDialog').open('lstgxproj,luastg', path)
     if fileName and fileName ~= '' then
         --local fileName = fd:GetPath()
         local msg = proj.loadFromFile(fileName, true)
@@ -262,10 +250,8 @@ function M.find()
         return
     end
     GoToLineNum()
+    --TODO
 end
---lineNumText:Connect(wx.wxEVT_COMMAND_TEXT_ENTER, function(event)
---    GoToLineNum()
---end)
 
 function M.moveDown()
     if not proj.getFile() then
