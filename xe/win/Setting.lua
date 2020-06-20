@@ -1,11 +1,11 @@
-local base = require('imgui.widgets.Window')
----@class xe.Setting:im.Window
+local base = require('imgui.Widget')
+---@class xe.Setting:im.Widget
 local M = class('xe.Setting', base)
 local im = imgui
-local wi = require('imgui.Widget')
+local wi = base
 
 function M:ctor()
-    base.ctor(self, 'Setting')
+    base.ctor(self)
     self._var = {}
     self._cheat = false
     self._resx = 1280
@@ -14,23 +14,32 @@ function M:ctor()
     --
     self:push()
     self:addChild(function()
-        local ret
-        local tmp = self._tmp
-        ret, tmp.cheat = im.checkbox('Cheat', tmp.cheat)
-        ret, tmp.fullscreen = im.checkbox('Full screen', tmp.fullscreen)
-        if not tmp.fullscreen then
-            ret, tmp.resx = im.inputInt('Width', tmp.resx)
-            ret, tmp.resy = im.inputInt('Height', stmp.resy)
+        local sz = im.vec2(-1, -im.getFrameHeightWithSpacing())
+        if im.beginChildFrame(im.getID('xe.setting.content'), sz) then
+            local ret
+            local tmp = self._tmp
+            ret, tmp.cheat = im.checkbox('Cheat', tmp.cheat)
+            ret, tmp.fullscreen = im.checkbox('Full screen', tmp.fullscreen)
+            if not tmp.fullscreen then
+                ret, tmp.resx = im.inputInt('Width', tmp.resx)
+                ret, tmp.resy = im.inputInt('Height', tmp.resy)
+            end
+            im.endChildFrame()
         end
     end)
-    self:addChild(wi.Button('OK', function()
-        self:pop()
-        self:setVisible(false)
-    end))
-    self:addChild(im.sameLine)
-    self:addChild(wi.Button('Cancel', function()
-        self:setVisible(false)
-    end))
+
+    local ok = wi.Button('OK', std.bind(self._ok, self))
+    local cancel = wi.Button('Cancel', std.bind(self._cancel, self))
+    self:addChildren(ok, im.sameLine, cancel)
+end
+
+function M:_ok()
+    self:pop()
+    self:setVisible(false)
+end
+
+function M:_cancel()
+    self:setVisible(false)
 end
 
 function M:push()
@@ -69,19 +78,25 @@ function M:getGameRes()
     return self._resx, self._resy
 end
 
-function M:setGameWindowed(v)
-    self._fullscreen = not v
+function M:isFullscreen()
+    return self._fullscreen
 end
 
-function M:getGameWindowed()
-    return not self._fullscreen
+local _id = 'Setting'
+function M:_handler()
+    im.setNextWindowSize(im.vec2(200, 200), im.Cond.Once)
+    im.openPopup(_id)
+    if im.beginPopupModal(_id) then
+        wi._handler(self)
+        im.endPopup()
+    end
 end
 
 local function get_ins()
     return require('xe.main'):getInstance()._setting
 end
 
-function M.show(self)
+function M:show()
     if self == nil or self == M then
         self = get_ins()
     end
