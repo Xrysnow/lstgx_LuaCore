@@ -357,7 +357,11 @@ function M:dumpForNodeDef()
 end
 
 function M:serialize()
-    return Serialize(self:dump())
+    if self:isRoot() then
+        return Serialize(self:dump().child)
+    else
+        return Serialize(self:dump())
+    end
 end
 
 local function _des(t)
