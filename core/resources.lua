@@ -157,6 +157,15 @@ end
 
 local _RenderText = RenderText
 
+function RenderTTF2(ttfname, text, left, right, bottom, top, scale, color, ...)
+    local fmt = 0
+    local arg = { ... }
+    for i = 1, #arg do
+        fmt = fmt + ENUM_TTF_FMT[arg[i]]
+    end
+    lstg.RenderTTF(ttfname, text, left, right, bottom, top, fmt, color, scale)
+end
+
 ---
 ---直接渲染文本
 ---fontname：已载入的字体名

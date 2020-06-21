@@ -55,7 +55,7 @@ local function main()
         end
         require('platform.android.native').setOrientationLandscape()
     end
-    lstg.DoFile('launch')
+    lstg.DoFile('launch.lua')
     lstg.SystemLog('start app')
     require("app.MyApp"):create():run()
 end
