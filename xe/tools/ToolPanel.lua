@@ -10,6 +10,7 @@ function M:ctor()
             im.WindowFlags.NoTitleBar,
             im.WindowFlags.HorizontalScrollbar)
     self._panels = {}
+    self._btns = {}
     self._tabbar = wi.TabBar('xe.tools.TabBar')
     self:addChild(self._tabbar)
     local data = require('xe.tools.data')
@@ -19,10 +20,13 @@ function M:ctor()
             local icon = 'xe/node/' .. item.bitmap
             assert(item.name:sub(1, 7) == 'Insert_')
             local name = item.name:sub(8)
-            local f = require('xe.ToolMgr').getNodeHandler(name)
+            local function f()
+                require('xe.main').getEditor():getTree():newNode(name)
+            end
             --TODO
             local tooltip = name
-            tab:addContent(icon, tooltip, f)
+            local btn, btn2 = tab:addContent(icon, tooltip, f)
+            self._btns[name] = { btn, btn2 }
         end
     end
 end
@@ -34,23 +38,36 @@ function M:_createTab(title)
     return panel
 end
 
---function M:_updateButtonLayout()
---end
+function M:disable(name)
+    local t = self._btns[name]
+    if not t then
+        return
+    end
+    t[1]:setVisible(false)
+    t[2]:setVisible(true)
+end
 
----@return editor.TabContent
---function M:getPanel(title)
---    return self._panel[title]
---end
+function M:enable(name)
+    local t = self._btns[name]
+    if not t then
+        return
+    end
+    t[1]:setVisible(true)
+    t[2]:setVisible(false)
+end
 
-function M:getTitleIndex(title)
-    for i, v in ipairs(self._title) do
-        if v == title then
-            return i
-        end
+function M:disableAll()
+    for k, v in pairs(self._btns) do
+        v[1]:setVisible(false)
+        v[2]:setVisible(true)
     end
 end
 
-function M:select(title)
+function M:enableAll()
+    for k, v in pairs(self._btns) do
+        v[1]:setVisible(true)
+        v[2]:setVisible(false)
+    end
 end
 
 return M
