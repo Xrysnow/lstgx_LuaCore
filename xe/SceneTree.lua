@@ -19,7 +19,7 @@ function M:ctor(...)
     self._insert_pos = 'child'
 end
 
-function M:newNode(type, text, icon, onSel, onUnsel)
+function M:newNode(type)
     print('newNode', type)
     self:insertDefault(type)
 end
@@ -37,7 +37,6 @@ function M.checkAllow(parent, child)
     assert(parent and child)
     local ctype = child:getType()
     local ptype = parent:getType()
-    --Print(string.format('check for %q => %q', ctype, ptype))
     local ct = nodeType[ctype]
     local pt = nodeType[ptype]
     if ptype == 'root' then
@@ -340,10 +339,7 @@ function M:editCurrentAttr(idx)
         return
     end
     local enum = nodeType[node:getType()][idx][2]
-    local picker = M.getPicker(enum, node, idx)
-    if picker then
-        picker()
-    elseif enum == 'resfile' then
+    if enum == 'resfile' then
         local type = node:getType()
         local wildCard
         if type == 'loadsound' or type == 'loadbgm' then
@@ -366,7 +362,6 @@ function M:editCurrentAttr(idx)
             -- just leave node unset here
             return
         end
-        --TODO: copy file if not in project dir
         local fullpath = path
         local name = string.filename(path)
         local panel = get_prop()
@@ -389,15 +384,12 @@ function M:editCurrentAttr(idx)
             end
         end
         self:submitAttrToCurrent()
-    else
-        --require('xe.input.EditText').show(idx, node)
     end
 end
 
 ---@param next_node xe.SceneNode
 function M:onSelChanged(next_node)
     print('SceneTree:onSelChanged')
-    --self:submitAttrToCurrent()
     M.submit()
     self:setCurrent(next_node)
     local panel = get_prop()
@@ -510,9 +502,6 @@ function M.submit(self)
         require('xe.history').add(op)
     end
     return changed
-end
-
-function M.getPicker(type, node, idx)
 end
 
 return M
