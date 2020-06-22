@@ -294,6 +294,7 @@ e:addListener('onFrameFunc', function()
         end
         Print('=   FrameReset   =')
         FrameReset()
+        dofile('main.lua')
     end
 end, 10, 'FrameReset')
 
