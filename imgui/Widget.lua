@@ -80,6 +80,13 @@ function M:addChildChain(...)
     return self
 end
 
+function M:addChildren(...)
+    for _, v in ipairs({ ... }) do
+        self:addChild(v)
+    end
+    return self
+end
+
 --------------------------------------------------
 -- widgets
 --------------------------------------------------
