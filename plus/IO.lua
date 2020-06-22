@@ -18,7 +18,7 @@ plus.FileStream = FileStream
 ---@param path string 文件路径
 ---@param mode string 打开模式
 function FileStream:init(path, mode)
-    self._f = assert(io.open(cc.FileUtils:getInstance():getSuitableFOpen(path), mode))
+    self._f = assert(io.open_u8(path, mode))
 end
 
 ---@brief 获取文件大小

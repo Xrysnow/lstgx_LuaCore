@@ -378,7 +378,7 @@ function M:editCurrentAttr(idx)
             panel:setValue(1, fullpath)
             panel:setValue(2, name)
             if type == 'loadparticle' then
-                local f, msg = io.open(fullpath, 'rb')
+                local f, msg = io.open_u8(fullpath, 'rb')
                 if f == nil then
                     log(msg, "Error")
                 else
