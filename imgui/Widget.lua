@@ -213,8 +213,12 @@ function M.RadioButton(label, checked, checker, onCheck)
 end
 
 ---@return im.RadioButtonGroup
-function M.RadioButtonGroup(labels, handlers, initIndex, sameLine)
-    return require('imgui.widgets.RadioButtonGroup')(labels, handlers, initIndex, sameLine)
+function M.RadioButtonGroup(labels, onChange, initIndex, sameLine)
+    local ret =  require('imgui.widgets.RadioButtonGroup')(labels, initIndex, sameLine)
+    if onChange then
+        ret:setOnChange(onChange)
+    end
+    return ret
 end
 
 ---@return im.Selectable
