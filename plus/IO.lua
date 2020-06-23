@@ -58,6 +58,17 @@ function FileStream:Close()
     self._f = nil
 end
 
+---删除文件流所管理的文件
+---不安全的方法
+function FileStream:Delete()
+    if self._f then
+        self._f:flush()
+        self._f:close()
+        self._f = nil
+    end
+    os.remove(self._path)
+end
+
 ---@brief 立即刷新缓冲区
 function FileStream:Flush()
     assert(self._f, "file is closed.")
