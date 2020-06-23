@@ -40,7 +40,7 @@ function M:ctor(node, idx)
     end
     local value = self:getEditValue()
     if not map[value] then
-        value = node:getDefaultAttrValue(idx)
+        value = node:getAttrValue(idx)
     end
     if not map[value] then
         value = se_list[1][1]
