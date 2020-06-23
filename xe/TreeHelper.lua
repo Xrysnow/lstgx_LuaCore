@@ -2,7 +2,7 @@ local M = { data = {}, imageIndex = {} }
 
 local watch = {}
 M.watch = watch
----@type table<xe.ui.TreeNode,boolean>
+---@type table<xe.SceneNode,boolean>
 watch.image = {}
 
 ---@param node xe.SceneNode
@@ -54,7 +54,14 @@ function M.Serialize(o, tab)
 end
 
 function M.DeSerialize(s)
-    return assert(loadstring('return ' .. s))()
+    local f = loadstring('return ' .. s)
+    if not f then
+        return
+    end
+    local ok, ret = pcall(f)
+    if ok then
+        return ret
+    end
 end
 
 return M
