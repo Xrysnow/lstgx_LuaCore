@@ -1,3 +1,6 @@
+---@type string
+local string = string
+
 string.whitespace = ' \t\n\r\v\f'
 string.ascii_lowercase = 'abcdefghijklmnopqrstuvwxyz'
 string.ascii_uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'

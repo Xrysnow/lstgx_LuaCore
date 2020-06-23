@@ -19,7 +19,7 @@ local soundVolume = {
 }
 _G['soundVolume'] = soundVolume
 
-local _PlaySound = PlaySound
+local _PlaySound = lstg.PlaySound
 
 ---
 ---@param name string 音效资源名
@@ -126,7 +126,7 @@ setmetatable(ENUM_TTF_FMT, { __index = function(t, k)
     return 0
 end })
 _G['ENUM_TTF_FMT'] = ENUM_TTF_FMT
-local _RenderTTF = RenderTTF
+local _RenderTTF = lstg.RenderTTF
 
 ---
 --- 渲染TTF
@@ -155,7 +155,7 @@ function RenderTTF(ttfname, text, left, right, bottom, top, color, ...)
     _RenderTTF(ttfname, text, left, right, bottom, top, fmt, color, scale)
 end
 
-local _RenderText = RenderText
+local _RenderText = lstg.RenderText
 
 function RenderTTF2(ttfname, text, left, right, bottom, top, scale, color, ...)
     local fmt = 0

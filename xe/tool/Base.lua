@@ -26,6 +26,4 @@ function M:_onclick()
     print('_onclick() should be overrided')
 end
 
---TODO: tooltip
-
 return M

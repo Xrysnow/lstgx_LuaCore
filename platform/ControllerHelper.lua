@@ -185,7 +185,6 @@ function M.init()
     cc.Director:getInstance():getEventDispatcher():addCustomEventListener(
             "director_after_update",
             function()
-                --Print('_last = nil')
                 _last = nil
             end
     )

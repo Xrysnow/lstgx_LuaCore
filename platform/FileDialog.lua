@@ -10,7 +10,7 @@ local function checkReturn(ret)
     if err == 'cancel' then
         --return
     else
-        Print(string.format('got error in FileDialog: %s', err))
+        print(string.format('got error in FileDialog: %s', err))
         --return
     end
     return nil, err
@@ -52,7 +52,6 @@ end
 ---@param filter string|table
 ---@param defaultPath string
 function M.open(filter, defaultPath)
-    Print(string.format('defaultPath = %q', defaultPath))
     --TODO: move to cpp
     if defaultPath and jit.os == 'Windows' then
         defaultPath = defaultPath:gsub('/', '\\')

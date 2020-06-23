@@ -17,7 +17,7 @@ math.mod = math.mod or math.fmod
 string.gfind = string.gfind or string.gmatch
 collectgarbage("setpause", 100)
 
-for _, ns in ipairs({ cc, ccui, lstg }) do
+for _, ns in ipairs({ cc, ccb, ccui, lstg }) do
     for _, v in pairs(ns) do
         local mt = getmetatable(v)
         if mt and (v.create or v.new) then
