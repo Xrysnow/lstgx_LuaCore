@@ -468,6 +468,102 @@ function M:checkAfterCompile()
     end
 end
 
+local insert = table.insert
+---@return table|boolean,string,xe.SceneNode
+function M:compile(t, indent)
+    print('start compile', self:getType(), self:getID())
+    t = t or {}
+    indent = indent or 0
+    local ret, msg, node
+    --
+    for i = 1, self:getAttrCount() do
+        ret, msg = self:checkAttr(i)
+        if not ret then
+            return false, ('Attribute %q is invalid: %s'):format(self:getAttrName(i), msg)
+        end
+    end
+    --
+    ret, msg = self:checkBeforeCompile()
+    if not ret then
+        return false, msg, self
+    end
+    --
+    if t.beforeHead then
+        local code = t.beforeHead(self)
+        if code then
+            insert(t, { code, indent })
+        end
+    end
+    --
+    local head = self:toHead()
+    if head then
+        insert(t, { head, indent })
+    end
+    for i = 1, self:getChildrenCount() do
+        ret, msg, node = self:getChildAt(i):compile(t, indent + self:getCodeIndent())
+        if not ret then
+            return false, msg, node
+        end
+    end
+    local foot = self:toFoot()
+    if foot then
+        insert(t, { foot, indent })
+    end
+    --
+    if t.afterFoot and (not t.afterFootCheck or t.afterFootCheck(self)) then
+        insert(t, { self:format(t.afterFoot), 0 })
+    end
+    --
+    ret, msg = self:checkAfterCompile()
+    if not ret then
+        return false, msg, self
+    end
+    --
+    return t
+end
+
+function M:_getAttrValueFromName(name)
+    local v
+    local cfg = self:getConfig()
+    for i = 1, #self.attr do
+        if name == cfg[i][1] then
+            v = self:getAttrValue(i)
+            break
+        end
+    end
+    return v
+end
+
+local tonumber = tonumber
+local assert = assert
+function M:format(s)
+    local function f1(ss)
+        local i = tonumber(ss)
+        local v = assert(self:getAttrValue(i))
+        return ('%q'):format(v)
+    end
+    s = s:gsub('$q(%d+)', f1)
+    local function f2(ss)
+        local i = tonumber(ss)
+        local v = assert(self:getAttrValue(i))
+        return ('%s'):format(v)
+    end
+    s = s:gsub('$(%d+)', f2)
+    local function f3(ss)
+        local name = ss:sub(2, -2)
+        local v = assert(self:_getAttrValueFromName(name))
+        return ('%q'):format(v)
+    end
+    s = s:gsub('$q(%b{})', f3)
+    local function f4(ss)
+        local name = ss:sub(2, -2)
+        local v = assert(self:_getAttrValueFromName(name))
+        return ('%s'):format(v)
+    end
+    s = s:gsub('$(%b{})', f4)
+    return s
+end
+
 function M:getCodeIndent()
     if self:isRoot() then
         return 0
