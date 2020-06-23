@@ -17,9 +17,10 @@ function M:ctor(...)
     self:_setRoot(root)
     root:setLabel('Project')
     self._insert_pos = 'child'
+    self._dirty = false
 end
 
-function M:newNode(type, text, icon, onSel, onUnsel)
+function M:newNode(type)
     print('newNode', type)
     self:insertDefault(type)
 end
@@ -37,7 +38,6 @@ function M.checkAllow(parent, child)
     assert(parent and child)
     local ctype = child:getType()
     local ptype = parent:getType()
-    --Print(string.format('check for %q => %q', ctype, ptype))
     local ct = nodeType[ctype]
     local pt = nodeType[ptype]
     if ptype == 'root' then
@@ -175,6 +175,9 @@ function M:insertOp(parent_id, child_ctor, idx)
         end
     }
     local ret = op.exe()
+    if ret then
+        self._dirty = true
+    end
     return op, ret
 end
 
@@ -204,7 +207,7 @@ end
 
 ---@param node xe.SceneNode
 function M.checkDelete(node)
-    return M.isValid(node) and not nodeType[node:getType()].forbiddelete
+    return M.isValid(node) and not node:isForbidDelete()
 end
 
 function M:deleteOp(node_id)
@@ -239,6 +242,9 @@ function M:deleteOp(node_id)
         end
     }
     local ret = op.exe()
+    if ret then
+        self._dirty = true
+    end
     return op, ret
 end
 
@@ -313,6 +319,7 @@ function M:submitAttr(node, values)
             end
         }
         op.exe()
+        self._dirty = true
         return op
     end
 end
@@ -333,6 +340,7 @@ function M:submitAttrTo(node)
 end
 
 function M:editCurrentAttr(idx)
+    --TODO: remove
     print('SceneTree:editCurrentAttr', idx)
     self.cur_attr_idx = idx
     local node = self:getCurrent()
@@ -340,10 +348,7 @@ function M:editCurrentAttr(idx)
         return
     end
     local enum = nodeType[node:getType()][idx][2]
-    local picker = M.getPicker(enum, node, idx)
-    if picker then
-        picker()
-    elseif enum == 'resfile' then
+    if enum == 'resfile' then
         local type = node:getType()
         local wildCard
         if type == 'loadsound' or type == 'loadbgm' then
@@ -366,7 +371,6 @@ function M:editCurrentAttr(idx)
             -- just leave node unset here
             return
         end
-        --TODO: copy file if not in project dir
         local fullpath = path
         local name = string.filename(path)
         local panel = get_prop()
@@ -378,7 +382,7 @@ function M:editCurrentAttr(idx)
             panel:setValue(1, fullpath)
             panel:setValue(2, name)
             if type == 'loadparticle' then
-                local f, msg = io.open(fullpath, 'rb')
+                local f, msg = io.open_u8(fullpath, 'rb')
                 if f == nil then
                     log(msg, "Error")
                 else
@@ -389,15 +393,12 @@ function M:editCurrentAttr(idx)
             end
         end
         self:submitAttrToCurrent()
-    else
-        --require('xe.input.EditText').show(idx, node)
     end
 end
 
 ---@param next_node xe.SceneNode
 function M:onSelChanged(next_node)
     print('SceneTree:onSelChanged')
-    --self:submitAttrToCurrent()
     M.submit()
     self:setCurrent(next_node)
     local panel = get_prop()
@@ -408,14 +409,13 @@ function M:onSelChanged(next_node)
     local node = next_node
     if node:isRoot() then
         self:setTypeHint("Node type: Project")
-        --TODO: show some info
-        panel:showNode(nil)
+        panel:showNode(node)
     else
         self:setTypeHint("Node type: " .. node:getDisplayType())
         panel:showNode(node)
-        if node:getAttrValue(1) == "" and node:getConfig().editfirst then
-            self:editCurrentAttr(1)
-            --TODO
+        if node:getAttrValue(1) == "" and node:isEditFirst() then
+            --self:editCurrentAttr(1)
+            --TODO: use highlight
         end
     end
 end
@@ -473,11 +473,19 @@ function M:setTypeHint(str)
 end
 
 function M:deserialize(str)
-    --TODO: give better error message here
     local t = require('xe.TreeHelper').DeSerialize(str)
+    local f = require('xe.SceneNode').deserialize
     for i, v in ipairs(t) do
-        self:getRoot():insertChild(require('xe.SceneTree').deserialize(v)())
+        local node = f(v)()
+        if not node then
+            -- error
+            log('Failed to deserialize node', 'error')
+            self:reset()
+            return false
+        end
+        self:getRoot():insertChild(node)
     end
+    return true
 end
 
 function M:serialize()
@@ -488,6 +496,14 @@ function M:reset()
     print('SceneTree:reset')
     self:getRoot():deleteAllChildren()
     get_prop():showNode(nil)
+end
+
+function M:setDirty(v)
+    self._dirty = v
+end
+
+function M:isDirty()
+    return self._dirty
 end
 
 function M.isValid(node)
@@ -509,10 +525,8 @@ function M.submit(self)
         changed = true
         require('xe.history').add(op)
     end
+    --TODO: auto save
     return changed
-end
-
-function M.getPicker(type, node, idx)
 end
 
 return M

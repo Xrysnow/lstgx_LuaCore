@@ -1,24 +1,20 @@
 local M = {}
 
-local _rank_names = {}
-local _ranks = {}
-
 function M.enumRanks()
-    if #_ranks == 0 then
-        for _, sg in ipairs(stage.groups) do
-            if sg ~= 'Spell Practice' then
-                _rank_names[stage.groups[sg].difficulty] = sg
-                table.insert(_ranks, stage.groups[sg].difficulty)
-            end
+    local _rank_names = {}
+    local _ranks = {}
+    for _, sg in ipairs(stage.groups) do
+        if sg ~= 'Spell Practice' then
+            _rank_names[stage.groups[sg].difficulty] = sg
+            table.insert(_ranks, stage.groups[sg].difficulty)
         end
-        table.sort(_ranks)
     end
-
+    table.sort(_ranks)
     return _ranks, _rank_names
 end
 
 function M.setRank(rank)
-    M.enumRanks()
+    local _ranks, _rank_names = M.enumRanks()
     scoredata.difficulty_select = rank
     lstg.group_name = _rank_names[rank]
     if not lstg.group_name then
@@ -101,6 +97,7 @@ local _spell_ranks = {}
 local _spell_rank_names = {}
 
 function M.enumSpells()
+    local _ranks, _rank_names = M.enumRanks()
     if #_spells == 0 then
         local need_fix = false
         for k, v in pairs(_ranks) do
@@ -241,16 +238,16 @@ function M._getReplaySlots()
             local time_str = os.date("!%H:%M", slot.stages[1].stageDate + setting.timezone * 3600)
             -- spaces
             stage_num = tostring(stage_num)
-            for i = 1, 3 - #stage_num do
+            for _ = 1, 3 - #stage_num do
                 stage_num = ' ' .. stage_num
             end
-            for i = 1, 7 - #diff do
+            for _ = 1, 7 - #diff do
                 diff = diff .. ' '
             end
-            for i = 1, 8 - #ply do
+            for _ = 1, 8 - #ply do
                 ply = ply .. ' '
             end
-            for i = 1, 8 - #usr do
+            for _ = 1, 8 - #usr do
                 usr = usr .. ' '
             end
 
@@ -294,6 +291,18 @@ function M.setReplay(replay, i_stage)
     lstg.tmpvar.rep_path = rep_path
     lstg.tmpvar.rep_stage = rep_stage
     assert(rep_path and rep_stage)
+end
+
+function M._reset()
+    _stage_groups = {}
+    _stages = {}
+    _stage_names = {}
+    _stage_origin_names = {}
+    _spells = {}
+    _spells_classified = {}
+    _spell_ranks = {}
+    _spell_rank_names = {}
+    _replays = nil
 end
 
 return M

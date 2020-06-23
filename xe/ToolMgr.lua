@@ -273,11 +273,4 @@ function M.moveUp()
     end
 end
 
-function M.getNodeHandler(name)
-    --TODO
-    return function()
-        require('xe.main').getEditor():getTree():newNode(name)
-    end
-end
-
 return M

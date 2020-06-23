@@ -13,7 +13,7 @@ function M:ctor(node, idx, extra)
     base.ctor(self, node, idx, 'type_define')
     local value = self:getEditValue()
     if value == '' then
-        value = node:getDefaultAttrValue(idx)
+        value = node:getAttrValue(idx) or ''
     end
     self._value = value
     local t1 = value:match('^(.+):.+$')

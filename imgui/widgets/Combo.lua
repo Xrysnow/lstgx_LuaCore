@@ -80,7 +80,8 @@ function M:_handler()
                 imgui.setItemDefaultFocus()
             end
         end
-        if cur ~= self._cur then
+        -- 0 means no item or cancelled
+        if cur ~= self._cur and cur ~= 0 then
             self._cur = cur
             if self._onchange then
                 self:_onchange(self._param[2], cur)

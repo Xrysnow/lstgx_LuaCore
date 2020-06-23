@@ -59,7 +59,7 @@ local bossdefine = {
     { 'Displayed name', 'string', CheckNonBlank },
     { 'Position', 'pos', CheckPos },
     { 'Spell Card Background', 'selecttype' },
-    { 'Image', 'resfile' },--TODO: should use 'image'
+    { 'Image', 'resfile' }, --TODO: should use 'image'
     { 'nCol', 'number', CheckExpr },
     { 'nRow', 'number', CheckExpr },
     { 'Collision size', 'vec2', CheckExpr },
@@ -124,7 +124,8 @@ local bossdefine = {
         M.difficulty = string.match(nodedata.attr[1], '^.+:(.+)$')
         local difficulty = M.difficulty
         if difficulty == nil or difficulty == '' then
-            M.difficulty = 'All'
+            difficulty = 'All'
+            M.difficulty = difficulty
         end
         local scbg, _bg
         if IsBlank(nodedata.attr[10]) then

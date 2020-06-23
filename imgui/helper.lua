@@ -239,6 +239,20 @@ function imgui.unpack(t)
     return unpack(t, 1, table.maxn(t))
 end
 
+function imgui.configFlagCheck(flag)
+    return bit.band(imgui.getIO().ConfigFlags, flag) > 0
+end
+
+function imgui.configFlagEnable(flag)
+    local io = imgui.getIO()
+    io.ConfigFlags = bit.bor(io.ConfigFlags, flag)
+end
+
+function imgui.configFlagDisable(flag)
+    local io = imgui.getIO()
+    io.ConfigFlags = bit.band(io.ConfigFlags, bit.bnot(flag))
+end
+
 function imgui.ImFontConfig.__call()
     return {}
 end
