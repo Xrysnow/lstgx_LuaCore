@@ -15,14 +15,16 @@ end
 
 function M.setRank(rank)
     local _ranks, _rank_names = M.enumRanks()
-    scoredata.difficulty_select = rank
-    lstg.group_name = _rank_names[rank]
-    if not lstg.group_name then
+    local group_name = _rank_names[rank]
+    if not group_name then
         local msg = string.format(
-                "can't find rank [%s], possible value: [%s]",
+                "can't find rank %q, possible value: %q",
                 tostring(rank), tostring(_ranks[1]))
-        error(msg)
+        return false, msg
     end
+    scoredata.difficulty_select = rank
+    lstg.group_name = group_name
+    return true
 end
 
 --
@@ -32,10 +34,15 @@ function M.enumPlayers()
 end
 
 function M.setPlayer(index)
+    local player_name = player_list[index][2]
+    local rep_player = player_list[index][3]
+    if not (player_name and rep_player) then
+        return false, ("can't find player %d"):format(index)
+    end
     scoredata.player_select = index--TODO: may have problem
-    lstg.var.player_name = player_list[index][2]
-    lstg.var.rep_player = player_list[index][3]
-    assert(lstg.var.player_name and lstg.var.rep_player)
+    lstg.var.player_name = player_name
+    lstg.var.rep_player = rep_player
+    return true
 end
 
 --
@@ -83,10 +90,14 @@ function M.getStageGroups()
 end
 
 function M.setStage(index)
-    lstg.practice = 'stage'
     local dif = scoredata.difficulty_select or 1
-    lstg.stage_name = stage.groups[_stage_groups[dif]][index]
-    assert(lstg.stage_name)
+    local stage_name = stage.groups[_stage_groups[dif]][index]
+    if not stage_name then
+        return false, ("can't find stage %d"):format(index)
+    end
+    lstg.practice = 'stage'
+    lstg.stage_name = stage_name
+    return true
 end
 
 --
@@ -166,13 +177,22 @@ function M.getSpellRank(index)
 end
 
 function M.setSpell(index)
-    lstg.practice = 'spell'
-    scoredata.difficulty_select = M.getSpellRank(index) or scoredata.difficulty_select
-    lstg.var.sc_index = index
     local p = scoredata.player_select or 1
-    lstg.var.player_name = player_list[p][2]
-    lstg.var.rep_player = player_list[p][3]
-    assert(scoredata.difficulty_select and lstg.var.player_name)
+    local player_name = player_list[p][2]
+    local rep_player = player_list[p][3]
+    if not (player_name and rep_player) then
+        return false, ("can't find player %d"):format(p)
+    end
+    local difficulty_select = M.getSpellRank(index) or scoredata.difficulty_select
+    if not difficulty_select then
+        return false, ("can't find difficulty of spell %d"):format(index)
+    end
+    lstg.practice = 'spell'
+    scoredata.difficulty_select = difficulty_select
+    lstg.var.sc_index = index
+    lstg.var.player_name = player_name
+    lstg.var.rep_player = rep_player
+    return true
 end
 
 --
@@ -277,20 +297,24 @@ function M._getReplaySlots()
 end
 
 function M.setReplay(replay, i_stage)
-    lstg.practice = 'replay'
     local rep_path = replay.slot.path
     local rep_stage
     if replay.rank_str == 'SpellPr' then
+        i_stage = 1
         rep_stage = replay.slot.stages[1].stageName
     else
         rep_stage = replay.slot.stages[i_stage].stageName
     end
+    if not (rep_path and rep_stage) then
+        return false, ("can't find stage %d in replay"):format(i_stage)
+    end
+    lstg.practice = 'replay'
     local u = require('game.util')
     u._rep_path = rep_path
     u._rep_stage = rep_stage
     lstg.tmpvar.rep_path = rep_path
     lstg.tmpvar.rep_stage = rep_stage
-    assert(rep_path and rep_stage)
+    return true
 end
 
 function M._reset()
