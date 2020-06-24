@@ -31,7 +31,7 @@ local loadbgm = {
     tohead      = function(nodedata)
         --local fname = wx.wxFileName(nodedata.attr[1]):GetFullName()
         local fname = string.filename(nodedata.attr[1], true)
-        return string.format("MusicRecord(%s,%q,%s,%s)\n", nodedata.attr[2], fname, nodedata.attr[3], nodedata.attr[4])
+        return string.format("MusicRecord(%q, %q, %s, %s)\n", nodedata.attr[2], fname, nodedata.attr[3], nodedata.attr[4])
     end,
     check       = function(nodedata)
         return M.AddPackBgm(nodedata.attr[1], nodedata.attr[2], 'loadbgm')
@@ -56,7 +56,7 @@ local loadimage = {
     tohead      = function(nodedata)
         --local fname = wx.wxFileName(nodedata.attr[1]):GetFullName()
         local fname = string.filename(nodedata.attr[1], true)
-        return string.format("_LoadImageFromFile('image:'..%s,%q,%s,%s,%s,%s)\n",
+        return string.format("_LoadImageFromFile('image:'..%q, %q, %s, %s, %s, %s)\n",
                              nodedata.attr[2], fname, nodedata.attr[3], nodedata.attr[4], nodedata.attr[5], nodedata.attr[6])
     end,
     check       = function(nodedata)
@@ -79,7 +79,7 @@ local loadtexture = {
     tohead      = function(nodedata)
         --local fname = wx.wxFileName(nodedata.attr[1]):GetFullName()
         local fname = string.filename(nodedata.attr[1], true)
-        return string.format("LoadTexture('texture:'..%q,%q,%s)\n", nodedata.attr[2], fname, nodedata.attr[3])
+        return string.format("LoadTexture('texture:'..%q, %q, %s)\n", nodedata.attr[2], fname, nodedata.attr[3])
     end,
     check       = function(nodedata)
         return M.AddPackRes(nodedata.attr[1], nodedata.attr[2], M.checkImageName, 'loadtexture')
@@ -104,7 +104,7 @@ local loadimagegroup = {
     tohead      = function(nodedata)
         --local fname = wx.wxFileName(nodedata.attr[1]):GetFullName()
         local fname = string.filename(nodedata.attr[1], true)
-        return string.format("_LoadImageGroupFromFile('image:'..%q,%q,%s,%s,%s,%s)\n", nodedata.attr[2], fname, nodedata.attr[3], nodedata.attr[4], nodedata.attr[5], nodedata.attr[6])
+        return string.format("_LoadImageGroupFromFile('image:'..%q, %q, %s, %s, %s, %s)\n", nodedata.attr[2], fname, nodedata.attr[3], nodedata.attr[4], nodedata.attr[5], nodedata.attr[6])
     end,
     check       = function(nodedata)
         return M.AddPackRes(nodedata.attr[1], nodedata.attr[2], M.checkImageName, 'loadimagegroup')
@@ -131,7 +131,7 @@ local loadani = {
     tohead      = function(nodedata)
         --local fname = wx.wxFileName(nodedata.attr[1]):GetFullName()
         local fname = string.filename(nodedata.attr[1], true)
-        return string.format("LoadAniFromFile('ani:'..%q,%q,%s,%s,%s,%s,%s,%s)\n", nodedata.attr[2], fname, nodedata.attr[3], nodedata.attr[4], nodedata.attr[5], nodedata.attr[6], nodedata.attr[7], nodedata.attr[8])
+        return string.format("LoadAniFromFile('ani:'..%q, %q, %s, %s, %s, %s, %s, %s)\n", nodedata.attr[2], fname, nodedata.attr[3], nodedata.attr[4], nodedata.attr[5], nodedata.attr[6], nodedata.attr[7], nodedata.attr[8])
     end,
     check       = function(nodedata)
         return M.AddPackRes(nodedata.attr[1], nodedata.attr[2], M.checkAniName, 'loadani')
@@ -155,7 +155,7 @@ local loadparticle = {
     tohead      = function(nodedata)
         --local fname = wx.wxFileName(nodedata.attr[1]):GetFullName()
         local fname = string.filename(nodedata.attr[1], true)
-        return string.format("LoadPS('particle:'..%q,%q,%q,%s,%s)\n", nodedata.attr[2], fname, nodedata.attr[3], nodedata.attr[4], nodedata.attr[5])
+        return string.format("LoadPS('particle:'..%q, %q, %q, %s, %s)\n", nodedata.attr[2], fname, nodedata.attr[3], nodedata.attr[4], nodedata.attr[5])
     end,
     check       = function(nodedata)
         local msg = M.AddPackRes(nodedata.attr[1], nodedata.attr[2], M.checkParName, 'loadparticle')
@@ -182,7 +182,7 @@ local loadFX = {
     tohead      = function(nodedata)
         --local fname = wx.wxFileName(nodedata.attr[1]):GetFullName()
         local fname = string.filename(nodedata.attr[1], true)
-        return string.format("LoadFX(%q,%q)\n", nodedata.attr[2], fname)
+        return string.format("LoadFX(%q, %q)\n", nodedata.attr[2], fname)
     end,
     check       = function(nodedata)
         return M.AddPackRes(nodedata.attr[1], nodedata.attr[2], M.checkImageName, 'loadFX')
