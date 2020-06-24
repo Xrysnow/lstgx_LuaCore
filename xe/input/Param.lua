@@ -44,16 +44,18 @@ function M:_update()
     end
 
     if ret == self._define then
-        local msg = tname == '' and 'Invalid type' or ('Invalid type %q'):format(tname)
-        im.textDisabled(msg)
+        if not ret then
+            local msg = tname == '' and 'Invalid type' or ('Invalid type %q'):format(tname)
+            im.textDisabled(msg)
+        end
         return
-    else
-        self._define = ret
-        self:removeAllChildren()
-        self:addChild(function()
-            self:_update()
-        end)
     end
+
+    self._define = ret
+    self:removeAllChildren()
+    self:addChild(function()
+        self:_update()
+    end)
 
     local value = self:getEditValue()
     self._value = ''
