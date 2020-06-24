@@ -167,7 +167,8 @@ function M:_setParentNode(node)
     if node == self._parent then
         return
     end
-    assert(not self._parent, ('%s already has parent %s, try to set %s'):format(self, self._parent, node))
+    assert(not self._parent,
+           ('%s already has parent %s, try to set %s'):format(self, self._parent, node))
     self._parent = node
     self._level = node._level + 1
 end
@@ -230,7 +231,9 @@ function M:_handler()
     end
     local is_leaf = self:isLeaf()
     if is_leaf then
-        flags = bit.bor(flags, im.TreeNodeFlags.Leaf, im.TreeNodeFlags.NoTreePushOnOpen)
+        flags = bit.bor(flags,
+                        im.TreeNodeFlags.Leaf,
+                        im.TreeNodeFlags.NoTreePushOnOpen)
     end
     local str = self._param[1]
     assert(str)
