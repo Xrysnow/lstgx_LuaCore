@@ -211,9 +211,34 @@ end
 function M:moveDown()
     tree.moveDown(self)
 end
-function M:_updatePos()
+
+local t_insert = table.insert
+local t_remove = table.remove
+---@return xe.ui.TreeNode[]
+function M:arrayDFS()
+    local t = {}
+    local stack = { self }
+    while #stack > 0 do
+        t_insert(t, stack[#stack])
+        stack[#stack] = nil
+        for _, v in self._children:iter_rev() do
+            t_insert(stack, v)
+        end
+    end
+    return t
 end
-function M:updatePosition()
+---@return xe.ui.TreeNode[]
+function M:arrayBFS()
+    local t = {}
+    local queue = { self }
+    while #queue > 0 do
+        t_insert(t, queue[1])
+        t_remove(queue, 1)
+        for _, v in self._children:iter() do
+            t_insert(queue, v)
+        end
+    end
+    return t
 end
 
 function M:_handler()
