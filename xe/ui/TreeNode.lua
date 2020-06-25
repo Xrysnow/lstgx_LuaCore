@@ -2,7 +2,6 @@ local base = require('imgui.widgets.TreeNode')
 ---@class xe.ui.TreeNode:im.TreeNode
 local M = class('xe.ui.TreeNode', base)
 local im = imgui
-local tree = require('cc.ui.TreeNode')
 local wi = require('imgui.Widget')
 local _flags = bit.bor(
         im.TreeNodeFlags.OpenOnArrow,
@@ -41,10 +40,22 @@ function M:getChildrenCount()
 end
 --- get count of all descendants
 function M:getDescendantsCount()
-    return tree.getDescendantsCount(self)
+    local ret = 0
+    for i = 1, self:getChildrenCount() do
+        ret = ret + 1 + self:getChildAt(i):getDescendantsCount()
+    end
+    return ret
 end
 function M:getLastDescendant(canBeThis)
-    return tree.getLastDescendant(self, canBeThis)
+    local count = self:getChildrenCount()
+    if count == 0 then
+        if canBeThis then
+            return self
+        else
+            return
+        end
+    end
+    return self:getChildAt(count):getLastDescendant(true)
 end
 
 function M:setString(str)
@@ -77,22 +88,56 @@ function M:insertChildAt(idx, child)
 end
 
 function M:insertBefore(child)
-    tree.insertBefore(self, child)
+    if self:isRoot() then
+        return
+    end
+    self._parent:insertChildAt(self._index, child)
 end
 function M:insertAfter(child)
-    tree.insertAfter(self, child)
+    if self:isRoot() then
+        return
+    end
+    self._parent:insertChildAt(self._index + 1, child)
 end
 function M:deleteChild(child)
-    tree.deleteChild(self, child)
+    assert(self:hasChild(child))
+    self._children:remove_if(function(v)
+        return type(v) == type(child) and tostring(v) == tostring(child)
+    end)
+    local view = self:getView()
+    if view and view:getCurrent() == child then
+        view:setCurrent(nil)
+    end
+    if child._onDelete then
+        child:_onDelete()
+    end
+    child:removeSelf()
+    self:_updateChildrenIndex()
 end
 function M:deleteChildAt(idx)
-    tree.deleteChildAt(self, idx)
+    idx = self:_checkChildIndex(idx)
+    local child = self._children:at(idx)
+    local view = self:getView()
+    if view and view:getCurrent() == child then
+        view:setCurrent(nil)
+    end
+    if child._onDelete then
+        child:_onDelete()
+    end
+    child:removeSelf()
+    self._children:erase_at(idx)
+    self:_updateChildrenIndex()
 end
 function M:deleteAllChildren()
-    tree.deleteAllChildren(self)
+    for _ = 1, self:getChildrenCount() do
+        self:deleteChildAt(1)
+    end
 end
 function M:delete()
-    tree.delete(self)
+    if self:isRoot() then
+        return
+    end
+    self._parent:deleteChildAt(self._index)
 end
 
 function M:setOnDelete(cb)
@@ -100,7 +145,7 @@ function M:setOnDelete(cb)
 end
 
 function M:toggle_fold()
-    if self:isOpen() then
+    if self:isFold() then
         self:unfold()
     else
         self:fold()
@@ -116,15 +161,23 @@ function M:unfold()
 end
 
 function M:unfoldToThis()
-    tree.unfoldToThis(self)
+    local p = self:getParentNode()
+    while p do
+        p:unfold()
+        p = p:getParentNode()
+    end
 end
 
 function M:isFold()
-    return not self:isOpen()
+    return self._fold
 end
 
 function M:toggle_select()
-    tree.toggle_select(self)
+    if self._select then
+        self:unselect()
+    else
+        self:select()
+    end
 end
 
 function M:select()
@@ -173,21 +226,50 @@ function M:_setParentNode(node)
     self._level = node._level + 1
 end
 function M:_updateChildrenIndex()
-    tree._updateChildrenIndex(self)
+    local i = 1
+    for _, v in self._children:iter() do
+        v._index = i
+        i = i + 1
+    end
 end
 function M:hasChild(node)
-    return tree.hasChild(self, node)
+    for _, v in self._children:iter() do
+        if type(v) == type(node) and tostring(v) == tostring(node) then
+            return true
+        end
+    end
+    return false
 end
 function M:_checkChildIndex(idx)
-    return tree._checkChildIndex(self, idx)
+    idx = math.floor(idx)
+    if idx < 1 or idx > self._children:size() then
+        error(string.format('invalid index %d, should in range [1, %d]', idx, self._children:size()))
+    end
+    return idx
 end
 ---@return xe.ui.TreeView
 function M:getView()
-    return tree.getView(self)
+    local p = self._parent
+    local ret
+    while p do
+        ret = p
+        p = p._parent
+    end
+    if ret and ret._isview then
+        return ret
+    end
 end
 ---@return xe.ui.TreeNode
 function M:getRoot()
-    return tree.getRoot(self)
+    local p = self._parent
+    local ret
+    while p do
+        ret = p
+        p = p._parent
+    end
+    if ret._isview then
+        return ret.root
+    end
 end
 ---@return boolean
 function M:isRoot()
@@ -197,19 +279,64 @@ function M:isLeaf()
     return self:getChildrenCount() == 0
 end
 function M:getTreeNext()
-    return tree.getTreeNext(self)
+    if self:getChildrenCount() >= 1 then
+        return self:getChildAt(1)
+    end
+    local p = self:getParentNode()
+    local ic = self:getIndex()
+    while p do
+        if p:getChildrenCount() > ic then
+            return p:getChildAt(ic + 1)
+        end
+        ic = p:getIndex()
+        p = p:getParentNode()
+    end
 end
 function M:getBrotherPrev()
-    return tree.getBrotherPrev(self)
+    if self:isRoot() then
+        return
+    end
+    local p = self:getParentNode()
+    if p and self:getIndex() >= 2 then
+        return p:getChildAt(self:getIndex() - 1)
+    end
 end
 function M:getBrotherNext()
-    return tree.getBrotherNext(self)
+    if self:isRoot() then
+        return
+    end
+    local p = self:getParentNode()
+    if p and p:getChildrenCount() > self:getIndex() then
+        return p:getChildAt(self:getIndex() + 1)
+    end
 end
 function M:moveUp()
-    tree.moveUp(self)
+    local p = self:getParentNode()
+    if self:isRoot() or not p then
+        return
+    end
+    local idx = self:getIndex()
+    if idx <= 1 then
+        return
+    end
+    local prev = p:getChildAt(idx - 1)
+    p._children:erase_at(idx - 1)
+    p._children:insert_at(idx, prev)
+    p:_updateChildrenIndex()
 end
 function M:moveDown()
-    tree.moveDown(self)
+    local p = self:getParentNode()
+    if self:isRoot() or not p then
+        return
+    end
+    local idx = self:getIndex()
+    if idx >= p:getChildrenCount() then
+        return
+    end
+    local next = p:getChildAt(idx + 1)
+    p._children:erase_at(idx + 1)
+    p._children:insert_at(idx, next)
+    p:_updateChildrenIndex()
 end
 
 local t_insert = table.insert
@@ -263,7 +390,8 @@ function M:_handler()
     local str = self._param[1]
     assert(str)
     if str == '' then
-        str = ('[%s] select: %s'):format(self:getType(), self._select)
+        --str = ('[%s] select: %s'):format(self:getType(), self._select)
+        str = ('[%s] fold: %s'):format(self:getType(), self._fold)
     end
     if self._icon then
         str = '     ' .. str
@@ -273,12 +401,19 @@ function M:_handler()
         self:select()
     end
     self._ret = ret
+    local fold_last = self._fold
     if ret[1] then
+        self._fold = false
         wi._handler(self)
         -- pop when return true
         if not is_leaf then
             im.treePop()
         end
+    else
+        self._fold = true
+    end
+    if fold_last ~= self._fold and self._onFoldChange then
+        self:_onFoldChange(self._fold)
     end
 end
 
