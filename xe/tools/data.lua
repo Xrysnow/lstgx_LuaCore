@@ -87,12 +87,14 @@ local M = {
             { name   = "Insert_taskwait",
               bitmap = 'taskwait.png',
             },
+            --[[
             { name   = "Insert_taskrepeat",
               bitmap = 'taskrepeat.png',
             },
             { name   = "Insert_taskbreak",
               bitmap = 'taskbreak.png',
             },
+            --]]
             { name   = "Insert_taskmoveto",
               bitmap = 'taskmoveto.png',
             },
@@ -194,6 +196,7 @@ local M = {
             },
         },
     },
+    --[[
     {
         label   = 'Tools',
         name    = "PanelTools",
@@ -209,7 +212,9 @@ local M = {
             },
         },
     },
-    --[[{
+    --]]
+    --[[
+    {
         label   = 'BulletEx',
         name    = "PanelBulletEx",
         content = {
@@ -265,7 +270,8 @@ local M = {
               bitmap = '_node_tof.png',
             },
         },
-    },]]
+    },
+    --]]
     {
         label   = 'Laser',
         name    = "PanelLaser",
@@ -330,6 +336,7 @@ local M = {
             { name   = "Insert_setv",
               bitmap = 'setv.png',
             },
+            --[[
             { name   = "Insert_setaccel",
               bitmap = 'setaccel.png',
             },
@@ -339,6 +346,7 @@ local M = {
             { name   = "Insert_setfv",
               bitmap = 'setfv.png',
             },
+            --]]
             { name   = "Insert_unitkill",
               bitmap = 'unitkill.png',
             },
@@ -402,9 +410,9 @@ local M = {
             { name   = "Insert_loadtexture",
               bitmap = 'loadtexture.png',
             },
-            { name   = "Insert_renderimage",
-              bitmap = 'renderimage.png',
-            },
+            --{ name   = "Insert_renderimage",
+            --  bitmap = 'renderimage.png',
+            --},
         },
     },
     {
