@@ -218,73 +218,78 @@ end
 ---　}
 ---}
 function ReplayManager.SaveReplayInfo(path, data)
-    local f = plus.FileStream(path, "wb")
+    local f = plus.FileStream(__UTF8ToANSI(path), "wb")
     local w = plus.BinaryWriter(f)
+    --用于记录当前replay文件是否已经完整保存
+    --如果保存中途出错，那么该文件会在finally函数中删除，防止下次进入游戏时读取到损坏的录像文件导致再次炸游戏
+    local _save_finish = false
 
     plus.TryCatch {
-        try =
-            function()
-                ---写入文件头
-                w:WriteString("STGR", false)
+        try = function()
+            -- 写入文件头
+            w:WriteString("STGR", false)
 
-                ---版本号1
-                w:WriteUShort(1)
+            -- 版本号1
+            w:WriteUShort(1)
 
-                ---游戏数据
-                w:WriteUShort(string.len(data.gameName))  ---游戏名称
-                w:WriteString(data.gameName, false)
-                w:WriteUShort(data.gameVersion)  ---游戏版本
-                w:WriteUShort(data.group_finish) --是否完成关卡
-                if data.gameExtendInfo then
-                    w:WriteUInt(string.len(data.gameExtendInfo))  ---额外信息
-                    w:WriteString(data.gameExtendInfo, false)
-                else
-                    w:WriteUInt(0)
-                end
-
-                ---玩家信息
-                w:WriteUShort(string.len(data.userName))  ---机签
-                w:WriteString(data.userName, false)
-                if data.userExtendInfo then
-                    w:WriteUInt(string.len(data.userExtendInfo))  ---额外信息
-                    w:WriteString(data.userExtendInfo, false)
-                else
-                    w:WriteUInt(0)
-                end
-
-                ---关卡数据
-                local stageCount = #data.stages
-                w:WriteUShort(stageCount)  ---关卡数量
-                for i = 1, stageCount do
-                    local stage = data.stages[i]
-
-                    w:WriteUShort(string.len(stage.stageName))  ---关卡名称
-                    w:WriteString(stage.stageName, false)
-                    if stage.stageExtendInfo then
-                        w:WriteUInt(string.len(stage.stageExtendInfo))  ---额外信息
-                        w:WriteString(stage.stageExtendInfo, false)
-                    else
-                        w:WriteUInt(0)
-                    end
-                    w:WriteUInt(math.floor(stage.score / 0x100000000))  ---分数的高32位
-                    w:WriteUInt(math.floor(stage.score % 0x100000000))  ---分数的低32位
-                    w:WriteUInt(stage.randomSeed)  ---随机数种子
-                    w:WriteFloat(stage.stageTime or 0)  ---通关时间
-                    w:WriteUInt(stage.stageDate or 0)  ---游戏日期(UNIX时间戳)
-                    w:WriteUShort(string.len(stage.stagePlayer))  ---使用自机
-                    w:WriteString(stage.stagePlayer, false)
---                  w:WriteUShort(stage.cur_stage_num)--关卡所在位置
---                  w:WriteUShort(stage.group_num)  --关卡组长度
-                    --录像数据
-                    print(stage.frameData:GetCount())
-                    w:WriteUInt(stage.frameData:GetCount())  ---帧数
-                    stage.frameData:Write(f)  ---数据
-                end
-            end,
-        finally =
-            function()
-                f:Close()
+            -- 游戏数据
+            w:WriteUShort(string.len(data.gameName))  -- 游戏名称
+            w:WriteString(data.gameName, false)
+            w:WriteUShort(data.gameVersion)  -- 游戏版本
+            w:WriteUShort(data.group_finish) --是否完成关卡
+            if data.gameExtendInfo then
+                w:WriteUInt(string.len(data.gameExtendInfo))  -- 额外信息
+                w:WriteString(data.gameExtendInfo, false)
+            else
+                w:WriteUInt(0)
             end
+
+            -- 玩家信息
+            w:WriteUShort(string.len(data.userName))  -- 机签
+            w:WriteString(data.userName, false)
+            if data.userExtendInfo then
+                w:WriteUInt(string.len(data.userExtendInfo))  -- 额外信息
+                w:WriteString(data.userExtendInfo, false)
+            else
+                w:WriteUInt(0)
+            end
+
+            -- 关卡数据
+            local stageCount = #data.stages
+            w:WriteUShort(stageCount)  -- 关卡数量
+            for i = 1, stageCount do
+                local stage = data.stages[i]
+
+                w:WriteUShort(string.len(stage.stageName))  -- 关卡名称
+                w:WriteString(stage.stageName, false)
+                if stage.stageExtendInfo then
+                    w:WriteUInt(string.len(stage.stageExtendInfo))  -- 额外信息
+                    w:WriteString(stage.stageExtendInfo, false)
+                else
+                    w:WriteUInt(0)
+                end
+                w:WriteUInt(math.floor(stage.score / 0x100000000))  -- 分数的高32位
+                w:WriteUInt(math.floor(stage.score % 0x100000000))  -- 分数的低32位
+                w:WriteUInt(stage.randomSeed)  -- 随机数种子
+                w:WriteFloat(stage.stageTime or 0)  -- 通关时间
+                w:WriteUInt(stage.stageDate or 0)  -- 游戏日期(UNIX时间戳)
+                w:WriteUShort(string.len(stage.stagePlayer))  -- 使用自机
+                w:WriteString(stage.stagePlayer, false)
+                --                   w:WriteUShort(stage.cur_stage_num)--关卡所在位置
+                --                   w:WriteUShort(stage.group_num)  --关卡组长度
+                -- 录像数据
+                w:WriteUInt(stage.frameData:GetCount())  -- 帧数
+                stage.frameData:Write(f)  -- 数据
+            end
+
+            _save_finish = true
+        end,
+        finally = function()
+            f:Close()
+            if not (_save_finish) then
+                f:Delete()--by ETC
+            end
+        end
     }
 end
 

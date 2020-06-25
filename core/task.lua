@@ -37,25 +37,25 @@ end
 
 ---执行（resume）task中的协程
 function task:Do()
-    local tsk = rawget(self, 'task')
-    --if tsk and #tsk > 0 then
+    local tsk = rawget(self, "task")
     if tsk then
-        --local task_stack = task.stack
-        --local task_co = task.co
-        --for _, co in ipairs(tsk) do
         for _, co in pairs(tsk) do
-            if status(co) ~= 'dead' then
+            if status(co) ~= "dead" then
                 insert(task.stack, self)
                 insert(task.co, co)
-
-                local _, errmsg = resume(co)
+                
+                local flag, errmsg = resume(co)
                 if errmsg then
-                    error(errmsg)
+                    error(
+                        tostring(errmsg)
+                        .. "\n========== coroutine traceback ==========\n"
+                        .. debug.traceback(co)
+                        .. "\n========== C traceback =========="
+                    )
                 end
-
+                
                 task.stack[#task.stack] = nil
                 task.co[#task.co] = nil
-                --lstg._ntask = lstg._ntask + 1
             end
         end
     end

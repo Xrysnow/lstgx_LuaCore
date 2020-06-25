@@ -245,3 +245,46 @@ local function getViewModeInfo(mode)
 end
 lstg.getViewModeInfo = getViewModeInfo
 
+---设置渲染矩形（会被SetViewMode覆盖）
+---@param l number @坐标系左边界
+---@param r number @坐标系右边界
+---@param b number @坐标系下边界
+---@param t number @坐标系上边界
+---@param scrl number @渲染系左边界
+---@param scrr number @渲染系右边界
+---@param scrb number @渲染系下边界
+---@param scrt number @渲染系上边界
+---@overload fun(info:table):nil @坐标系信息
+function SetRenderRect(l, r, b, t, scrl, scrr, scrb, scrt)
+    if l and r and b and t and scrl and scrr and scrb and scrt then
+        --设置坐标系
+        SetOrtho(l, r, b, t)
+        --设置视口
+        SetViewport(
+                scrl * screen.scale + screen.dx,
+                scrr * screen.scale + screen.dx,
+                scrb * screen.scale + screen.dy,
+                scrt * screen.scale + screen.dy
+        )
+        --清空fog
+        SetFog()
+        --设置图像缩放比
+        SetImageScale(1)
+    elseif type(l) == "table" then
+        --设置坐标系
+        SetOrtho(l.l, l.r, l.b, l.t)
+        --设置视口
+        SetViewport(
+                l.scrl * screen.scale + screen.dx,
+                l.scrr * screen.scale + screen.dx,
+                l.scrb * screen.scale + screen.dy,
+                l.scrt * screen.scale + screen.dy
+        )
+        --清空fog
+        SetFog()
+        --设置图像缩放比
+        SetImageScale(1)
+    else
+        error("Invalid arguement.")
+    end
+end
