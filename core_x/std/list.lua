@@ -148,6 +148,10 @@ function list:iter()
     return std.list_iter(self)
 end
 
+function list:iter_rev()
+    return std.list_rev_iter(self)
+end
+
 --element access---------------------------------
 
 ---### Access first element
@@ -396,8 +400,8 @@ end
 
 ------------------------
 
-function std.list_iter(list)
-    assert(std.islist(list))
+function std.list_iter(lst)
+    assert(std.islist(lst))
     local iter = function(t, it)
         if it then
             return it.next, it.val
@@ -405,7 +409,21 @@ function std.list_iter(list)
             return nil
         end
     end
-    return iter, list, list._begin
+    return iter, lst, lst._begin
+end
+
+function std.list_rev_iter(lst)
+    assert(std.islist(lst))
+    local iter = function(t, it)
+        if it then
+            local prev = it.prev
+            if prev then
+                return prev, prev.val
+            end
+        end
+        return nil
+    end
+    return iter, lst, lst._end
 end
 
 ------------------------
@@ -435,12 +453,15 @@ assert(lst:back() == lst:end_().prev.val)
 lst:push_front(0)
 lst:push_back(6)
 
-
 assert(lst:front() == lst:begin().val)
 assert(lst:back() == lst:end_().prev.val)
 
---for it, v in std.list_iter(lst) do
---    SystemLog(tostring(v))
---end
-]]
+for _, v in std.list_iter(lst) do
+    print(v)
+end
+print('---')
+for _, v in std.list_rev_iter(lst) do
+    print(v)
+end
+--]]
 
