@@ -25,7 +25,7 @@ end
 
 --重写内置的Kill，kill对象的附属
 do
-    local old = Kill
+    local old = lstg.Kill
     function Kill(o)
         if o then
             if o._servants then
@@ -37,7 +37,7 @@ do
 end
 --重写内置的Del，del对象的附属
 do
-    local old = Del
+    local old = lstg.Del
     function Del(o)
         if o then
             if o._servants then
