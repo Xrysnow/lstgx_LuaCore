@@ -22,7 +22,8 @@ function M:onEnter()
     if self._editor then
         return
     end
-    --cc.Director:getInstance():setDisplayStats(false)
+    cc.Director:getInstance():getRunningScene():addChild(assert(cc.Sprite('null.png')))
+    cc.Director:getInstance():setDisplayStats(false)
     --cc.Director:getInstance():setDisplayStats(true)
     lstg.loadData()
     SetResourceStatus('global')
@@ -98,16 +99,6 @@ function M:onEnter()
         im.menuItem('22')
     end)
 
-    --local btn = require('xe.tool.Base')('xe/tool/new.png')
-    --btn:addTo(menu_bar)
-    --btn:addTo(menu)
-
-    self._toolbar = require('xe.tool.ToolBar')()
-    la:addChild(self._toolbar)
-
-    self._toolpanel = require('xe.tools.ToolPanel')()
-    la:addChild(self._toolpanel)
-
     self._editor = require('xe.win.SceneEditor')()
     la:addChild(self._editor)
 
@@ -117,22 +108,30 @@ function M:onEnter()
     self._output = require('xe.win.Output')()
     la:addChild(self._output)
 
-    self._debug = require('xe.win.Debug')()
-    la:addChild(self._debug)
+    self._watch = require('imgui.ui.VariableWatch').createWindow('Watch')
+    la:addChild(self._watch)
 
-    la:addChild(im.showDemoWindow)
+    self._console = require('imgui.ui.Console').createWindow('Console')
+    la:addChild(self._console)
+
+    --la:addChild(im.showDemoWindow)
 
     -- dialogs
 
     self._edit_txt = require('xe.input.EditText')()
-    self._edit_txt:setVisible(false):addTo(la)
-
+    self:_addDialog(self._edit_txt)
     self._setting = require('xe.win.Setting')()
-    self._setting:setVisible(false):addTo(la)
+    self:_addDialog(self._setting)
+    self._newproj = require('xe.win.NewProject')()
+    self:_addDialog(self._newproj)
 
-    --self._output:addLine('test', 'info')
-    --self._output:addLine('test', 'warn')
-    --self._output:addLine('test', 'error')
+    self._game_log = require('imgui.ui.LogWindow')()
+    local win = require('imgui.widgets.Window')('Log')
+    la:addChild(win:addChild(self._game_log))
+end
+
+function M:_addDialog(v)
+    v:setVisible(false):addTo(im.get())
 end
 
 function M.hideProperty()
@@ -146,6 +145,25 @@ end
 function M.getProperty()
     return M:getInstance()._property
 end
+
+---@return xe.SceneTree
+function M.getTree()
+    return M:getInstance()._editor:getTree()
+end
+
+function M.getToolBar()
+    return M:getInstance()._editor._toolbar
+end
+
+function M.getToolPanel()
+    return M:getInstance()._editor._toolpanel
+end
+
+function M.getGameLog()
+    return M:getInstance()._game_log
+end
+
+--
 
 function M.getSetting(k)
     return require('xe.win.Setting').getVar(k)
