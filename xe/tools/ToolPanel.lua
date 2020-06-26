@@ -1,31 +1,42 @@
-local base = require('imgui.widgets.Window')
----@class xe.ToolPanel:im.Window
+local base = require('imgui.Widget')
+---@class xe.ToolPanel:im.Widget
 local M = class('editor.ToolPanel', base)
 local im = imgui
 local wi = require('imgui.Widget')
 
 function M:ctor()
     base.ctor(self, 'Tools')
-    self:setFlags(
-            im.WindowFlags.NoTitleBar,
-            im.WindowFlags.HorizontalScrollbar)
+    --self:setFlags(
+    --        im.WindowFlags.NoTitleBar,
+    --        im.WindowFlags.HorizontalScrollbar)
     self._panels = {}
     self._btns = {}
     self._tabbar = wi.TabBar('xe.tools.TabBar')
     self:addChild(self._tabbar)
+
+    local def = require('xe.node_def._def')
+    def.regist()
     local data = require('xe.tools.data')
     for _, v in ipairs(data) do
         local tab = self:_createTab(v.label)
-        for _, item in ipairs(v.content) do
+        for i, item in ipairs(v.content) do
             local icon = 'xe/node/' .. item.bitmap
             assert(item.name:sub(1, 7) == 'Insert_')
             local name = item.name:sub(8)
             local function f()
                 require('xe.main').getEditor():getTree():newNode(name)
             end
-            --TODO
+
             local tooltip = name
+            local d = def.getDefine(name)
+            if d and d.disptype then
+                tooltip = i18n(d.disptype)
+            end
+
             local btn, btn2 = tab:addContent(icon, tooltip, f)
+            if i < #v.content then
+                tab:addChild(im.sameLine)
+            end
             self._btns[name] = { btn, btn2 }
         end
     end
