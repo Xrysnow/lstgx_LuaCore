@@ -12,26 +12,27 @@ end
 local function check_return(msg)
     if type(msg) == 'string' then
         logger.log(msg, "Error")
-        return msg
+        return false
     end
+    return true
 end
 
 --
 
 function M.new()
-    return check_return(proj.new())
+    check_return(proj.new())
 end
 
 function M.open()
-    return check_return(proj.open())
+    check_return(proj.open())
 end
 
 function M.save()
-    return check_return(proj.save())
+    check_return(proj.save())
 end
 
 function M.close()
-    return check_return(proj.close())
+    check_return(proj.close())
 end
 
 --
@@ -44,7 +45,7 @@ function M.merge()
     local fileName, err = require('platform.FileDialog').open('lstgxproj,luastg', path)
     if fileName and fileName ~= '' then
         --local fileName = fd:GetPath()
-        local msg = proj.loadFromFile(fileName, true)
+        local msg = proj._loadFromFile(fileName, true)
         if msg == nil then
             -- record history
             his.clear()
@@ -119,33 +120,47 @@ function M.paste()
 end
 
 function M.setting()
+    --if not proj.getFile() then
+    --    return
+    --end
+    require('xe.win.Setting').show()
+end
+
+function M.build(debugStage, debugSC)
     if not proj.getFile() then
         return
     end
-    require('xe.win.Setting').show()
+    local dir = proj.getDir()
+    local path = dir .. '/_editor_output.lua'
+    return proj.compileToFile(path, debugStage, debugSC)
 end
 
 function M.pack()
     if not proj.getFile() then
         return
     end
-    local s = proj.compileToString(proj.getRoot(), 0)
     --TODO
-    if s then
-        cc.FileUtils:getInstance():writeStringToFile(s, '_output.lua')
-    end
-    --local msg = proj.pack(false, nil, nil)
-    --if msg then
-    --    logger.log(msg, "Error")
-    --end
 end
 
 function M.debugStage()
     if not proj.getFile() then
         return
     end
-    if check_return(proj.pack(true, nil, nil)) == nil then
-        proj.launchGame()
+    local _debug_stage_name
+    local curNode = get_tree():getCurrent()
+    local taskNode = curNode:getParentNode()
+    if taskNode:getType() == 'stagetask' then
+        local stageNode = taskNode:getParentNode()
+        local groupNode = stageNode:getParentNode()
+        local stageName = stageNode:getAttrValue(1)
+        local groupName = groupNode:getAttrValue(1)
+        _debug_stage_name = ("%s@%s"):format(stageName, groupName)
+    else
+        logger.log("must debug from direct child node of stagetask node", 'error')
+        return
+    end
+    if check_return(M.build(true, nil)) then
+        proj.launchGame(nil, nil, nil, _debug_stage_name)
     end
 end
 
@@ -154,14 +169,11 @@ function M.debugSC()
         return
     end
     local scDebugNode = get_tree():getCurrent()
-    if not scDebugNode then
-        return
-    end
     if scDebugNode:getType() ~= 'bossspellcard' then
         logger.log('current node is not a spell card node', "Error")
     else
-        if check_return(proj.pack(false, nil, scDebugNode)) == nil then
-            proj.launchGame()
+        if check_return(M.build(nil, true)) then
+            proj.launchGame(nil, nil, nil, nil, true)
         end
     end
 end
@@ -170,7 +182,7 @@ function M.run()
     if not proj.getFile() then
         return
     end
-    if check_return(proj.pack(false, nil, nil)) == nil then
+    if check_return(M.build()) then
         proj.launchGame()
     end
 end
