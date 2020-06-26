@@ -1,19 +1,23 @@
 --
 local M = {}
 local logger = require('xe.logger')
-local OutputLog = logger.log
+local info = logger.getLogger('', 'info')
+local err = require('xe.logger').getLogger('New Project', 'error')
 
 local curProjFile
 local curProjDir
 local auto_save_counter = 1
 
 --
-local function getDirFromPath(path)
-    return string.filefolder(path)
-end
+--local function getDirFromPath(path)
+--    return string.filefolder(path)
+--end
 ---Returns the name part of the filename (without extension).
-local function getNameFromPath(path)
-    return string.filename(path, false)
+--local function getNameFromPath(path)
+--    return string.filename(path, false)
+--end
+local function get_tree()
+    return require('xe.main').getTree()
 end
 
 function M.getFile()
@@ -22,110 +26,240 @@ end
 
 function M.getDir()
     if curProjFile then
-        return string.filefolder(curProjFile)
+        if not curProjDir then
+            curProjDir = string.filefolder(curProjFile)
+        end
+        return curProjDir
     end
-    --return curProjFile
 end
 
----@return xe.ui.TreeView
-function M.getTree()
-    --
+function M.saveEditorSetting()
+    require('xe.win.Setting').save()
 end
 
----@return xe.ui.TreeNode
-function M.getRoot()
-    --
-end
-
---function M.saveEditorSetting(t)
---end
-
-function M.setCurFile(s)
+function M._setCurFile(s)
     curProjFile = s
     if s == nil then
         SetTitle("LuaSTG-x Editor")
         curProjDir = nil
         logger.clear()
+        require('xe.main').getToolPanel():disableAll()
+        local toolbar = require('xe.main').getToolBar()
+        toolbar:disableAll()
+        toolbar:enable('new')
+        toolbar:enable('open')
     else
-        --SetTitle(curProjFile .. " - LuaSTG-x Editor")
-        SetTitle(getNameFromPath(curProjFile) .. " - LuaSTG-x Editor")
-        curProjDir = getDirFromPath(curProjFile)
-        require('xe.win.Setting').setVar('projpath', curProjDir)
-        require('xe.win.Setting').save()
-        --M.saveEditorSetting(setting)
-        --logger.log(string.format("current project file: %s", getNameFromPath(curProjFile)), "Info")
-        logger.log(string.format("current project file:   %s", curProjFile), "Info")
-        logger.log(string.format("current project folder: %s", M.GetCurProjDir()), "Info")
+        SetTitle(string.filename(curProjFile) .. " - LuaSTG-x Editor")
+        M.saveEditorSetting()
+        require('xe.main').getToolPanel():enableAll()
+        local toolbar = require('xe.main').getToolBar()
+        toolbar:enableAll()
+        toolbar:disable('debugSC')
+        toolbar:disable('debugStage')
+        toolbar:disable('insertChild')
+        get_tree():setInsertPos('child')
+
+        info("current project file: %s", curProjFile)
+        info("current project folder: %s", M.getDir())
     end
 end
 
-function M.saveToFile(path)
-    print('proj saveToFile')
-    --
+function M._loadFromFile(path)
+    if not path or path == '' then
+        return
+    end
+    local f = io.open_u8(path, 'rb+')
+    if not f then
+        err("failed to open file %s", path)
+        return
+    end
+    local str = f:read('*a')
+    f:close()
+
+    if not str or str == '' then
+        err("invalid project file %s", path)
+        return
+    end
+
+    M._setCurFile(path)
+
+    local tree = get_tree()
+    tree:reset()
+    tree:deserialize(str)
+    tree:getRoot():select()
+    return true
 end
 
-function M.loadFromFile(path)
-    print('proj loadFromFile')
+function M._saveToFile(path)
+    if not curProjFile then
+        return
+    end
+    local f = io.open_u8(path, 'wb+')
+    if not f then
+        err("failed to open file %s", path)
+        return
+    end
+    local tree = get_tree()
+    local str = tree:serialize()
+    if str == '' then
+        err("failed to save file %s", path)
+        return
+    end
+    f:write(str)
+    f:close()
+    return true
+end
+
+function M.save()
+    print('proj save')
     --
+    return M._saveToFile(curProjFile)
+end
+
+function M._autoSaveDir()
+    return M.getDir() .. '/' .. '.editor'
+end
+
+function M._autoSavePath()
+    --return ('%s/%s.lstgxproj'):format(M._autoSaveDir(), os.date('%Y_%m_%d_%H_%M_%S'))
+    return ('%s/autosave.lstgxproj'):format(M._autoSaveDir())
 end
 
 function M.autoSave()
     print('proj autoSave')
-    --
-end
-
-function M.compileToFile()
-    print('proj compileToFile')
-    --
-end
-
-function M.save(event)
-    print('proj save')
-    --
-end
-
-function M.saveAs(event)
-    print('proj saveAs')
-    --
+    --TODO
 end
 
 function M.needSave()
-    print('proj needSave')
-    --
+    if not curProjFile then
+        return
+    end
+    local tree = get_tree()
+    return tree:isDirty()
+end
+
+function M._close(onFinish)
+    M._setCurFile(nil)
+    local tree = get_tree()
+    tree:reset()
+    logger.clear()
+    -- remove search path
+    local fu = cc.FileUtils:getInstance()
+    local paths = fu:getSearchPaths()
+    local dir = M.getDir()
+    for i = 1, #paths do
+        if paths[i] == dir then
+            table.remove(paths, i)
+            break
+        end
+    end
+    fu:setSearchPaths(paths)
+    if onFinish then
+        onFinish()
+    end
+end
+
+function M._confirmSave(onFinish)
+    local win = require('xe.win.Message')('Save', 'Save project?')
+    win:addHandler('Yes', function()
+        if M.save() then
+            if onFinish then
+                onFinish()
+            end
+        end
+    end)
+    win:addHandler('No', function()
+        if onFinish then
+            onFinish()
+        end
+    end)
+    win:addHandler('Cancel')
+    imgui.get():addChild(win)
 end
 
 function M.close(onFinish)
-    print('proj close')
+    if not curProjFile then
+        return
+    end
     --
+    if M.needSave() then
+        M._confirmSave(function()
+            M._close(onFinish)
+        end)
+    else
+        M._close(onFinish)
+    end
 end
 
-function M.open()
-    print('proj open')
+function M._open(onFinish)
+    local path = require('platform.FileDialog').open('lstgxproj,luastg')
+    if not path then
+        return
+    end
+    if not M._loadFromFile(path) then
+        return
+    end
+    cc.FileUtils:getInstance():addSearchPath(M.getDir())
+    if onFinish then
+        onFinish()
+    end
+    return true
+end
+
+function M.open(onFinish)
+    if M.needSave() then
+        M._confirmSave(function()
+            M._open(onFinish)
+        end)
+    else
+        M._open(onFinish)
+    end
+end
+
+function M._new()
+    require('xe.main').getInstance()._newproj:setVisible(true)
 end
 
 function M.new()
-    print('proj new')
-    --
+    if M.needSave() then
+        M._confirmSave(function()
+            M._new()
+        end)
+    else
+        M._new()
+    end
 end
 
 function M.pack()
-    print('proj pack')
-    --
+    --TODO
 end
 
 function M.compileToString(...)
-    local f = { _contents = {} }
-    f.write = function(_, str)
-        table.insert(f._contents, str)
+    if not curProjFile then
+        return
     end
-    f.close = function()
+    local sw = lstg.StopWatch()
+    local str = get_tree():compile(...)
+    if not str then
+        err('failed to compile project')
+        return
     end
-    local msg = M.CompileToFile(f, ...)
-    if not msg then
-        return table.concat(f._contents)
-    else
-        OutputLog(msg, 'Error')
+    print(('project compiled in %.2f ms'):format(sw:get() * 1000))
+    return str
+end
+
+function M.compileToFile(path, ...)
+    local str = M.compileToString(...)
+    if not str then
+        return
     end
+    local f, msg = io.open_u8(path, 'wb+')
+    if not f then
+        err(msg)
+    end
+    f:write(str)
+    f:close()
+    return true
 end
 
 function M.onQuit()
@@ -134,14 +268,14 @@ function M.onQuit()
     end)
 end
 
-function M.launchGame()
-    print('proj launchGame')
-    --
+function M.launchGame(...)
+    --TODO
+    require('xe.game').start(...)
 end
 
 function M.addPackRes(path, from_type)
-    print('proj addPackRes')
-    --
+    print('proj addPackRes', path, from_type)
+    --TODO
 end
 
 return M
