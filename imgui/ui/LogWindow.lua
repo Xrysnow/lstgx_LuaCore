@@ -1,6 +1,6 @@
-local base = require('imgui.widgets.Window')
+local base = require('imgui.Widget')
 
----@class im.LogWindow:im.Window
+---@class im.LogWindow:im.Widget
 local M = class('im.LogWindow', base)
 local im = imgui
 
@@ -164,6 +164,12 @@ function M:_render()
         im.textUnformatted(item.string)
     end
     im.getStyle().ItemSpacing = s
+end
+
+function M.createWindow(...)
+    local ret = require('imgui.widgets.Window')(...)
+    ret:addChild(M())
+    return ret
 end
 
 return M

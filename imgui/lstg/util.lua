@@ -48,10 +48,10 @@ function M.load(target, docking, no_tool, no_font)
     end
     if not no_tool then
         --la:addChild(im.showDemoWindow)
-        la:addChild(require('imgui.ui.Console')('Console'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.ui.LogWindow')('Log'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.Console').createWindow('Console'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.LogWindow').createWindow('Log'):setContentSize(cc.size(500, 500)))
         la:addChild(require('imgui.ui.StyleSetting')('Setting'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.ui.VariableWatch')('Watch'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.VariableWatch').createWindow('Watch'):setContentSize(cc.size(500, 500)))
         la:addChild(require('imgui.lstg.GameInfo')('Game Info'):setContentSize(cc.size(500, 500)))
     end
     im.setVisible(setting.imgui_visible)

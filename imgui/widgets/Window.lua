@@ -114,6 +114,7 @@ function M:setAutoScrollY(b)
 end
 
 function M:_handler()
+    local imgui = imgui
     if self._pos then
         imgui.setNextWindowPos(self._pos)
         self._pos = nil

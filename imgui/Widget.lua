@@ -1,5 +1,8 @@
 ---@class im.Widget:cc.Node
 local M = class('imgui.Widget', cc.Node)
+local imgui = imgui
+local pairs = pairs
+local type = type
 
 function M:ctor(...)
     self._param = { ... }
@@ -221,7 +224,7 @@ end
 
 ---@return im.RadioButtonGroup
 function M.RadioButtonGroup(labels, onChange, initIndex, sameLine)
-    local ret =  require('imgui.widgets.RadioButtonGroup')(labels, initIndex, sameLine)
+    local ret = require('imgui.widgets.RadioButtonGroup')(labels, initIndex, sameLine)
     if onChange then
         ret:setOnChange(onChange)
     end
@@ -362,16 +365,26 @@ function M.styleColor(idx, color)
             { idx, color })
 end
 
+local function pushStyleColors(t)
+    for k, v in pairs(t) do
+        if type(v) == 'function' then
+            v = v()
+        end
+        imgui.pushStyleColor(k, v)
+    end
+end
+local function popStyleColors(t)
+    for _, _ in pairs(t) do
+        imgui.popStyleColor()
+    end
+end
+
 function M.styleColors(t)
     local on_push = function()
-        for k, v in pairs(t) do
-            imgui.pushStyleColor(k, v)
-        end
+        pushStyleColors(t)
     end
     local on_pop = function()
-        for _, _ in pairs(t) do
-            imgui.popStyleColor()
-        end
+        popStyleColors(t)
     end
     return M.wrapper(on_push, on_pop)
 end
@@ -383,16 +396,40 @@ function M.styleVar(idx, value)
             { idx, value })
 end
 
+local function pushStyleVars(t)
+    for k, v in pairs(t) do
+        if type(v) == 'function' then
+            v = v()
+        end
+        imgui.pushStyleVar(k, v)
+    end
+end
+local function popStyleVars(t)
+    for _, _ in pairs(t) do
+        imgui.popStyleVar()
+    end
+end
+
 function M.styleVars(t)
     local on_push = function()
-        for k, v in pairs(t) do
-            imgui.pushStyleVar(k, v)
-        end
+        pushStyleVars(t)
     end
     local on_pop = function()
-        for _, _ in pairs(t) do
-            imgui.popStyleVar()
-        end
+        popStyleVars(t)
+    end
+    return M.wrapper(on_push, on_pop)
+end
+
+function M.style(colors, vars)
+    colors = colors or {}
+    vars = vars or {}
+    local on_push = function()
+        pushStyleColors(colors)
+        pushStyleVars(vars)
+    end
+    local on_pop = function()
+        popStyleColors(colors)
+        popStyleVars(vars)
     end
     return M.wrapper(on_push, on_pop)
 end

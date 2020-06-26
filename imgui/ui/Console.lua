@@ -1,6 +1,6 @@
-local base = require('imgui.widgets.Window')
+local base = require('imgui.Widget')
 
----@class im.Console:im.Window
+---@class im.Console:im.Widget
 local M = class('im.Console', base)
 local im = imgui
 
@@ -237,6 +237,12 @@ function M:_render()
     if reclaim_focus then
         im.setKeyboardFocusHere(-1)
     end
+end
+
+function M.createWindow(...)
+    local ret = require('imgui.widgets.Window')(...)
+    ret:addChild(M())
+    return ret
 end
 
 return M
