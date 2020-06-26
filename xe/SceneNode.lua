@@ -316,7 +316,7 @@ local function _dump(node)
         table.insert(t.child, _dump(node:getChildAt(i)))
     end
     t.type = node:getType()
-    t.expand = node:isFold()
+    t.expand = not node:isFold()
     if t.type == 'project' then
         return t.child
     else
@@ -370,15 +370,11 @@ local function _des(t)
     if not ret then
         return
     end
-    --Print(string.format('-- des type %q [%q]', t.type, t.attr and t.attr[1]))
     for i = 1, ret:getAttrCount() do
         ret:setAttrValue(i, t.attr[i])
     end
     ret.property = _collect_property(t)
     if t.child then
-        --if #t.child > 0 then
-        --    Print(string.format('-- des %d in %q', #t.child, t.type))
-        --end
         for _, v in ipairs(t.child) do
             local ch = _des(v)
             if ch then
@@ -387,6 +383,11 @@ local function _des(t)
         end
     end
     ret:updateString()
+    if ret:getProperty('expand') == true then
+        ret:unfold()
+    else
+        ret:fold()
+    end
     return ret
 end
 
