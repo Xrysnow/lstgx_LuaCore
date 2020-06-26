@@ -19,7 +19,10 @@ local playsound = {
     { 'Volume', 'number', CheckExpr },
     { 'Pan', 'audio_pan', CheckExpr },
     { 'not use default vol', 'bool' },
-    disptype     = 'play sound',
+    disptype     = {
+        en = 'play sound',
+        zh = '播放音效',
+    },
     default      = { ["type"] = "playsound", attr = { 'tan00', '0.1', 'self.x/256', false } },
     allowchild   = {},
     forbidparent = { 'root', 'folder' },
@@ -42,7 +45,10 @@ local playsound = {
 local loadsound = {
     { 'File path', 'resfile', CheckNonBlank },
     { 'Resource name', 'string', CheckNonBlank },
-    disptype    = 'load sound',
+    disptype    = {
+        en = 'load sound',
+        zh = '加载音效',
+    },
     editfirst   = true,
     watch       = 'sound',
     allowchild  = {},
@@ -84,7 +90,10 @@ local loadsound = {
 }
 local playbgm = {
     { 'Music name', 'string', CheckNonBlank },
-    disptype     = 'play background music',
+    disptype     = {
+        en = 'play background music',
+        zh = '播放背景音乐',
+    },
     allowchild   = {},
     forbidparent = { 'root', 'folder' },
     totext       = function(nodedata)
@@ -95,7 +104,10 @@ local playbgm = {
     end,
 }
 local pausebgm = {
-    disptype     = 'pause background music',
+    disptype     = {
+        en = 'pause background music',
+        zh = '暂停背景音乐',
+    },
     allowchild   = {},
     forbidparent = { 'root', 'folder' },
     totext       = function(nodedata)
@@ -106,7 +118,10 @@ local pausebgm = {
     end,
 }
 local resumebgm = {
-    disptype     = 'resume background music',
+    disptype     = {
+        en = 'resume background music',
+        zh = '恢复背景音乐',
+    },
     allowchild   = {},
     forbidparent = { 'root', 'folder' },
     totext       = function(nodedata)
@@ -117,7 +132,10 @@ local resumebgm = {
     end,
 }
 local stopbgm = {
-    disptype     = 'stop background music',
+    disptype     = {
+        en = 'stop background music',
+        zh = '停止背景音乐',
+    },
     allowchild   = {},
     forbidparent = { 'root', 'folder' },
     totext       = function(nodedata)

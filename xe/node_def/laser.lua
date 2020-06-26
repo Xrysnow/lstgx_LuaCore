@@ -16,7 +16,10 @@ local MakeFullPath = M.MakeFullPath
 
 local laserdefine = {
     { 'Type name', 'typename', CheckClassName },
-    disptype    = 'define laser',
+    disptype    = {
+        en = 'define laser',
+        zh = '定义激光',
+    },
     editfirst   = true,
     allowparent = { 'root', 'folder' },
     allowchild  = { 'callbackfunc' },
@@ -66,7 +69,7 @@ local laserdefine = {
         M.difficulty = nil
     end,
 }
-local laserinit_head_fmt=[[_editor_class[%q].init = function(self, _x, _y, %s)
+local laserinit_head_fmt = [[_editor_class[%q].init = function(self, _x, _y, %s)
 laser.init(self, %s, _x, _y, 0, %s, %s, %s, %s, %s, %s)
 ]]
 local laserinit = {
@@ -78,7 +81,10 @@ local laserinit = {
     { 'Width', 'any', CheckExpr },
     { 'Node size', 'any', CheckExpr },
     { 'Head', 'any', CheckExpr },
-    disptype     = 'on create laser',
+    disptype     = {
+        en = 'on create laser',
+        zh = '初始化激光',
+    },
     allowparent  = {},
     forbiddelete = true,
     totext       = function(nodedata)
@@ -101,7 +107,10 @@ local lasercreate = {
     { 'Type name', 'selecttype', CheckNonBlank },
     { 'Position', 'pos', CheckPos },
     { 'Parameter', 'param', CheckExprOmit },
-    disptype     = 'create laser',
+    disptype     = {
+        en = 'create laser',
+        zh = '创建激光',
+    },
     editfirst    = true,
     default      = { ["type"] = 'lasercreate', attr = { '', 'self.x, self.y', '' } },
     forbidparent = { 'root', 'folder' },
@@ -134,10 +143,13 @@ local lasercreate = {
     end,
 }
 local laserturnon = {
-    { 'time (in frames)', 'any', CheckExpr },
+    { 'Time (frames)', 'any', CheckExpr },
     { 'Play sound effect', 'bool', CheckExpr },
     { 'wait in this task', 'bool', CheckExpr },
-    disptype     = 'turn on laser',
+    disptype     = {
+        en = 'turn on laser',
+        zh = '开启激光',
+    },
     needancestor = { 'laserdefine', 'lasershooter' },
     default      = { ['type'] = 'laserturnon', attr = { '30', 'true' } },
     totext       = function(nodedata)
@@ -148,9 +160,12 @@ local laserturnon = {
     end,
 }
 local laserturnoff = {
-    { 'time (in frames)', 'any', CheckExpr },
+    { 'Time (frames)', 'any', CheckExpr },
     { 'wait in this task', 'bool', CheckExpr },
-    disptype     = 'turn off laser',
+    disptype     = {
+        en = 'turn off laser',
+        zh = '关闭激光',
+    },
     needancestor = { 'laserdefine', 'lasershooter' },
     default      = { ['type'] = 'laserturnoff', attr = { '30' } },
     totext       = function(nodedata)
@@ -161,9 +176,12 @@ local laserturnoff = {
     end,
 }
 local laserturnhalfon = {
-    { 'time (in frames)', 'any', CheckExpr },
+    { 'Time (frames)', 'any', CheckExpr },
     { 'wait in this task', 'bool', CheckExpr },
-    disptype     = 'turn half on laser',
+    disptype     = {
+        en = 'turn half on laser',
+        zh = '半开激光',
+    },
     needancestor = { 'laserdefine', 'lasershooter' },
     default      = { ['type'] = 'laserturnhalfon', attr = { '30' } },
     totext       = function(nodedata)
@@ -174,10 +192,13 @@ local laserturnhalfon = {
     end,
 }
 local lasergrow = {
-    { 'time (in frames)', 'any', CheckExpr },
+    { 'Time (frames)', 'any', CheckExpr },
     { 'Play sound effect', 'bool', CheckExpr },
     { 'wait in this task', 'bool', CheckExpr },
-    disptype     = 'grow laser',
+    disptype     = {
+        en = 'grow laser',
+        zh = '伸展激光',
+    },
     needancestor = { 'laserdefine', 'lasershooter' },
     default      = { ['type'] = 'lasergrow', attr = { '30', 'true' } },
     totext       = function(nodedata)
@@ -191,7 +212,10 @@ local laserchange = {
     { 'Laser', 'any', CheckExpr },
     { 'Image', 'any', CheckExpr },
     { 'Color', 'color', CheckExpr },
-    disptype     = 'change laser\'s image and color',
+    disptype     = {
+        en = 'change image and color of laser',
+        zh = '更改激光类型与颜色',
+    },
     forbidparent = { 'folder', 'root' },
     allowchild   = {},
     default      = { ['type'] = 'laserchange', attr = { 'self', '1', 'orginal' } },

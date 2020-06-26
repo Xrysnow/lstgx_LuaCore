@@ -68,7 +68,10 @@ local bossdefine = {
     { "Background Music", "any" },
     { 'Number of imgs', 'any' },
     { 'Number of anis', 'any' },
-    disptype    = 'define boss',
+    disptype    = {
+        en = 'define boss',
+        zh = '定义boss',
+    },
     editfirst   = true,
     default     = {
         ["attr"]  = { "", "Name", "240,384", "", "", "4", "3", "16,16", "8", "", "", "4,4,4,4", "1,1,1" },
@@ -201,7 +204,10 @@ local bossspellcard = {
     { 'Drop point', 'any', CheckExpr },
     { 'Immune to bomb', 'bool', CheckExpr },
     { 'Performing action', 'bool', CheckExpr },
-    disptype    = 'spell card',
+    disptype    = {
+        en = 'add spell card',
+        zh = '添加符卡',
+    },
     default     = {
         ["attr"]   = { "", "2", "15", "60", "600", "0", "0", "0", "false", "false" },
         ["type"]   = "bossspellcard",
@@ -262,7 +268,10 @@ local bossspellcard = {
 }
 local bossscstart = {
     allowparent  = { 'bossspellcard' },
-    disptype     = 'on start spell card',
+    disptype     = {
+        en = 'on start spell card',
+        zh = '符卡开始事件',
+    },
     forbiddelete = true,
     totext       = function(nodedata)
         return "on start"
@@ -276,7 +285,10 @@ local bossscstart = {
 }
 local bossscfinish = {
     allowparent  = { 'bossspellcard' },
-    disptype     = 'on finish spell card',
+    disptype     = {
+        en = 'on finish spell card',
+        zh = '符卡结束事件',
+    },
     forbiddelete = true,
     totext       = function(nodedata)
         return "on finish"
@@ -297,7 +309,10 @@ function _tmp_sc:init()
 local dialog = {
     { 'Can skip', 'bool', CheckExpr },
     { 'dialog', 'bool', CheckExpr },
-    disptype    = 'dialog',
+    disptype    = {
+        en = 'create dialog',
+        zh = '创建对话',
+    },
     default     = {
         ["attr"]   = { "true", "true" },
         ["type"]   = "dialog",
@@ -317,7 +332,10 @@ local dialog = {
     end
 }
 local dialogtask = {
-    disptype     = 'task for dialog',
+    disptype     = {
+        en = 'task for dialog',
+        zh = '对话task',
+    },
     allowparent  = {},
     forbiddelete = true,
     totext       = function(nodedata)
@@ -334,10 +352,13 @@ local sentence = {
     { 'Image', 'image', CheckNonBlank },
     { 'Position', 'leftright', CheckNonBlank },
     { 'Text', 'any' },
-    { 'Time (in frames)', 'any', CheckExprOmit },
+    { 'Time (frames)', 'any', CheckExprOmit },
     { 'Scale', 'any', CheckExprOmit },
     editfirst    = true,
-    disptype     = 'sentence',
+    disptype     = {
+        en = 'add sentence of dialog',
+        zh = '添加对话语句',
+    },
     needancestor = { 'dialogtask' },
     allowchild   = {},
     totext       = function(nodedata)
@@ -369,7 +390,10 @@ end
 local bosscreate = {
     { 'Type name', 'selecttype', CheckNonBlank },
     { 'Wait', 'bool', CheckExpr },
-    disptype     = 'create boss',
+    disptype     = {
+        en = 'create boss',
+        zh = '创建boss',
+    },
     editfirst    = true,
     needancestor = { 'stage' },
     allowchild   = {},
@@ -396,7 +420,10 @@ local bossmoveto = {
     { 'Destination', 'any', CheckExpr },
     { 'nFrame', 'any', CheckExprOmit },
     { 'Mode', 'movetomode', CheckExprOmit },
-    disptype    = 'boss move to',
+    disptype    = {
+        en = 'boss move to',
+        zh = '移动boss',
+    },
     allowparent = { 'bossdefine' },
     allowchild  = {},
     default     = { ["attr"] = { "0,144", "60", "MOVE_NORMAL" }, ["type"] = "bossmoveto" },
@@ -427,7 +454,10 @@ local bossmoveto = {
 local bosscast = {
     { 'Time', 'any', CheckExpr },
     needancestor = { 'bossdefine' },
-    disptype     = 'boss cast',
+    disptype     = {
+        en = 'play boss charging animation',
+        zh = '播放boss蓄力动画',
+    },
     default      = { ["attr"] = { '60' }, ["type"] = "bosscast" },
     allowchild   = {},
     totext       = function(nodedata)
@@ -439,7 +469,10 @@ local bosscast = {
 }
 local bossshowaura = {
     { 'Show aura', 'bool', CheckExpr },
-    disptype     = 'show/hide boss aura',
+    disptype     = {
+        en = 'show/hide boss aura',
+        zh = '显示/隐藏boss法阵',
+    },
     needancestor = { 'bossdefine' },
     allowchild   = {},
     totext       = function(nodedata)

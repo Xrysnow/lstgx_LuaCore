@@ -16,7 +16,10 @@ local MakeFullPath = M.MakeFullPath
 
 local enemydefine = {
     { 'Type name', 'typename', CheckClassName },
-    disptype    = 'define enemy',
+    disptype    = {
+        en = 'define enemy',
+        zh = '定义enemy',
+    },
     editfirst   = true,
     allowparent = { 'root', 'folder' },
     allowchild  = { 'callbackfunc' },
@@ -85,7 +88,10 @@ local enemyinit = {
     { 'Clear bullets when die', 'bool', CheckExpr },
     { 'Delete when leave screen', 'bool', CheckExpr },
     { 'Taijutsu nashi', 'bool', CheckExpr },
-    disptype     = 'on create enemy',
+    disptype     = {
+        en = 'on create enemy',
+        zh = '初始化enemy',
+    },
     allowparent  = {},
     forbiddelete = true,
     totext       = function(nodedata)
@@ -109,7 +115,10 @@ local enemycreate = {
     { 'Type name', 'selecttype', CheckNonBlank },
     { 'Position', 'pos', CheckPos },
     { 'Parameter', 'param', CheckExprOmit },
-    disptype     = 'create enemy',
+    disptype     = {
+        en = 'create enemy',
+        zh = '创建enemy',
+    },
     editfirst    = true,
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
@@ -153,12 +162,15 @@ local enemysimple = {
     { 'Clear bullets when die', 'bool', CheckExpr },
     { 'Delete when leave screen', 'bool', CheckExpr },
     { 'Taijutsu nashi', 'bool', CheckExpr },
-    disptype     = 'create simple enemy with task',
+    disptype     = {
+        en = 'create simple enemy with task',
+        zh = '创建简单enemy',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = { 'task' },
     default      = {
         ['type'] = 'enemysimple',
-        attr = { '1', '10', 'self.x, self.y', '0', '0', '0', '1', 'false', 'false', 'false' }
+        attr     = { '1', '10', 'self.x, self.y', '0', '0', '0', '1', 'false', 'false', 'false' }
     },
     totext       = function(nodedata)
         return string.format("create enemy in (%s)", nodedata.attr[3])

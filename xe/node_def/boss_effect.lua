@@ -16,7 +16,10 @@ local MakeFullPath = M.MakeFullPath
 
 local pactrometer = {
     { 'Position', 'pos', CheckPos },
-    disptype     = 'boss pactrometer',
+    disptype     = {
+        en = 'create boss charging effect',
+        zh = '创建boss蓄力特效',
+    },
     default      = { ["type"] = 'pactrometer', attr = { 'self.x, self.y' } },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
@@ -29,7 +32,10 @@ local pactrometer = {
 }
 local explode = {
     { 'Position', 'pos', CheckPos },
-    disptype     = 'boss explode',
+    disptype     = {
+        en = 'create boss explode effect',
+        zh = '创建boss死亡特效',
+    },
     default      = { ["type"] = 'explode', attr = { 'self.x, self.y' } },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},

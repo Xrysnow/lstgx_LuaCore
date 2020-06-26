@@ -17,12 +17,15 @@ local MakeFullPath = M.MakeFullPath
 local bulletcleanrange = {
     { 'Position', 'pos', CheckPos },
     { 'Radius of Range', 'any', CheckExpr },
-    { 'Time of Spreading out', 'any', CheckExpr },
+    { 'Time of spreading out', 'any', CheckExpr },
     { 'Duration', 'any', CheckExpr },
-    { 'Convert bullet into faith', 'bool', CheckExpr },
-    { 'Clean the indestroyable bullet', 'bool', CheckExpr },
-    { 'floating velocity', 'any', CheckExpr },
-    disptype     = 'make a floating bullet-cleaning range',
+    { 'Convert bullets into faith items', 'bool', CheckExpr },
+    { 'Clear indestructible bullets', 'bool', CheckExpr },
+    { 'Floating velocity', 'any', CheckExpr },
+    disptype     = {
+        en = 'create a floating bullet-clearing range',
+        zh = '创建自定义消弹效果',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
     default      = {
@@ -30,7 +33,7 @@ local bulletcleanrange = {
         ['attr'] = { 'player.x, player.y', '48', '15', '45', 'true', 'true', '0' }
     },
     totext       = function(nodedata)
-        return string.format('make a floating(v=%s) bullet-cleaning range(%s) in (%s), last (%s+%s) frames.',
+        return string.format('make a floating(v=%s) bullet-clearing range(%s) in (%s), last (%s+%s) frames.',
                              nodedata.attr[7], nodedata.attr[2], nodedata.attr[1], nodedata.attr[3], nodedata.attr[4])
     end,
     tohead       = function(nodedata)

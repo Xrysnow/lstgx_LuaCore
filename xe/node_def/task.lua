@@ -15,6 +15,10 @@ local CheckAnonymous = M.CheckAnonymous
 local MakeFullPath = M.MakeFullPath
 
 local task = {
+    disptype = {
+        en = 'create task',
+        zh = '创建task',
+    },
     needancestor = {
         'enemydefine', 'bossdefine', 'objectdefine',
         'laserdefine', 'laserbentdefine',
@@ -33,6 +37,10 @@ local task = {
     end,
 }
 local tasker = {
+    disptype = {
+        en = 'create independent task',
+        zh = '创建独立task',
+    },
     forbidparent = { 'root', 'folder' },
     totext       = function(nodedata)
         return "create tasker"
@@ -45,7 +53,10 @@ local tasker = {
     end,
 }
 local taskclear = {
-    disptype     = 'clear task',
+    disptype = {
+		en = 'clear task',
+		zh = '清空task',
+	},
     needancestor = { 'enemydefine', 'bossdefine', 'objectdefine', 'laserdefine', 'laserbentdefine', 'bulletdefine', 'rebounderdefine' },
     allowchild   = {},
     totext       = function(nodedata)
@@ -57,7 +68,10 @@ local taskclear = {
 }
 local taskwait = {
     { 'nFrame', 'any', CheckExpr },
-    disptype     = 'wait',
+    disptype = {
+		en = 'task wait',
+		zh = 'task等待',
+	},
     default      = { ["type"] = 'taskwait', attr = { '60' } },
     needancestor = { 'task', 'stagetask', 'dialogtask', 'tasker' },
     allowchild   = {},
@@ -84,7 +98,10 @@ taskrepeat = {
     { 'Var 4 name', 'any' },
     { 'Var 4 init value', 'any' },
     { 'Var 4 increment', 'any' },
-    disptype     = 'repeat',
+    disptype = {
+		en = 'task repeat',
+		zh = 'task repeat',
+	},
     default      = { ["type"] = 'taskrepeat', attr = { '_infinite', '60', '', '', '', '', '', '', '', '', '', '', '', '' } },
     needancestor = { 'task', 'stagetask', 'dialogtask', 'tasker' },
     check        = function(nodedata)
@@ -124,10 +141,10 @@ taskrepeat = {
         local attr = nodedata.attr
         for i = 3, 12, 3 do
             if not IsBlank(attr[i]) then
-                ret = ret .. string.format("local %s,%s=(%s),(%s) ", attr[i], "_d_" .. attr[i], attr[i + 1], attr[i + 2])
+                ret = ret .. string.format("local %s, %s = (%s),(%s) ", attr[i], "_d_" .. attr[i], attr[i + 1], attr[i + 2])
             end
         end
-        return ret .. "for _=1," .. nodedata.attr[1] .. " do\n"
+        return ret .. "for _ = 1, " .. nodedata.attr[1] .. " do\n"
     end,
     tofoot       = function(nodedata)
         local ret = ""
@@ -137,7 +154,7 @@ taskrepeat = {
         end
         for i = 3, 12, 3 do
             if not IsBlank(attr[i]) then
-                ret = ret .. string.format("%s=%s+%s ", attr[i], attr[i], "_d_" .. attr[i])
+                ret = ret .. string.format("%s = %s + %s ", attr[i], attr[i], "_d_" .. attr[i])
             end
         end
         return ret .. "end end\n"
@@ -147,7 +164,10 @@ local taskbreak = {
     { 'Condition', 'any' },
     default      = { ["type"] = 'taskbreak', attr = { '' } },
     needancestor = { 'repeat', 'taskrepeat' },
-    disptype     = 'jump',
+    disptype = {
+		en = 'break repeat',
+		zh = '跳出repeat',
+	},
     allowchild   = {},
     totext       = function(nodedata)
         if #nodedata.attr[1] == 0 then
@@ -166,7 +186,10 @@ local taskbreak = {
 }
 local taskreturn = {
     needancestor = { 'task', 'dialogtask', 'tasker' },
-    disptype     = 'terminate task',
+    disptype = {
+		en = 'terminate task',
+		zh = '结束task',
+	},
     allowchild   = {},
     totext       = function(nodedata)
         return "terminate current task"
@@ -179,7 +202,10 @@ local taskmoveto = {
     { 'Destination', 'any', CheckExpr },
     { 'nFrame', 'any', CheckExprOmit },
     { 'Mode', 'movetomode', CheckExprOmit },
-    disptype     = 'move to',
+    disptype = {
+		en = 'task move to',
+		zh = '创建移动task',
+	},
     needancestor = { 'task', 'dialogtask', 'tasker' },
     allowchild   = {},
     default      = {
@@ -218,7 +244,10 @@ local taskBeziermoveto = {
     { 'Point 3', 'any', },
     { 'Point 4', 'any', },
     { 'Point 5', 'any', },
-    disptype     = 'move to by Bezier Curve',
+    disptype = {
+		en = 'move to by Bezier Curve',
+		zh = '创建移动task（贝塞尔曲线）',
+	},
     needancestor = { 'task', 'dialogtask', 'tasker' },
     allowchild   = {},
     default      = {
@@ -274,7 +303,10 @@ local taskbosswander = {
     { 'Y Amplitude', 'any', CheckExprOmit },
     { 'Movement Mode', 'movetomode', CheckExprOmit },
     { 'Direction Mode', 'directmode', CheckExprOmit },
-    disptype       = 'boss wander',
+    disptype = {
+		en = 'task boss wander',
+		zh = '创建boss游走task',
+	},
     default        = {
         ["attr"] = { "60", "-96,96", "112,144", "16,32", "8,16", "MOVE_NORMAL", "MOVE_X_TOWARDS_PLAYER" },
         ["type"] = "taskbosswander"

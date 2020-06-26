@@ -27,7 +27,10 @@ local setting = {
     { 'Author', 'any', CheckName },
     { 'Allow practice', 'bool', CheckExpr },
     { 'Allow sc practice', 'bool', CheckExpr },
-    disptype     = 'project settings',
+    disptype     = {
+        en = 'project settings',
+        zh = '设置',
+    },
     totext       = function(nodedata)
         return 'project settings'
     end,

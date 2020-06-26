@@ -15,12 +15,15 @@ local CheckAnonymous = M.CheckAnonymous
 local MakeFullPath = M.MakeFullPath
 
 local setv = {
-    { 'Unit', 'any', CheckExpr },
+    { 'Object', 'any', CheckExpr },
     { 'Velocity', 'any', CheckExpr },
     { 'Angle', 'any', CheckExpr },
     { 'Aim to player', 'bool', CheckExpr },
     { 'Set rotation', 'bool', CheckExpr },
-    disptype     = 'set velocity',
+    disptype     = {
+        en = 'set velocity of object',
+        zh = '设置object速度',
+    },
     forbidparent = { 'folder', 'root' },
     allowchild   = {},
     default      = { ['type'] = 'setv', attr = { 'self', '3', '0', 'false', 'true' } },
@@ -44,7 +47,10 @@ local setcolor = {
     { 'Red', 'any', CheckExpr },
     { 'Green', 'any', CheckExpr },
     { 'Blue', 'any', CheckExpr },
-    disptype     = 'change object\'s color and blend mode',
+    disptype     = {
+        en = 'set color and blend mode of object',
+        zh = '设置object颜色与混合模式',
+    },
     forbidparent = { 'folder', 'root' },
     allowchild   = {},
     default      = { ['type'] = 'setcolor', attr = { 'self', '', '255', '255', '255', '255' } },
@@ -58,7 +64,10 @@ local setcolor = {
 local objectsetimg = {
     { 'Object', 'any', CheckExpr },
     { 'Image', 'image', CheckNonBlank },
-    disptype     = 'change object\'s image',
+    disptype     = {
+        en = 'set image of object',
+        zh = '设置object图像',
+    },
     forbidparent = { 'folder', 'root' },
     allowchild   = {},
     default      = { ['type'] = 'objectsetimg', attr = { 'self', '' } },
@@ -71,23 +80,29 @@ local objectsetimg = {
 }
 local unitforeach = {
     { 'Group', 'group', CheckExpr },
-    disptype       = 'for each unit in group',
+    disptype       = {
+        en = 'iterate object of a group',
+        zh = '遍历碰撞组中的object',
+    },
     forbidparent   = { 'folder', 'root' },
     forbidancestor = { 'unitforeach' },
     totext         = function(nodedata)
         return string.format("for each unit in group %s", nodedata.attr[1])
     end,
     tohead         = function(nodedata)
-        return string.format("for _,unit in ObjList(%s) do\n", nodedata.attr[1])
+        return string.format("for _, unit in ObjList(%s) do\n", nodedata.attr[1])
     end,
     tofoot         = function(nodedata)
         return "end\n"
     end,
 }
 local unitkill = {
-    { 'Unit', 'any', CheckExpr },
-    { 'Trigger event', 'bool', CheckExpr },
-    disptype     = 'kill unit',
+    { 'Object', 'any', CheckExpr },
+    { 'Trigger event callback', 'bool', CheckExpr },
+    disptype     = {
+        en = 'kill object',
+        zh = '对object执行kill操作',
+    },
     forbidparent = { 'folder', 'root' },
     allowchild   = {},
     default      = { ['type'] = 'unitkill', attr = { 'self', 'true' } },
@@ -99,9 +114,12 @@ local unitkill = {
     end,
 }
 local unitdel = {
-    { 'Unit', 'any', CheckExpr },
-    { 'Trigger event', 'bool', CheckExpr },
-    disptype     = 'delete unit',
+    { 'Object', 'any', CheckExpr },
+    { 'Trigger event callback', 'bool', CheckExpr },
+    disptype     = {
+        en = 'delete object',
+        zh = '对object执行delete操作',
+    },
     forbidparent = { 'folder', 'root' },
     allowchild   = {},
     default      = { ['type'] = 'unitdel', attr = { 'self', 'true' } },
@@ -112,12 +130,16 @@ local unitdel = {
         return string.format("_del(%s, %s)\n", nodedata.attr[1], nodedata.attr[2])
     end,
 }
+--
 local setaccel = {
-    { 'Unit', 'any', CheckExpr },
+    { 'Object', 'any', CheckExpr },
     { 'Acceleration', 'any', CheckExpr },
     { 'Angle', 'any', CheckExpr },
     { 'Aim to player', 'bool', CheckExpr },
-    disptype     = 'set acceleration',
+    disptype     = {
+        en = 'set acceleration of object',
+        zh = '设置object加速度',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
     default      = { ['type'] = 'setaccel', ['attr'] = { 'self', '0.05', '0', 'false' } },
@@ -142,9 +164,12 @@ local setaccel = {
     end
 }
 local setgravity = {
-    { 'Unit', 'any', CheckExpr },
+    { 'Object', 'any', CheckExpr },
     { 'Gravity', 'any', CheckExpr },
-    disptype     = 'set gravity',
+    disptype     = {
+        en = 'set gravity of object',
+        zh = '设置object重力',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
     default      = { ['type'] = 'setgravity', ['attr'] = { 'self', '0.05' } },
@@ -156,11 +181,14 @@ local setgravity = {
     end
 }
 local setfv = {
-    { 'Unit', 'any', CheckExpr },
-    { 'Max Velocity', 'any', CheckExpr },
-    { 'Max X-Velocity', 'any', CheckExpr },
-    { 'Max Y-Velocity', 'any', CheckExpr },
-    disptype     = 'set velocity forbidance',
+    { 'Object', 'any', CheckExpr },
+    { 'Max velocity', 'any', CheckExpr },
+    { 'Max X-velocity', 'any', CheckExpr },
+    { 'Max Y-velocity', 'any', CheckExpr },
+    disptype     = {
+        en = 'set velocity limit of object',
+        zh = '设置object速度限制',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
     default      = { ['type'] = 'setfv', ['attr'] = { 'self', 'original', 'original', 'original' } },
@@ -207,7 +235,7 @@ local setfv = {
         return string.format("_forbid_v(%s, %s, %s, %s)\n", nodedata.attr[1], v, vx, vy)
     end
 }
-
+--]]
 local _def = {
     setv         = setv,
     setcolor     = setcolor,

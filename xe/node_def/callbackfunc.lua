@@ -19,12 +19,15 @@ local event_type_dict = { frame = true, render = true, colli = true, kill = true
 
 local callbackfunc = {
     { 'Event type', 'event', CheckNonBlank },
-    disptype    = 'unit event trigger',
+    disptype    = {
+        en = 'define event callback',
+        zh = '定义事件回调',
+    },
     default     = {
-        expand = true,
+        expand   = true,
         ['type'] = 'callbackfunc',
-        attr = { 'frame' },
-        child = {
+        attr     = { 'frame' },
+        child    = {
             { ['type'] = 'defaultaction', attr = {} }
         }
     },
@@ -50,7 +53,10 @@ local callbackfunc = {
     end,
 }
 local defaultaction = {
-    disptype    = 'do default action',
+    disptype    = {
+        en = 'do event callback',
+        zh = '执行事件回调',
+    },
     allowchild  = {},
     allowparent = { 'callbackfunc' },
     totext      = function(nodedata)

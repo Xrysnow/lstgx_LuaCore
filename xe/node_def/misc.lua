@@ -15,9 +15,12 @@ local CheckAnonymous = M.CheckAnonymous
 local MakeFullPath = M.MakeFullPath
 
 local shakescreen = {
-    { 'time', 'number', CheckExpr },
-    { 'amplitude', 'number', CheckExpr },
-    disptype     = 'shake screen',
+    { 'Time (frames)', 'number', CheckExpr },
+    { 'Amplitude', 'number', CheckExpr },
+    disptype     = {
+        en = 'shake screen',
+        zh = '屏幕震动效果',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
     default      = { ["type"] = 'shakescreen', attr = { '240', '3' } },
@@ -30,7 +33,10 @@ local shakescreen = {
 }
 local setfps = {
     { 'FPS', 'number', CheckExpr },
-    disptype     = 'Set FPS',
+    disptype     = {
+        en = 'Set FPS',
+        zh = '设置游戏帧率',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
     default      = { ["type"] = 'setfps', attr = { '60' } },
@@ -44,6 +50,10 @@ local setfps = {
 local smear = {
     { "Master", "any", CheckExpr },
     { "Interval (floating number)", "number", CheckExpr },
+    disptype     = {
+        en = 'smear effect',
+        zh = '创建拖影效果',
+    },
     default      = { ["type"] = "smear", attr = { "self", "1" } },
     forbidparent = { "root", "folder" },
     allowchild   = {},
@@ -58,10 +68,13 @@ local dropitem = {
     { 'Item', 'item' },
     { 'Number', 'number', CheckExpr },
     { 'Position', 'pos', CheckPos },
-    disptype     = 'drop item',
+    disptype     = {
+        en = 'drop item',
+        zh = '创建掉落物',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
-    default      = { ["type"] = 'dropitem', attr = { 'item_extend', '1', 'self.x,self.y' } },
+    default      = { ["type"] = 'dropitem', attr = { 'item_extend', '1', 'self.x, self.y' } },
     totext       = function(nodedata)
         if nodedata.attr[2] == '0' then
             return "drop nothing"

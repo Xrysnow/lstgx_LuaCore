@@ -19,9 +19,13 @@ local connect = {
     { 'Servant', 'any', CheckExpr },
     { 'Damage transfer', 'any', CheckExpr },
     { 'Connect death', 'bool', CheckExpr },
+    disptype     = {
+        en = 'bind servant',
+        zh = '绑定使魔',
+    },
     default      = {
         ['type'] = 'connect',
-        attr = { 'self', 'last', '0', 'true' }
+        attr     = { 'self', 'last', '0', 'true' }
     },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
@@ -39,8 +43,11 @@ local connect = {
 local setrelpos = {
     { 'Position', 'pos', CheckPos },
     { 'Rotation', 'any', CheckExpr, 'self.rot' },
-    { 'Follow master\'s rotation', 'bool', CheckExpr, 'false' },
-    disptype     = 'set relative position',
+    { 'Follow rotation of master', 'bool', CheckExpr, 'false' },
+    disptype     = {
+        en = 'set relative position',
+        zh = '设置相对位置',
+    },
     default      = {
         ['type'] = 'setrelpos',
         attr     = { '0, 0', 'self.rot', 'false' }

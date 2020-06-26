@@ -16,7 +16,10 @@ local MakeFullPath = M.MakeFullPath
 
 local objectdefine = {
     { 'Type name', 'typename', CheckClassName },
-    disptype    = 'define object',
+    disptype    = {
+        en = 'define object',
+        zh = '定义object',
+    },
     editfirst   = true,
     allowparent = { 'root', 'folder' },
     allowchild  = { 'callbackfunc' },
@@ -64,7 +67,7 @@ local objectdefine = {
         M.difficulty = nil
     end,
 }
-local objectinit_head_fmt=[[_editor_class[%q].init = function(self, _x, _y, %s)
+local objectinit_head_fmt = [[_editor_class[%q].init = function(self, _x, _y, %s)
 self.x, self.y = _x, _y
 self.img = %q
 self.layer = %s
@@ -88,7 +91,10 @@ local objectinit = {
     { 'Auto rotation', 'bool', CheckExpr },
     { 'Hit point', 'any', CheckExpr },
     { 'Collision', 'bool', CheckExpr },
-    disptype     = 'on create object',
+    disptype     = {
+        en = 'on create object',
+        zh = '初始化object',
+    },
     allowparent  = {},
     forbiddelete = true,
     totext       = function(nodedata)
@@ -116,7 +122,10 @@ local objectcreate = {
     { 'Type name', 'selecttype', CheckNonBlank },
     { 'Position', 'pos', CheckPos },
     { 'Parameter', 'param', CheckExprOmit },
-    disptype     = 'create object',
+    disptype     = {
+        en = 'create object',
+        zh = '创建object',
+    },
     editfirst    = true,
     default      = { ["type"] = 'objectcreate', attr = { '', 'self.x, self.y', '' } },
     forbidparent = { 'root', 'folder' },
@@ -143,7 +152,8 @@ local objectcreate = {
             return string.format('object type %q does not exist', nodedata.attr[1])
         end
         if M.paramNumDict[class] ~= CalcParamNum(nodedata.attr[3]) then
-            return "number of parameter is incorrect"
+            return ("number of parameter is incorrect, expect %d, but got %d"):format(
+                    M.paramNumDict[class], CalcParamNum(nodedata.attr[3]))
         end
         nodedata.fullclassname = class
     end,

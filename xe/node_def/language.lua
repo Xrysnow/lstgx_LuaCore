@@ -16,7 +16,10 @@ local MakeFullPath = M.MakeFullPath
 
 local codeblock = {
     { 'Title', 'any' },
-    disptype     = 'code block',
+    disptype     = {
+        en = 'code block',
+        zh = '添加代码块',
+    },
     forbidparent = { 'root', 'folder' },
     totext       = function(nodedata)
         return nodedata.attr[1]
@@ -30,6 +33,10 @@ local codeblock = {
 }
 local code = {
     { 'Code', 'any', CheckCode },
+    disptype   = {
+        en = 'code',
+        zh = '添加代码',
+    },
     allowchild = {},
     editfirst  = true,
     totext     = function(nodedata)
@@ -46,6 +53,10 @@ local code = {
 }
 local comment = {
     { 'Comment', 'any' },
+    disptype   = {
+        en = 'comment',
+        zh = '添加注释',
+    },
     allowchild = {},
     editfirst  = true,
     totext     = function(nodedata)
@@ -58,7 +69,10 @@ local comment = {
 local variable = {
     { 'Name', 'any', CheckVName },
     { 'Initial value', 'any', CheckExprOmit },
-    disptype     = 'define variable',
+    disptype     = {
+        en = 'define variable',
+        zh = '定义变量',
+    },
     editfirst    = true,
     allowchild   = {},
     forbidparent = { 'root', 'folder' },
@@ -92,6 +106,10 @@ repeat_ = {
     { 'Var 4 name', 'any' },
     { 'Var 4 init value', 'any' },
     { 'Var 4 increment', 'any' },
+    disptype     = {
+        en = 'repeat statement',
+        zh = '循环语句',
+    },
     default      = { ["type"] = 'repeat', attr = { '_infinite', '', '', '', '', '', '', '', '', '', '', '', '' } },
     forbidparent = { 'root', 'folder' },
     check        = function(nodedata)
@@ -149,6 +167,10 @@ repeat_ = {
 }
 local break_ = {
     { 'Condition', 'any' },
+    disptype     = {
+        en = 'break statement',
+        zh = 'break语句',
+    },
     default      = { ["type"] = 'break', attr = { '' } },
     needancestor = { 'repeat', 'taskrepeat' },
     allowchild   = {},
@@ -169,6 +191,10 @@ local break_ = {
 }
 local if_ = {
     { 'Condition', 'any', CheckExpr },
+    disptype     = {
+        en = 'if statement',
+        zh = 'if语句',
+    },
     editfirst    = true,
     forbidparent = { 'root', 'folder' },
     depth        = 0,
@@ -193,6 +219,10 @@ local if_ = {
     end,
 }
 local then_ = {
+    disptype     = {
+        en = 'then statement',
+        zh = 'then语句',
+    },
     totext       = function(nodedata)
         return "then"
     end,
@@ -200,6 +230,10 @@ local then_ = {
     forbiddelete = true,
 }
 local else_ = {
+    disptype     = {
+        en = 'else statement',
+        zh = 'else语句',
+    },
     totext       = function(nodedata)
         return "else"
     end,

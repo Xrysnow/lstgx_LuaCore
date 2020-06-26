@@ -24,7 +24,10 @@ local stagegroup = {
     { 'Start bomb', 'any', CheckExpr, '3' },
     { 'Allow practice', 'bool', CheckExpr },
     { 'Difficulty value', 'difficulty', CheckExpr, '1' },
-    disptype    = 'stage group',
+    disptype    = {
+        en = 'stage group',
+        zh = '创建关卡组',
+    },
     editfirst   = true,
     default     = { ["type"] = 'stagegroup', attr = { '', '2', '100', '50000', '3', 'true' } },
     allowchild  = { 'stage' },
@@ -82,6 +85,10 @@ local stage = {
     { 'Start faith (practice)', 'any', CheckExpr },
     { 'Start spell (practice)', 'any', CheckExpr },
     { 'Allow practice', 'bool', CheckExpr },
+    disptype    = {
+        en = 'stage',
+        zh = '创建关卡',
+    },
     editfirst   = true,
     allowparent = { 'stagegroup' },
     allowchild  = {},
@@ -117,7 +124,10 @@ local stage = {
     end,
 }
 local stagetask = {
-    disptype     = 'task for stage',
+    disptype     = {
+        en = 'task for stage',
+        zh = '添加关卡task',
+    },
     allowparent  = {},
     forbiddelete = true,
     totext       = function(nodedata)
@@ -132,7 +142,10 @@ local stagetask = {
 }
 local stagefinish = {
     needancestor = { 'stage' },
-    disptype     = 'finish stage',
+    disptype     = {
+        en = 'finish stage',
+        zh = '结束关卡',
+    },
     allowchild   = {},
     totext       = function(nodedata)
         return "finish current stage"
@@ -142,8 +155,11 @@ local stagefinish = {
     end,
 }
 local stagegoto = {
-    { 'Stage (by index)', 'any', CheckExpr },
-    disptype     = 'go to stage',
+    { 'Stage (index)', 'any', CheckExpr },
+    disptype     = {
+        en = 'go to stage',
+        zh = '切换关卡',
+    },
     needancestor = { 'stage' },
     allowchild   = {},
     totext       = function(nodedata)
@@ -171,7 +187,10 @@ task.Wait(30)
 stage.group.FinishGroup()
 ]]
 local stagefinishgroup = {
-    disptype     = 'finish stage group',
+    disptype     = {
+        en = 'finish stage group',
+        zh = '结束关卡组',
+    },
     needancestor = { 'stage' },
     allowchild   = {},
     totext       = function(nodedata)
@@ -183,7 +202,10 @@ local stagefinishgroup = {
 }
 local bgstage = {
     { 'Background', 'bgstage', CheckVName },
-    disptype     = 'set stage background',
+    disptype     = {
+        en = 'set stage background',
+        zh = '设置关卡背景',
+    },
     needancestor = { 'stage' },
     allowchild   = {},
     totext       = function(nodedata)

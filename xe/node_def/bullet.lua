@@ -16,7 +16,10 @@ local MakeFullPath = M.MakeFullPath
 
 local bulletdefine = {
     { 'Type name', 'typename', CheckClassName },
-    disptype    = 'define bullet',
+    disptype    = {
+        en = 'define bullet',
+        zh = '定义子弹',
+    },
     editfirst   = true,
     allowparent = { 'root', 'folder' },
     allowchild  = { 'callbackfunc' },
@@ -62,7 +65,10 @@ local bulletinit = {
     { 'Color', 'color', CheckExpr },
     { 'Stay on create', 'bool', CheckExpr },
     { 'Destroyable', 'bool', CheckExpr },
-    disptype     = 'on create bullet',
+    disptype     = {
+        en = 'on create bullet',
+        zh = '子弹初始化',
+    },
     allowparent  = {},
     forbiddelete = true,
     totext       = function(nodedata)
@@ -91,7 +97,10 @@ local bulletcreate = {
     { 'Type name', 'selecttype', CheckNonBlank },
     { 'Position', 'pos', CheckPos },
     { 'Parameter', 'param', CheckExprOmit },
-    disptype     = 'create bullet',
+    disptype     = {
+        en = 'create bullet',
+        zh = '创建子弹',
+    },
     editfirst    = true,
     default      = { ["type"] = 'bulletcreate', attr = { '', 'self.x,self.y', '' } },
     forbidparent = { 'root', 'folder' },
@@ -143,7 +152,10 @@ local bulletcreatestraight = {
     { 'Accel Angle', 'any' },
     { 'Max Velocity', 'any' },
     { 'Shuttle', 'bool', CheckExpr },
-    disptype     = 'create simple bullet',
+    disptype     = {
+        en = 'create simple bullet',
+        zh = '创建简单子弹',
+    },
     default      = {
         ['type'] = 'bulletcreatestraight',
         attr     = { 'arrow_big', 'COLOR_RED', 'self.x,self.y', '3', '0', 'false', '0', 'true', 'true', '0', 'false', '0', '0', '0', 'false' }
@@ -203,7 +215,10 @@ local bulletcreatestraightex = {
     { 'Destroyable', 'bool', CheckExpr },
     { 'Time', 'number' },
     { 'Rebound', 'bool', CheckExpr },
-    disptype     = 'create simple bullets',
+    disptype     = {
+        en = 'create simple bullets',
+        zh = '创建简单子弹组',
+    },
     default      = {
         ['type'] = 'bulletcreatestraightex',
         attr     = { 'arrow_big', 'COLOR_RED', 'self.x, self.y', '5', '0', '3', '4', '0', '0', 'false', '0', 'true', 'true', '0', 'false' }
@@ -232,9 +247,12 @@ local bulletcreatestraightex = {
     end,
 }
 local bulletclear = {
-    { 'Convert to faith', 'bool', CheckExpr },
+    { 'Convert to faith items', 'bool', CheckExpr },
     { 'Clear indestructible', 'bool', CheckExpr },
-    disptype     = 'clear bullet',
+    disptype     = {
+        en = 'clear bullet',
+        zh = '创建默认消弹效果',
+    },
     default      = { ["type"] = 'bulletclear', attr = { 'true', 'false' } },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
@@ -249,7 +267,10 @@ local bulletchangestyle = {
     { 'Bullet', 'any', CheckExpr },
     { 'Style', 'bulletstyle', CheckExpr },
     { 'Color', 'color', CheckExpr },
-    disptype     = 'change bullet\'s style and color',
+    disptype     = {
+        en = 'change style and color of bullet',
+        zh = '更改弹型与颜色',
+    },
     forbidparent = { 'folder', 'root' },
     allowchild   = {},
     default      = { ['type'] = 'bulletchangestyle', attr = { 'self', 'arrow_big', 'COLOR_RED' } },
@@ -260,6 +281,7 @@ local bulletchangestyle = {
         return string.format("ChangeBulletImage(%s, %s, %s)\n", nodedata.attr[1], nodedata.attr[2], nodedata.attr[3])
     end,
 }
+--
 local highlight = {
     { 'Style', 'bulletstyle', CheckExpr },
     { 'Color', 'color', CheckExpr },
@@ -280,6 +302,7 @@ local highlight = {
         return string.format("ChangeBulletHighlight(%s)\n", table.concat(nodedata.attr, ","))
     end
 }
+--]]
 local _def = {
     bulletdefine           = bulletdefine,
     bulletinit             = bulletinit,

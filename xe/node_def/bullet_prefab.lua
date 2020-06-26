@@ -13,7 +13,7 @@ local IsBlank = M.IsBlank
 local CheckResFileInPack = M.CheckResFileInPack
 local CheckAnonymous = M.CheckAnonymous
 local MakeFullPath = M.MakeFullPath
-
+--[[ -- not used
 local archiexpand = {
     { 'Style', 'bulletstyle', CheckExpr },
     { 'Color', 'color', CheckExpr },
@@ -25,7 +25,10 @@ local archiexpand = {
     { 'Start Angle', 'any', CheckExpr },
     { 'Rotation Velocity', 'any', CheckExpr },
     { 'Radius Increment', 'any', CheckExpr },
-    disptype     = 'create a bullet flying along the Archimedes spiral',
+    disptype     = {
+        en = 'create a bullet flying along the Archimedes spiral',
+        zh = '',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
     default      = {
@@ -58,7 +61,10 @@ local archirotate = {
     { 'Start Angle', 'any', CheckExpr },
     { 'Rotation Velocity', 'any', CheckExpr },
     { 'Time before rotation', 'any', CheckExpr },
-    disptype     = 'create a bullet flying along the Archimedes spiral',
+    disptype     = {
+        en = 'create a bullet flying along the Archimedes spiral',
+        zh = '',
+    },
     forbidparent = { 'root', 'folder' },
     allowchild   = {},
     default      = {
@@ -87,3 +93,4 @@ local _def = {
 for k, v in pairs(_def) do
     require('xe.node_def._def').DefineNode(k, v)
 end
+--]]

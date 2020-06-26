@@ -13,10 +13,13 @@ local IsBlank = M.IsBlank
 local CheckResFileInPack = M.CheckResFileInPack
 local CheckAnonymous = M.CheckAnonymous
 local MakeFullPath = M.MakeFullPath
-
+--[[
 local rebounderdefine = {
     { 'Type name', 'typename', CheckClassName },
-    disptype    = 'define rebounder',
+    disptype = {
+		en = 'define rebounder',
+		zh = '',
+	},
     editfirst   = true,
     allowparent = { 'root', 'folder' },
     allowchild  = { 'callbackfunc' },
@@ -49,7 +52,10 @@ local rebounderinit_head_fmt = [[_editor_class[%q].init = function(self, _x, _y,
 ]]
 local rebounderinit = {
     { 'Parameter list', 'any', CheckParam },
-    disptype     = 'on create rebounder',
+    disptype = {
+		en = 'on create rebounder',
+		zh = '',
+	},
     allowparent  = {},
     forbiddelete = true,
     totext       = function(nodedata)
@@ -75,7 +81,10 @@ local reboundercreate = {
     { 'Parameter', 'param', CheckExprOmit },
     { 'Length', 'any', CheckExpr },
     { 'Angle', 'any', CheckExpr },
-    disptype     = 'create rebounder',
+    disptype = {
+		en = 'create rebounder',
+		zh = '',
+	},
     editfirst    = true,
     default      = { ["type"] = 'reboundercreate', attr = { '', '0,0', '', '128', '0' } },
     forbidparent = { 'root', 'folder' },
@@ -131,3 +140,4 @@ local _def = {
 for k, v in pairs(_def) do
     require('xe.node_def._def').DefineNode(k, v)
 end
+--]]

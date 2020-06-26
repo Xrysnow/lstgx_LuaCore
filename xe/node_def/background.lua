@@ -20,7 +20,10 @@ _editor_class[%q].init = function(self)
 ]]
 local bgdefine = {
     { 'Type name', 'typename', CheckClassName },
-    disptype    = 'define boss\'s background',
+    disptype    = {
+        en = 'define background',
+        zh = '定义背景',
+    },
     editfirst   = true,
     allowparent = { 'root', 'folder' },
     watch       = 'bgdefine',
@@ -49,7 +52,10 @@ local bglayer = {
     { 'vscale', 'gop', CheckExpr },
     --{'Extra init action','any',CheckCode},
     --{'Extra frame action','any',CheckCode},
-    disptype    = 'layer',
+    disptype    = {
+        en = 'add background layer',
+        zh = '添加背景层',
+    },
     editfirst   = true,
     default     = {
         ["type"] = 'bglayer',

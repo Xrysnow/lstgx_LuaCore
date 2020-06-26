@@ -16,6 +16,10 @@ local MakeFullPath = M.MakeFullPath
 
 local folder = {
     { 'Title', 'string' },
+    disptype    = {
+        en = 'Folder',
+        zh = '文件夹',
+    },
     allowparent = { 'root', 'folder' },
     depth       = 0,
     totext      = function(nodedata)

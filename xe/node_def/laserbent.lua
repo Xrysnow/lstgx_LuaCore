@@ -16,7 +16,10 @@ local MakeFullPath = M.MakeFullPath
 
 local laserbentdefine = {
     { 'Type name', 'typename', CheckClassName },
-    disptype    = 'define bent laser',
+    disptype    = {
+        en = 'define bent laser',
+        zh = '定义曲线激光',
+    },
     editfirst   = true,
     allowparent = { 'root', 'folder' },
     allowchild  = { 'callbackfunc' },
@@ -71,7 +74,10 @@ local laserbentinit = {
     { 'Width', 'any', CheckExpr },
     { 'Sampling', 'any', CheckExpr },
     { 'Node', 'any', CheckExpr },
-    disptype     = 'on create bent laser',
+    disptype     = {
+        en = 'on create bent laser',
+        zh = '初始化曲线激光',
+    },
     allowparent  = {},
     forbiddelete = true,
     totext       = function(nodedata)
@@ -100,7 +106,10 @@ local laserbentcreate = {
     { 'Type name', 'selecttype', CheckNonBlank },
     { 'Position', 'pos', CheckPos },
     { 'Parameter', 'param', CheckExprOmit },
-    disptype     = 'create bent laser',
+    disptype     = {
+        en = 'create bent laser',
+        zh = '创建曲线激光',
+    },
     editfirst    = true,
     default      = { ["type"] = 'laserbentcreate', attr = { '', 'self.x, self.y', '' } },
     forbidparent = { 'root', 'folder' },

@@ -13,7 +13,7 @@ local IsBlank = M.IsBlank
 local CheckResFileInPack = M.CheckResFileInPack
 local CheckAnonymous = M.CheckAnonymous
 local MakeFullPath = M.MakeFullPath
-
+--
 local renderimage = {
     { 'image', 'string', CheckNonBlank },
     { 'Position', 'pos', CheckPos },
@@ -21,7 +21,10 @@ local renderimage = {
     { 'Horizonal scale', 'any', CheckExpr },
     { 'Vertical scale', 'any', CheckExpr },
     { 'Layer', 'layer', CheckExpr },
-    disptype     = 'render',
+    disptype = {
+		en = 'render',
+		zh = '',
+	},
     default      = { ["type"] = 'renderimage', attr = { 'leaf', 'self.x, self.y', '0', '1.0', '1.0', 'LAYER_BG' } },
     forbidparent = { 'root', 'folder' },
     allowchild   = { 'task' },
@@ -41,3 +44,4 @@ local _def = {
 for k, v in pairs(_def) do
     require('xe.node_def._def').DefineNode(k, v)
 end
+--]]
