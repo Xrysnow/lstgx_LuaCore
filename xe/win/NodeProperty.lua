@@ -8,6 +8,7 @@ function M:ctor()
     base.ctor(self)
     ---@type xe.NodePropertySetter[]
     self._setters = {}
+    self._isGame = false
 end
 
 function M:collectValues()
@@ -78,6 +79,31 @@ function M:showNode(node)
         im.separator()
         im.text(node:toFoot() or 'N/A')
     end)
+end
+
+function M:setEditor()
+    if not self._isGame then
+        return
+    end
+    self._isGame = false
+    self:showNode(nil)
+end
+
+function M:setGame()
+    if self._isGame then
+        return
+    end
+    self._isGame = true
+    self:showNode(nil)
+    self:addChildChain(
+            wi.TreeNode('Game Resource'),
+            require('imgui.lstg.GameResInfo')())
+    self:addChildChain(
+            wi.TreeNode('THlib Info'),
+            require('imgui.lstg.THlibInfo')())
+    self:addChildChain(
+            wi.TreeNode('Performance'),
+            require('imgui.lstg.PerformanceInfo')())
 end
 
 return M
