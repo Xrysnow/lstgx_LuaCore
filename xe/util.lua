@@ -1,5 +1,7 @@
 --
 local M = {}
+local im = imgui
+local wi = require('imgui.Widget')
 
 function M.checkExp(str)
     str = '_=\n' .. str
@@ -68,6 +70,62 @@ function M.checkIdentifier(s)
         return false
     end
     return true
+end
+
+---@param sp cc.Sprite
+function M.createButton(sp, padding)
+    padding = padding or 4
+    local sz = sp:getContentSize()
+    local btn = require('imgui.widgets.ImageButton')(sp)
+    btn:setContentSize(sz):setFramePadding(padding)
+
+    local node = cc.Node()
+    local delta = padding * 2 - 2
+    node:setContentSize(cc.size(sz.width + delta, sz.height + delta))
+    local tint = im.vec4(1, 1, 1, 1)
+    local btn_disable = wi.Widget(function()
+        im.ccNode(node, tint, im.getStyleColorVec4(im.Col.Border))
+    end)
+    btn_disable:setVisible(false)
+    node:addTo(btn_disable):setVisible(false)
+    sp:addTo(node):setPosition(sz.width / 2 + padding - 1, sz.height / 2 + padding - 1)
+
+    local program = ccb.Program:getBuiltinProgram(15)
+    assert(program)
+    sp:setProgramState(ccb.ProgramState(program))
+    sp:setBlendFunc({ src = ccb.BlendFactor.SRC_ALPHA, dst = ccb.BlendFactor.ONE_MINUS_SRC_ALPHA })
+
+    return btn, btn_disable
+end
+
+function M.createTextButton(str, padding, cb, color)
+    local vars = {
+        [im.StyleVar.FramePadding] = padding,
+    }
+    local colors1 = {
+        [im.Col.Text] = color,
+    }
+    local style1 = wi.style(colors1, vars)
+    local btn = wi.Button(str)
+    btn:addTo(style1)
+    if cb then
+        btn:setOnClick(cb)
+    end
+
+    local colors2 = {
+        [im.Col.Button]        = im.vec4(0, 0, 0, 0),
+        [im.Col.ButtonActive]  = im.vec4(0, 0, 0, 0),
+        [im.Col.ButtonHovered] = im.vec4(0, 0, 0, 0),
+        [im.Col.Text]          = function()
+            return im.getStyleColorVec4(im.Col.TextDisabled)
+        end,
+    }
+    local style2 = wi.style(colors2, vars)
+    style2:setVisible(false)
+    local btn2 = wi.Button(str)
+    btn2:addTo(style2)
+
+    return style1, style2
 end
 
 return M
