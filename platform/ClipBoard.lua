@@ -5,13 +5,17 @@ local last_set = ''
 
 function M.set(s)
     if not s then
-        w:setClipboardString('')
         last_set = ''
+        if plus.isDesktop() then
+            w:setClipboardString('')
+        end
         return
     end
     assert(type(s) == 'string')
     last_set = s
-    w:setClipboardString(s)
+    if plus.isDesktop() then
+        w:setClipboardString(s)
+    end
 end
 
 function M.get()
