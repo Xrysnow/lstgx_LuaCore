@@ -125,14 +125,14 @@ function lstg.loadSettingFile()
             _setting[k] = v
             if k == 'res_ratio' then
                 local ratio = v[1] / v[2]
-                setting.windowsize_w = math.ceil(setting.windowsize_h * ratio / 2) * 2
                 setting.resx = math.ceil(setting.resy * ratio / 2) * 2
+                --setting.windowsize_w = math.ceil(setting.windowsize_h * ratio / 2) * 2
             elseif k == 'resy' then
                 local ratio = setting.res_ratio[1] / setting.res_ratio[2]
                 setting.resx = math.ceil(v * ratio / 2) * 2
-            elseif k == 'windowsize_h' then
-                local ratio = setting.res_ratio[1] / setting.res_ratio[2]
-                setting.windowsize_w = math.ceil(setting.windowsize_h * ratio / 2) * 2
+            --elseif k == 'windowsize_h' then
+            --    local ratio = setting.res_ratio[1] / setting.res_ratio[2]
+            --    setting.windowsize_w = math.ceil(setting.windowsize_h * ratio / 2) * 2
             end
         end,
         __index    = _setting
