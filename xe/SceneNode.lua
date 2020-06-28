@@ -613,6 +613,17 @@ function M:format(s)
     return s
 end
 
+--
+
+function M:isDebuggable(typ)
+    if typ == 'spellcard' then
+        return self:getType() == 'bossspellcard'
+    elseif typ == 'stage' then
+        local p = self:getParentNode()
+        return p and p:getType() == 'stagetask'
+    end
+end
+
 function M:getCodeIndent()
     if self:isRoot() then
         return 0
