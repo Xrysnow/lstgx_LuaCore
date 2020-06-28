@@ -196,7 +196,7 @@ function M.start(rank, player, stage_, debugStage, debugSC)
 
     if not node then
         node = cc.Node()
-        node:addTo(cc.Director:getInstance():getRunningScene())
+        node:addTo(imgui.get())
         node:scheduleUpdateWithPriorityLua(M._update, 0)
     end
     stage.next_stage = stage_menu
@@ -229,19 +229,7 @@ local _RenderFunc = 'RenderFunc'
 local fvoid = function()
 end
 
-function M.stop()
-    if not started then
-        return
-    end
-    --
-    if FrameFunc ~= fvoid then
-        M._FrameFunc = FrameFunc
-    end
-    _G[_FrameFunc] = fvoid
-    if RenderFunc ~= fvoid then
-        M._RenderFunc = RenderFunc
-    end
-    _G[_RenderFunc] = fvoid
+local function _stop()
     --TODO: clear registered classes
     --all_class = {}
     --class_name = {}
@@ -274,7 +262,40 @@ function M.stop()
     if NavEnableGamepad then
         imgui.configFlagEnable(imgui.ConfigFlags.NavEnableGamepad)
     end
+end
+
+function M.stop()
+    if not started then
+        return
+    end
+    --
+    if FrameFunc ~= fvoid then
+        M._FrameFunc = FrameFunc
+    end
+    _G[_FrameFunc] = fvoid
+    if RenderFunc ~= fvoid then
+        M._RenderFunc = RenderFunc
+    end
+    _G[_RenderFunc] = fvoid
+
+    audio.Engine:stop()
+
+    -- resources should be cleared after render
+    M._ed:addListener('update', function()
+        _stop()
+        M._ed:removeListenerByTag('stop')
+    end, 10, 'stop')
+
     started = false
+end
+
+local function _pause()
+    if FrameFunc ~= fvoid then
+        M._FrameFunc = FrameFunc
+    end
+    _G[_FrameFunc] = fvoid
+
+    _pause_music()
 end
 
 function M.pause()
@@ -284,12 +305,20 @@ function M.pause()
     if paused then
         return
     end
-    if FrameFunc ~= fvoid then
-        M._FrameFunc = FrameFunc
-    end
-    _G[_FrameFunc] = fvoid
+    _pause()
 
     paused = true
+end
+
+local function _resume()
+    if M._FrameFunc then
+        _G[_FrameFunc] = M._FrameFunc
+    end
+    if M._RenderFunc then
+        _G[_RenderFunc] = M._RenderFunc
+    end
+
+    _resume_music()
 end
 
 function M.resume()
@@ -299,14 +328,31 @@ function M.resume()
     if not paused then
         return
     end
-    if M._FrameFunc then
-        _G[_FrameFunc] = M._FrameFunc
-    end
-    if M._RenderFunc then
-        _G[_RenderFunc] = M._RenderFunc
-    end
+    _resume()
 
     paused = false
+end
+
+function M.step(n, onFinish)
+    if n < 1 or not paused then
+        return
+    end
+    local ii = 1
+    M._ed:addListener('update', function()
+        if ii <= n then
+            ii = ii + 1
+            _resume()
+        else
+            _pause()
+            if onFinish then
+                onFinish()
+            end
+            M._ed:removeListenerByTag('step')
+        end
+        if ii > n + 1 then
+            error('should not be here')
+        end
+    end, 1, 'step')
 end
 
 function M.addTask(f, priority, tag)
