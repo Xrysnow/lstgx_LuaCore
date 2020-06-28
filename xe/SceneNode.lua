@@ -647,7 +647,12 @@ function M:getConfig()
     if self:isRoot() then
         return {}
     end
-    return assert(nodeType[self:getType()], 'invalid type: ' .. tostring(self:getType()))
+    local cfg = self._config
+    if cfg then
+        return cfg
+    end
+    self._config = assert(nodeType[self:getType()], 'invalid type: ' .. tostring(self:getType()))
+    return self._config
 end
 
 function M:getWatch()
