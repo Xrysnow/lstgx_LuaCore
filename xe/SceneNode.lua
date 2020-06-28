@@ -492,6 +492,8 @@ function M:isEditFirst()
     return self:getConfig().editfirst
 end
 
+--
+
 function M:checkBeforeCompile()
     local f = self:getConfig().check
     local msg = f and f(self:dumpForNodeDef())
@@ -516,7 +518,6 @@ end
 local insert = table.insert
 ---@return table|boolean,string,xe.SceneNode
 function M:compile(t, indent)
-    print('start compile', self:getType(), self:getID())
     t = t or {}
     indent = indent or 0
     local ret, msg, node
@@ -536,7 +537,7 @@ function M:compile(t, indent)
     if t.beforeHead then
         local code = t.beforeHead(self)
         if code then
-            insert(t, { code, indent })
+            insert(t, { self:format(code), indent })
         end
     end
     --
@@ -556,7 +557,10 @@ function M:compile(t, indent)
     end
     --
     if t.afterFoot and (not t.afterFootCheck or t.afterFootCheck(self)) then
-        insert(t, { self:format(t.afterFoot), 0 })
+        local code = t.afterFoot(self)
+        if code then
+            insert(t, { self:format(code), indent })
+        end
     end
     --
     ret, msg = self:checkAfterCompile()
