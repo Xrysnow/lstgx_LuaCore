@@ -567,6 +567,8 @@ function M:compile(t, indent)
     return t
 end
 
+--
+
 function M:_getAttrValueFromName(name)
     local v
     local cfg = self:getConfig()
@@ -583,29 +585,31 @@ local tonumber = tonumber
 local assert = assert
 function M:format(s)
     local function f1(ss)
-        local i = tonumber(ss)
-        local v = assert(self:getAttrValue(i))
-        return ('%q'):format(v)
+        if ss:sub(1, 1) == 'q' then
+            if ss:sub(2, 2) == 'p' then
+                return ('%q'):format(self:getParentNode():getAttrValue(tonumber(ss:sub(3))))
+            else
+                return ('%q'):format(self:getAttrValue(tonumber(ss:sub(2))))
+            end
+        else
+            return assert(self:getAttrValue(tonumber(ss)))
+        end
     end
-    s = s:gsub('$q(%d+)', f1)
+    s = s:gsub('$(q?p?%d+)', f1)
+
     local function f2(ss)
-        local i = tonumber(ss)
-        local v = assert(self:getAttrValue(i))
-        return ('%s'):format(v)
+        if ss:sub(1, 1) == 'q' then
+            if ss:sub(2, 2) == 'p' then
+                return ('%q'):format(self:getParentNode():_getAttrValueFromName(ss:sub(4, -2)))
+            else
+                return ('%q'):format(self:_getAttrValueFromName(ss:sub(3, -2)))
+            end
+        else
+            return assert(self:_getAttrValueFromName(ss:sub(2, -2)))
+        end
     end
-    s = s:gsub('$(%d+)', f2)
-    local function f3(ss)
-        local name = ss:sub(2, -2)
-        local v = assert(self:_getAttrValueFromName(name))
-        return ('%q'):format(v)
-    end
-    s = s:gsub('$q(%b{})', f3)
-    local function f4(ss)
-        local name = ss:sub(2, -2)
-        local v = assert(self:_getAttrValueFromName(name))
-        return ('%s'):format(v)
-    end
-    s = s:gsub('$(%b{})', f4)
+    s = s:gsub('$(q?p?%b{})', f2)
+
     return s
 end
 
