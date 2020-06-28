@@ -101,7 +101,8 @@ end
 
 ---@return cc.Layer
 function imgui.get()
-    return dir:getRunningScene():getChildByName(layerName)
+    local scene = dir:getRunningScene()
+    return scene and scene:getChildByName(layerName)
 end
 
 function imgui.off()
