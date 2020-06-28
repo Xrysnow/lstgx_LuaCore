@@ -69,7 +69,7 @@ M.movetomode = {
     enum = require('xe.node.enum_type').movetomode
 }
 M.number = {
-    'number'
+    --'number'
 }
 M.param = {
     'param'
