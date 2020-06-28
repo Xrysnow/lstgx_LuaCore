@@ -31,7 +31,7 @@ end
 function M:children()
     return self._children:iter()
 end
----@return ui.TreeNode
+---@return xe.ui.TreeNode
 function M:getChildAt(idx)
     return self._children:at(idx)
 end
@@ -81,10 +81,22 @@ function M:insertChildAt(idx, child)
     if idx < 1 or idx > self._children:size() + 1 then
         error('invalid index ' .. idx)
     end
+
+    for _, v in self._children:iter() do
+        v:retain()
+        v:removeSelf()
+    end
+
     self._children:insert_at(idx, child)
     child:_setParentNode(self)
     self:_updateChildrenIndex()
-    self:addChild(child)
+
+    for _, v in self._children:iter() do
+        self:addChild(v)
+        if v ~= child then
+            v:release()
+        end
+    end
 end
 
 function M:insertBefore(child)
