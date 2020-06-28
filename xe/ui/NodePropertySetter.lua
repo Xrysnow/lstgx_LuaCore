@@ -110,18 +110,20 @@ function M:_select(idx)
         return
     end
     for _, v in ipairs(self._inputs) do
-        v:setVisible(false)
+        if v:isVisible() then
+            v:setVisible(false)
+        end
     end
     local input = self._inputs[idx]
     assert(input)
     input:setVisible(true)
     self._cur = idx
     -- submit here because inputs don't share values
-    require('xe.SceneTree').submit()
+    input:submit()
 end
 
 function M:_getCurIndex()
-    local t = self._node:getAttrEditType(self._idx)
+    local t = self._node:getAttrEditType(self._idx) or 'string'
     for i, v in ipairs(self._inputs) do
         if v:getType() == t then
             return i
