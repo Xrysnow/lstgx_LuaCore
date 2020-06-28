@@ -322,6 +322,7 @@ function M:getBrotherNext()
         return p:getChildAt(self:getIndex() + 1)
     end
 end
+
 function M:moveUp()
     local p = self:getParentNode()
     if self:isRoot() or not p then
@@ -332,9 +333,11 @@ function M:moveUp()
         return
     end
     local prev = p:getChildAt(idx - 1)
-    p._children:erase_at(idx - 1)
-    p._children:insert_at(idx, prev)
-    p:_updateChildrenIndex()
+    prev:retain()
+    p:deleteChildAt(idx - 1)
+    p:insertChildAt(idx, prev)
+    prev:release()
+    self:select()
 end
 function M:moveDown()
     local p = self:getParentNode()
@@ -346,9 +349,11 @@ function M:moveDown()
         return
     end
     local next = p:getChildAt(idx + 1)
-    p._children:erase_at(idx + 1)
-    p._children:insert_at(idx, next)
-    p:_updateChildrenIndex()
+    next:retain()
+    p:deleteChildAt(idx + 1)
+    p:insertChildAt(idx, next)
+    next:release()
+    self:select()
 end
 
 local t_insert = table.insert
