@@ -285,7 +285,7 @@ end
 function getclassname(obj)
     local t = type(obj)
     if t ~= "table" and t ~= "userdata" then
-        return
+        return t
     end
     local ret
     ret = ret or obj['.classname']
