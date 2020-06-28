@@ -395,10 +395,15 @@ function M.deserialize(s)
     if type(s) == 'string' then
         s = DeSerialize(s)
     end
+    if not s then
+        return nil
+    end
     return function()
         return _des(s)
     end
 end
+
+--
 
 function M:updateString()
     self:setString(self:toText())
