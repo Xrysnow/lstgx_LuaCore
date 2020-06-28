@@ -177,6 +177,10 @@ function M:getAttrEditValue(idx, type)
     return a.edit[type]
 end
 
+function M:_getAttrEditValues(idx)
+    return self.attr[idx].edit
+end
+
 function M:setAttrEditValue(idx, type, value)
     local a = self.attr[idx]
     if not a.edit then
@@ -303,12 +307,32 @@ function M:getClone()
     end
 end
 
----@param node xe.ui.TreeNode
+---@param node xe.SceneNode
 local function _dump(node)
     local t = table.clone(node.property)
-    t.attr = {}
+    t.attr = {
+        -- [1] = a1,
+        -- [2] = a2,
+        edit = {
+            -- [1] = {
+            --     [1]  = TYPE,
+            --     [k1] = v1,
+            --     [k2] = v2,
+            -- },
+            -- [2] = { ... },
+        }
+    }
+    local edit = t.attr.edit
     for i = 1, node:getAttrCount() do
-        table.insert(t.attr, node:getAttrValue(i))
+        t.attr[i] = node:getAttrValue(i)
+        edit[i] = {}
+        local et = node:getAttrEditType(i)
+        if et then
+            edit[i][1] = et
+            for k, v in pairs(node:_getAttrEditValues(i)) do
+                edit[i][k] = v
+            end
+        end
     end
     t.child = {}
     for i = 1, node:getChildrenCount() do
@@ -369,9 +393,25 @@ local function _des(t)
     if not ret then
         return
     end
-    for i = 1, ret:getAttrCount() do
+    local n = ret:getAttrCount()
+    for i = 1, n do
         ret:setAttrValue(i, t.attr[i])
     end
+    local edit = t.attr.edit
+    if edit then
+        for i = 1, n do
+            if edit[i] then
+                for k, v in pairs(edit[i]) do
+                    if k == 1 then
+                        ret:setAttrEditType(i, v)
+                    else
+                        ret:setAttrEditValue(i, k, v)
+                    end
+                end
+            end
+        end
+    end
+
     ret.property = _collect_property(t)
     if t.child then
         for _, v in ipairs(t.child) do
