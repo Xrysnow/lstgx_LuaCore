@@ -177,13 +177,12 @@ function M:getAttrEditValue(idx, type)
     return a.edit[type]
 end
 
-function M:setAttrEditValue(idx, type, value, str)
+function M:setAttrEditValue(idx, type, value)
     local a = self.attr[idx]
     if not a.edit then
         a.edit = {}
     end
     a.edit[type] = value
-    --self:setAttrValue(idx, str or tostring(value))
 end
 
 --

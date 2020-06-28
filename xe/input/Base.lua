@@ -28,7 +28,7 @@ function M:getType()
     return self._type
 end
 
-function M:submit(value, str)
+function M:submit(value)
     if value == nil then
         value = self:getValue()
     end
@@ -38,7 +38,7 @@ function M:submit(value, str)
     --else
     --end
     self._node:setAttrEditType(self._idx, self._type)
-    self._node:setAttrEditValue(self._idx, self._type, value, str)
+    self._node:setAttrEditValue(self._idx, self._type, value)
     require('xe.SceneTree').submit()
 end
 
