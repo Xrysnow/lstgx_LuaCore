@@ -64,15 +64,6 @@ local M = {
     },
     --]]
     {
-        class   = "tool", name = "Delete",
-        tooltip = {
-            en = "Delete node(Del)",
-            zh = "删除节点(Del)",
-        },
-        --bitmap  = "delete.png",
-        bitmap  = "delete.svg",
-    },
-    {
         class   = "tool", name = "Copy",
         tooltip = {
             en = "Copy node(Ctrl+C)",
@@ -98,6 +89,15 @@ local M = {
         },
         --bitmap  = "paste.png",
         bitmap  = "paste.svg",
+    },
+    {
+        class   = "tool", name = "Delete",
+        tooltip = {
+            en = "Delete node(Del)",
+            zh = "删除节点(Del)",
+        },
+        --bitmap  = "delete.png",
+        bitmap  = "delete.svg",
     },
     {
         class   = "tool", name = "Setting",
@@ -162,16 +162,15 @@ local M = {
         --bitmap  = "down.png",
         bitmap  = "insert_after.svg",
     },
-    --[[
     {
         class   = "tool", name = "InsertBefore",
         tooltip = {
-            en="Insert before",
-            zh="",
+            en = "Insert before",
+            zh = "优先插入为前序节点",
         },
-        bitmap  = "up.png",
+        --bitmap  = "up.png",
+        bitmap  = "insert_before.svg",
     },
-    --]]
     {
         class   = "tool", name = "InsertChild",
         tooltip = {
