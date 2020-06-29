@@ -123,7 +123,7 @@ function M:_select(idx)
 end
 
 function M:_getCurIndex()
-    local t = self._node:getAttrEditType(self._idx) or 'string'
+    local t = self._node:getAttrEditType(self._idx)-- or 'string'
     for i, v in ipairs(self._inputs) do
         if v:getType() == t then
             return i
