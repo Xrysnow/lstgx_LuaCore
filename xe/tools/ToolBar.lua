@@ -8,6 +8,7 @@ function M:ctor()
     base.ctor(self)
     ---@type table<string,im.ImageButton[]>
     self._btns = {}
+    self._states = {}
 
     local colors = { [im.Col.Button] = function()
         local col = im.getStyleColorVec4(im.Col.Button)
@@ -37,8 +38,14 @@ function M:ctor()
             if fname == 'insertAfter' then
                 self:disable('insertAfter')
                 self:enable('insertChild')
+                self:enable('insertBefore')
             elseif fname == 'insertChild' then
                 self:disable('insertChild')
+                self:enable('insertAfter')
+                self:enable('insertBefore')
+            elseif fname == 'insertBefore' then
+                self:disable('insertBefore')
+                self:enable('insertChild')
                 self:enable('insertAfter')
             end
         end
@@ -59,7 +66,12 @@ function M:ctor()
         end
 
         self._btns[fname] = { btn, btn_disable }
+        self._states[fname] = true
     end
+
+    self:addChild(function()
+        self:_applyEnable()
+    end)
 
     self:disableAll()
     self:enable('new')
@@ -75,34 +87,46 @@ end
 function M:disable(name)
     local v = self._btns[name]
     if v then
-        v[1]:setVisible(false)
-        v[2]:setVisible(true)
+        self._states[name] = false
     else
         print('invalid tool name:', name)
     end
 end
-
 function M:disableAll()
-    for _, v in pairs(self._btns) do
-        v[1]:setVisible(false)
-        v[2]:setVisible(true)
+    local states = {}
+    for k, v in pairs(self._states) do
+        states[k] = false
     end
+    self._states = states
 end
-
 function M:enable(name)
     local v = self._btns[name]
     if v then
-        v[1]:setVisible(true)
-        v[2]:setVisible(false)
+        self._states[name] = true
     else
         print('invalid tool name:', name)
     end
 end
-
 function M:enableAll()
-    for _, v in pairs(self._btns) do
-        v[1]:setVisible(true)
-        v[2]:setVisible(false)
+    local states = {}
+    for k, v in pairs(self._states) do
+        states[k] = true
+    end
+    self._states = states
+end
+function M:setEnabled(name, b)
+    local v = self._btns[name]
+    if v then
+        self._states[name] = b and true or false
+    else
+        print('invalid tool name:', name)
+    end
+end
+function M:_applyEnable()
+    for k, v in pairs(self._btns) do
+        local b = self._states[k]
+        v[1]:setVisible(b)
+        v[2]:setVisible(not b)
     end
 end
 
