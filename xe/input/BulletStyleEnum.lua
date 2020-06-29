@@ -18,6 +18,7 @@ for i, v in ipairs(styles) do
     styles[v] = i
 end
 local colors = require('xe.input.ColorEnum')._colors
+local style_desc = require('xe.node.bullet_desc')
 
 ---@param node xe.SceneNode
 function M:ctor(node, idx)
@@ -135,6 +136,13 @@ function M:_renderTypeSelector(nCol)
         if i % nCol ~= 0 and i < #styles then
             im.sameLine()
         end
+
+        if im.isItemHovered() then
+            local desc = i18n(style_desc[styles[i]])
+            if desc then
+                im.setTooltip(desc)
+            end
+        end
     end
     im.popStyleVar(1)
     if self._sel ~= last then
@@ -236,7 +244,7 @@ LoadImageGroup('square', 'bullet1',
 --小玉
 LoadImageGroup('ball_mid', 'bullet1',
                176, 0, 32, 32, 1, 8, 4, 4)
---葡萄弹
+--菌弹
 LoadImageGroup('mildew', 'bullet1',
                208, 0, 16, 16, 1, 16, 2, 2)
 --椭弹
@@ -314,7 +322,7 @@ LoadImageGroup('heart', 'bullet4',
 --刀弹b
 LoadImageGroup('knife_b', 'bullet4',
                192, 0, 32, 32, 1, 8, 3.5, 3.5)
---小玉c
+--环玉
 for i = 1, 8 do
     LoadImage('ball_mid_c' .. i, 'bullet4',
               232, i * 32 - 24, 16, 16, 4, 4)
