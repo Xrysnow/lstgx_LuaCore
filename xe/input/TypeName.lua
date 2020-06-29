@@ -29,6 +29,7 @@ function M:ctor(node, idx)
     if t ~= 'bossdefine' then
         -- background type
         for k, v in pairs(require('xe.TreeHelper').watch[watch]) do
+            assert(k.getAttrValue, ('invalid object in watch: %s'):format(getclassname(k)))
             local name = k:getAttrValue(1) or ''
             local tmp = name:match('^(.+):.+$')
             if tmp then
@@ -39,6 +40,7 @@ function M:ctor(node, idx)
         end
     else
         for k, v in pairs(require('xe.TreeHelper').watch[watch]) do
+            assert(k.getAttrValue, ('invalid object in watch: %s'):format(getclassname(k)))
             local name = k:getAttrValue(1) or ''
             if name ~= '' then
                 table.insert(list, name)
@@ -63,6 +65,7 @@ function M:ctor(node, idx)
         value = node:getAttrValue(idx)
     end
     if not map[value] then
+        require('xe.logger').log('use default type name', 'info')
         value = list[1]
     end
     self._value = value
