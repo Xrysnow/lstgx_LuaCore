@@ -6,7 +6,7 @@ local wi = require('imgui.Widget')
 
 ---@param node xe.SceneNode
 function M:ctor(node, idx, items)
-    base.ctor(self, node, idx, 'string')
+    base.ctor(self, node, idx, 'enum')
 
     if not items or #items == 0 then
         items = { '' }
