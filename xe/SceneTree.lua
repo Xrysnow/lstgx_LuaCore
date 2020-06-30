@@ -418,6 +418,10 @@ function M:onSelChanged(next_node)
             --TODO: use highlight
         end
     end
+    --
+    local toolbar = require('xe.main').getToolBar()
+    toolbar:setEnabled('debugSC', next_node:isDebuggable('spellcard'))
+    toolbar:setEnabled('debugStage', next_node:isDebuggable('stage'))
 end
 
 function M:onDelete(node)
@@ -426,7 +430,6 @@ function M:onDelete(node)
 end
 
 function M:copyCurrent()
-    print('SceneTree:copyCurrent')
     local cur = self:getCurrent()
     if M.isValid(cur) then
         require('platform.ClipBoard').set("\001LuaSTG" .. cur:serialize())
@@ -434,7 +437,6 @@ function M:copyCurrent()
 end
 
 function M:cutCurrent()
-    print('SceneTree:cutCurrent')
     local cur = self:getCurrent()
     if M.isValid(cur) and not cur:isForbidDelete() then
         self:copyCurrent()
@@ -443,7 +445,6 @@ function M:cutCurrent()
 end
 
 function M:pasteToCurrent()
-    print('SceneTree:pasteToCurrent')
     local cur = self:getCurrent()
     if M.isValid(cur) or cur:isRoot() then
         local cp = require('platform.ClipBoard').get()
