@@ -20,6 +20,7 @@ function M:ctor()
     map.warn = map.Warning
     map.error = map.Error
     map.erro = map.Error
+    self._color_map = map
 
     local fsize = im.getFontSize()
     local btn_clear = wi.Button(ifont.TrashAlt, function()
@@ -47,6 +48,14 @@ function M:ctor()
         end
     end)
     --TODO: trace
+
+    local map2 = { Info = 'I', Warning = 'W', Error = 'E' }
+    map2.info = map2.Info
+    map2.warning = map2.Warning
+    map2.warn = map2.Warning
+    map2.error = map2.Error
+    map2.erro = map2.Error
+    self._str_map = map2
 end
 
 function M:addLine(str, typ, trace)
@@ -55,6 +64,20 @@ function M:addLine(str, typ, trace)
     if #self._lines > self._max then
         table.remove(self._lines, 1)
     end
+    local s = ''
+
+    if typ and typ ~= '' then
+        if self._str_map[typ] then
+            typ = self._str_map[typ]
+        end
+        s = ('%s[%s] '):format(s, typ)
+    end
+    s = s .. '[Editor] '
+    if trace and trace ~= '' then
+        s = ('%s[%s] '):format(s, trace)
+    end
+    s = s .. str
+    print(s)
 end
 
 function M:clear()
