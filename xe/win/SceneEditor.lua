@@ -21,8 +21,17 @@ function M:ctor()
     self:addChild(win)--:addChild(im.separator)
     self._treewin = win
 
+    local setting = setting.xe
+    local style = wi.style(nil, {
+        [im.StyleVar.FramePadding] = function()
+            local v = setting.editor_tree_padding or 0
+            return im.vec2(v, v)
+        end
+    })
+    style:addTo(win)
+
     self._tree = require('xe.SceneTree')()
-    self._tree:addTo(win)
+    self._tree:addTo(style)
 
     self._game = require('xe.win.GameView')()
     self._game:addTo(self):setVisible(false)
