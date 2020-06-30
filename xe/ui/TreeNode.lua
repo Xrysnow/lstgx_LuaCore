@@ -6,8 +6,10 @@ local wi = require('imgui.Widget')
 local _flags = bit.bor(
         im.TreeNodeFlags.OpenOnArrow,
         im.TreeNodeFlags.OpenOnDoubleClick,
+        im.TreeNodeFlags.FramePadding,
         im.TreeNodeFlags.SpanAllAvailWidth,
         im.TreeNodeFlags.AllowItemOverlap)
+M._height = 16
 
 function M:ctor(text)
     base.ctor(self, text or '...')
@@ -417,6 +419,12 @@ function M:_handler()
     if im.isItemClicked() then
         self:select()
     end
+
+    if self:isRoot() then
+        local cursor = im.getCursorScreenPos()
+        M._height = cursor.y - self._cursor.y
+    end
+
     self._ret = ret
     local fold_last = self._fold
     if ret[1] then
@@ -444,9 +452,13 @@ function M:_renderIcon()
         return
     end
     local p = self._cursor
-    local h = im.getTextLineHeightWithSpacing()
+    local h = M._height
     local dl = im.getWindowDrawList()
-    local a = pAdd(p, cc.p(h, im.getTextLineHeight() / 2 - 16 / 2))
+    local padding = im.getStyle().FramePadding
+    local spacing = im.getStyle().ItemSpacing
+    local a = pAdd(p, cc.p(
+            im.getTextLineHeight() + padding.x,
+            h / 2 - 16 / 2 - spacing.y / 2))
     local b = pAdd(a, cc.p(16, 16))
     dl:addImage(self._icon, a, b)
 end
