@@ -14,7 +14,7 @@ end
 function M:ctor(type)
     base.ctor(self, tostring(type))
     assert(table.length(nodeType) > 0, 'node types not registered')
-
+    assert(type)
     self.type = type
     self.attr = {}
     self.property = {}
@@ -29,12 +29,20 @@ function M:ctor(type)
         self:getView():onSelChanged(nil)
     end)
     local icon = _get_icon(type)
+    --TODO: should no put here
     self._icon = cc.Sprite(icon)
     if self._icon then
         self._icon:addTo(self):setVisible(false)
     end
 
-    --TODO: keyboard event
+    self._onFoldChange = function()
+        local v = self:getView()
+        if v then
+            v:setDirty(true)
+        end
+    end
+
+    --TODO: right click
 end
 
 local _ignore = { type = true, attr = true, child = true }
@@ -493,6 +501,8 @@ function M:getDisplayType()
     local t = self:getConfig().disptype
     if not t then
         t = tostring(self:getType())
+    elseif type(t) == 'table' then
+        t = i18n(t)
     end
     return t
 end
