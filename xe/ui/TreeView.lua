@@ -10,12 +10,16 @@ function M:ctor(...)
 end
 
 function M:_setRoot(node)
-    assert(not self.root)
-    ---@type xe.ui.TreeNode
-    self.root = node
-    self.root._isroot = true
-    self.root:_setParentNode(self)
-    self.root:addTo(self)
+    if node then
+        assert(not self.root)
+        ---@type xe.ui.TreeNode
+        self.root = node
+        self.root._isroot = true
+        self.root:_setParentNode(self)
+        self.root:addTo(self)
+    else
+        self.root = nil
+    end
 end
 
 function M:getRoot()
