@@ -6,11 +6,11 @@ local wi = base
 
 function M:ctor()
     base.ctor(self)
-    self._var = {}
-    self._cheat = false
-    self._resx = 1280
-    self._resy = 960
-    self._fullscreen = false
+    self._setting = setting.xe
+    self:_set()
+
+    self._timer = 1
+    self:scheduleUpdateWithPriorityLua(std.bind(self._update, self), 1)
     --
     self:push()
     self:addChild(function()
@@ -19,11 +19,15 @@ function M:ctor()
             local ret
             local tmp = self._tmp
             ret, tmp.cheat = im.checkbox('Cheat', tmp.cheat)
-            ret, tmp.fullscreen = im.checkbox('Full screen', tmp.fullscreen)
-            if not tmp.fullscreen then
-                ret, tmp.resx = im.inputInt('Width', tmp.resx)
-                ret, tmp.resy = im.inputInt('Height', tmp.resy)
-            end
+
+            im.separator()
+
+            im.textWrapped('Editor tree padding')
+            ret, tmp.editor_tree_padding = im.sliderInt(
+                    '##', tmp.editor_tree_padding or 0, 0, 8)
+
+            im.separator()
+
             im.endChildFrame()
         end
     end)
@@ -44,47 +48,48 @@ end
 
 function M:push()
     -- push temp values
-    self._tmp = {
-        cheat      = self._cheat,
-        resx       = self._resx,
-        resy       = self._resy,
-        fullscreen = self._fullscreen,
-    }
+    self._tmp = table.clone(self._setting)
 end
 
 function M:pop()
     -- pop temp values
-    local tmp = self._tmp
-    self._cheat = tmp.cheat
-    self._resx = tmp.resx
-    self._resy = tmp.resy
-    self._fullscreen = tmp.fullscreen
+    for k, v in pairs(self._tmp) do
+        self._setting[k] = v
+    end
 end
 
-function M:setCheat(v)
-    self._cheat = v
+function M:_set()
+    local setting = self._setting
+    local glv = cc.Director:getInstance():getOpenGLView()
+    local fsz = setting.frame_size
+    if fsz then
+        glv:setFrameSize(fsz[1], fsz[2])
+    end
 end
 
-function M:getCheat()
-    return self._cheat
-end
+function M:_update()
+    local t = self._timer + 1
+    if t > 3600 then
+        self._timer = 1
+        t = 1
+    else
+        self._timer = t
+    end
+    if t % 30 == 0 then
+        local s = self._setting
+        local glv = cc.Director:getInstance():getOpenGLView()
+        local fsz = glv:getFrameSize()
+        s.frame_size = { fsz.width, fsz.height }
+        setting.windowsize_w = fsz.width
+        setting.windowsize_h = fsz.height
 
-function M:setGameRes(x, y)
-    self._resx = x
-    self._resy = y
-end
-
-function M:getGameRes()
-    return self._resx, self._resy
-end
-
-function M:isFullscreen()
-    return self._fullscreen
+        lstg.saveSettingFile()
+    end
 end
 
 local _id = 'Setting'
 function M:_handler()
-    im.setNextWindowSize(im.vec2(200, 200), im.Cond.Once)
+    im.setNextWindowSize(im.vec2(300, 300), im.Cond.Once)
     im.openPopup(_id)
     if im.beginPopupModal(_id) then
         wi._handler(self)
@@ -107,12 +112,12 @@ end
 
 function M.setVar(k, v)
     local ins = get_ins()
-    ins._var[k] = v
+    ins._setting[k] = v
 end
 
 function M.getVar(k)
     local ins = get_ins()
-    return ins._var[k]
+    return ins._setting[k]
 end
 
 function M.save()
