@@ -374,6 +374,9 @@ function M:dumpForNodeDef()
         end,
         __newindex = function(t, k, v)
             self:setProperty(nil, k, v)
+        end,
+        __call     = function(t, v)
+            return self:format(v)
         end
     })
     return ret
@@ -450,28 +453,41 @@ end
 
 ---@return string
 function M:toText()
-    local f = self:getConfig().totext
-    if f then
-        local ret = f(self:dumpForNodeDef())
-        return ret
+    local fmt = self:getConfig().totext
+    if fmt then
+        if type(fmt) == 'string' then
+            return self:format(fmt)
+        else
+            return fmt(self:dumpForNodeDef())
+        end
     end
 end
 
 ---@return string
 function M:toHead()
-    local f = self:getConfig().tohead
-    if f then
-        return f(self:dumpForNodeDef())
+    local fmt = self:getConfig().tohead
+    if fmt then
+        if type(fmt) == 'string' then
+            return self:format(fmt)
+        else
+            return fmt(self:dumpForNodeDef())
+        end
     end
 end
 
 ---@return string
 function M:toFoot()
-    local f = self:getConfig().tofoot
-    if f then
-        return f(self:dumpForNodeDef())
+    local fmt = self:getConfig().tofoot
+    if fmt then
+        if type(fmt) == 'string' then
+            return self:format(fmt)
+        else
+            return fmt(self:dumpForNodeDef())
+        end
     end
 end
+
+--
 
 function M:getDisplayType()
     local t = self:getConfig().disptype
