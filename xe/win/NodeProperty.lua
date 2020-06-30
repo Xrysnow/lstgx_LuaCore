@@ -8,7 +8,7 @@ function M:ctor()
     base.ctor(self)
     ---@type xe.NodePropertySetter[]
     self._setters = {}
-    self._isGame = false
+    self._mode = 'editor'
 end
 
 function M:collectValues()
@@ -82,18 +82,35 @@ function M:showNode(node)
 end
 
 function M:setEditor()
-    if not self._isGame then
+    if self._mode == 'editor' then
         return
     end
-    self._isGame = false
+    self._mode = 'editor'
     self:showNode(nil)
 end
 
-function M:setGame()
-    if self._isGame then
+function M:showAssets(node)
+    if self._mode ~= 'assets' then
+        if node == nil then
+            -- no action
+            return
+        end
+        self._mode = 'assets'
+        self:showNode(nil)
+    end
+    self:removeAllChildren()
+    if node == nil then
         return
     end
-    self._isGame = true
+    local content = wi.Widget(std.bind(node.renderPropery, node))
+    self:addChild(content)
+end
+
+function M:setGame()
+    if self._mode == 'game' then
+        return
+    end
+    self._mode = 'game'
     self:showNode(nil)
     self:addChildChain(
             wi.TreeNode('Game Resource'),
