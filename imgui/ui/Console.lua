@@ -17,28 +17,28 @@ function M:ctor(...)
     self.ScrollToBottom = true
     -- nil to use default color (change with theme)
     self.style = {
-        keyword      = imgui.c3b(86, 154, 214),
+        keyword      = im.c3b(86, 154, 214),
         identifier   = nil,
         operator     = nil,
         -- builtin function
-        ['function'] = imgui.c3b(0, 139, 139),
-        string       = imgui.c3b(214, 157, 133),
-        comment      = imgui.c3b(87, 166, 74),
-        constant     = imgui.c3b(0, 139, 139),
-        library      = imgui.c3b(0, 139, 139),
-        number       = imgui.c3b(181, 206, 168),
-        label        = imgui.c3b(86, 154, 214),
+        ['function'] = im.c3b(0, 139, 139),
+        string       = im.c3b(214, 157, 133),
+        comment      = im.c3b(87, 166, 74),
+        constant     = im.c3b(0, 139, 139),
+        library      = im.c3b(0, 139, 139),
+        number       = im.c3b(181, 206, 168),
+        label        = im.c3b(86, 154, 214),
 
-        global_var   = imgui.c3b(0, 139, 139),
-        global_func  = imgui.c3b(72, 61, 255),
-        member_var   = imgui.c3b(204, 84, 46),
+        global_var   = im.c3b(0, 139, 139),
+        global_func  = im.c3b(72, 61, 255),
+        member_var   = im.c3b(204, 84, 46),
         member_func  = nil,
-        static_func  = imgui.c3b(194, 194, 90),
-        self         = imgui.c3b(86, 154, 214),
-        bool         = imgui.c3b(108, 218, 218),
-        ['nil']      = imgui.c3b(108, 218, 218),
+        static_func  = im.c3b(194, 194, 90),
+        self         = im.c3b(86, 154, 214),
+        bool         = im.c3b(108, 218, 218),
+        ['nil']      = im.c3b(108, 218, 218),
 
-        error        = imgui.c3b(255, 0, 0),
+        error        = im.c3b(255, 0, 0),
     }
     self:addChild(function()
         self:_render()
@@ -98,12 +98,12 @@ function M:getContent()
     for i, v in ipairs(self.Items) do
         local typ = type(v)
         if typ == 'string' then
-            table.insert(v)
-        elseif t == 'table' then
-            if item.color then
-                table.insert(v[1])
+            table.insert(t, v)
+        elseif typ == 'table' then
+            if v.color then
+                table.insert(t, v[1])
             else
-                table.insert(v.string)
+                table.insert(t, v.string)
             end
         end
     end
