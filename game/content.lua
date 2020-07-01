@@ -223,8 +223,8 @@ function M._getReplaySlots()
         local slot = ext.replay.GetSlot(i)
         if slot then
             -- use time of the first stage
-            local datetime = slot.stages[1].stageDate + setting.timezone * 3600
-            local date_str = os.date("!%y/%m/%d", datetime)
+            local datetime = slot.stages[1].stageDate
+            local date_str = os.date("%y/%m/%d", datetime)
 
             local totalScore = 0
             local diff, stage_num = 0, 0
@@ -255,7 +255,8 @@ function M._getReplaySlots()
             end
             local ply = slot.stages[1].stagePlayer
             local usr = slot.userName
-            local time_str = os.date("!%H:%M", slot.stages[1].stageDate + setting.timezone * 3600)
+            --local time_str = os.date("!%H:%M", slot.stages[1].stageDate + setting.timezone * 3600)
+            local time_str = os.date("%H:%M", slot.stages[1].stageDate)
             -- spaces
             stage_num = tostring(stage_num)
             for _ = 1, 3 - #stage_num do

@@ -356,7 +356,7 @@ end, 9)
 --
 
 function Screenshot()
-    local time = os.date("!%Y-%m-%d-%H-%M-%S", os.time() + setting.timezone * 3600)
+    local time = os.date("%Y-%m-%d-%H-%M-%S")
     local path = 'snapshot/' .. time .. '.png'
     lstg.Snapshot(path)
     SystemLog(string.format('%s %q', i18n('save screenshot to'), path))
