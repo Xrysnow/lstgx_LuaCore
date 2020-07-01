@@ -98,7 +98,7 @@ end
 ---@param with_ext boolean
 ---@return string
 function string.filename(s, with_ext)
-    s = s:gsub('\\', '/'):gsub('//', '/')
+    s = s:gsub('\\', '/'):gsub('/+', '/')
     if with_ext then
         return s:match(".*/([^/]*)$") or s
     else
@@ -110,7 +110,7 @@ end
 ---@param s string
 ---@return string
 function string.fileext(s)
-    s = s:gsub('\\', '/'):gsub('//', '/')
+    s = s:gsub('\\', '/'):gsub('/+', '/')
     return s:match(".*%.(%w+)$") or ''
 end
 
@@ -118,7 +118,7 @@ end
 ---@param s string
 ---@return string
 function string.filefolder(s)
-    s = s:gsub('\\', '/'):gsub('//', '/')
+    s = s:gsub('\\', '/'):gsub('/+', '/')
     return s:match("(.+)/[^/]*%w+$") or ''
 end
 
@@ -126,7 +126,7 @@ end
 ---@param s string
 ---@return string
 function string.path_uniform(s)
-    return s:gsub('\\', '/'):gsub('//', '/')
+    return s:gsub('\\', '/'):gsub('/+', '/')
 end
 
 --------------------------------------------------
