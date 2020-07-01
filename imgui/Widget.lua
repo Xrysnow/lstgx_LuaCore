@@ -491,7 +491,8 @@ function M.propertyInput(label, data, k, params)
     --
     local id = tostring(data) .. label .. k
     im.setNextItemWidth(-1)
-    local int = params.int
+    local ptype = params.type
+    local int = params.int or ptype == 'int'
     local step, step_fast = params.step, params.step_fast
     if int then
         step = step or 1
@@ -514,14 +515,14 @@ function M.propertyInput(label, data, k, params)
             if val == v[1] then
                 idx = i - 1
             end
-            table.insert(items, v[2])
+            table.insert(items, v[2] or tostring(v[1]))
         end
         ret, idx = im.combo(label, idx, items)
         data[k] = c[idx + 1][1]
-    elseif vtype == 'table' then
+    elseif vtype == 'table' or ptype == 'color' or ptype == 'vec' then
         local v = {}
-        local is_vec
-        local is_color
+        local is_vec = ptype == 'vec'
+        local is_color = ptype == 'color'
         if val.x then
             v = { val.x, val.y, val.z, val.w }
             is_vec = true
@@ -530,9 +531,11 @@ function M.propertyInput(label, data, k, params)
         end
         if is_vec and #v > 1 then
             if int then
-                ret, ret2 = im.inputIntN(label, v, step, step_fast, flags)
+                ret, ret2 = im.inputIntN(
+                        label, v, step, step_fast, flags)
             else
-                ret, ret2 = im.inputFloatN(label, v, step, step_fast, params.format or '%.3f', flags)
+                ret, ret2 = im.inputFloatN(
+                        label, v, step, step_fast, params.format or '%.3f', flags)
             end
             data[k].x = ret2[1]
             data[k].y = ret2[2]
@@ -541,16 +544,29 @@ function M.propertyInput(label, data, k, params)
             --TODO: limit
         elseif is_color then
             local col = im.color(val)
-            ret, ret2 = im.colorEdit4(label, { col.x, col.y, col.z, col.w }, flags)
+            ret, ret2 = im.colorEdit4(
+                    label, { col.x, col.y, col.z, col.w }, flags)
             data[k] = im.tocc4b(im.vec4(unpack(ret2)))
         else
             im.text('N/A')
         end
-    elseif vtype == 'number' then
-        if int then
-            ret, data[k] = im.inputInt(label, val, step, step_fast, flags)
+    elseif vtype == 'number' or ptype == 'number' or ptype == 'int' then
+        if params.slider then
+            local min = params.min or 0
+            local max = params.max or 100
+            if int then
+                ret, data[k] = im.sliderInt(
+                        label, val, min, max, params.format or '%d')
+            else
+                ret, data[k] = im.sliderInt(
+                        label, val, min, max, params.format or '%.3f')
+            end
         else
-            ret, data[k] = im.inputFloat(label, val, step, step_fast, params.format or '%.3f', flags)
+            if int then
+                ret, data[k] = im.inputInt(label, val, step, step_fast, flags)
+            else
+                ret, data[k] = im.inputFloat(label, val, step, step_fast, params.format or '%.3f', flags)
+            end
         end
         -- limit
         if params.min and data[k] < params.min then
@@ -559,12 +575,12 @@ function M.propertyInput(label, data, k, params)
         if params.max and data[k] > params.max then
             data[k] = params.max
         end
-    elseif vtype == 'boolean' then
+    elseif vtype == 'boolean' or ptype == 'bool' then
         if params.bool_show then
             label = val and 'True' or 'False'
         end
         ret, data[k] = im.checkbox(label, val)
-    elseif vtype == 'string' then
+    elseif vtype == 'string' or ptype == 'string' then
         local hint = params.hint
         local multiline = params.multiline
         if multiline then
