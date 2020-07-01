@@ -13,6 +13,7 @@ end
 
 --- by @usernameiwantedwasalreadytaken
 function M.Microsoft()
+    im.styleColorsLight()
     local hspacing = 8
     local vspacing = 6
     style.DisplaySafeAreaPadding = ImVec2(0, 0)
@@ -71,9 +72,9 @@ function M.Microsoft()
     set(col.SliderGrab, grab)
     set(col.SliderGrabActive, darker)
 
-    set(col.CloseButton, transparent)
-    set(col.CloseButtonHovered, transparent)
-    set(col.CloseButtonActive, transparent)
+    --set(col.CloseButton, transparent)
+    --set(col.CloseButtonHovered, transparent)
+    --set(col.CloseButtonActive, transparent)
 
     set(col.ScrollbarBg, header)
     set(col.ScrollbarGrab, grab)
@@ -83,6 +84,7 @@ end
 
 --- by @ice1000
 function M.JetBrainsDarcula()
+    im.styleColorsDark()
     style.WindowRounding = 5.3
     style.GrabRounding = 2.3
     style.FrameRounding = 2.3
@@ -133,6 +135,7 @@ end
 
 --- by @r-lyeh
 function M.CherryTheme()
+    im.styleColorsDark()
     -- cherry colors, 3 intensities
     local function HI(v)
         return ImVec4(0.502, 0.075, 0.256, v)
@@ -155,7 +158,7 @@ function M.CherryTheme()
     set(col.Text, TEXT(0.78))
     set(col.TextDisabled, TEXT(0.28))
     set(col.WindowBg, ImVec4(0.13, 0.14, 0.17, 1.00))
-    set(col.ChildWindowBg, BG(0.58))
+    set(col.ChildBg, BG(0.58))
     set(col.PopupBg, BG(0.9))
     set(col.Border, ImVec4(0.31, 0.31, 1.00, 0.00))
     set(col.BorderShadow, ImVec4(0.00, 0.00, 0.00, 0.00))
@@ -179,9 +182,9 @@ function M.CherryTheme()
     set(col.Header, MED(0.76))
     set(col.HeaderHovered, MED(0.86))
     set(col.HeaderActive, HI(1.00))
-    set(col.Column, ImVec4(0.14, 0.16, 0.19, 1.00))
-    set(col.ColumnHovered, MED(0.78))
-    set(col.ColumnActive, MED(1.00))
+    --set(col.Column, ImVec4(0.14, 0.16, 0.19, 1.00))
+    --set(col.ColumnHovered, MED(0.78))
+    --set(col.ColumnActive, MED(1.00))
     set(col.ResizeGrip, ImVec4(0.47, 0.77, 0.83, 0.04))
     set(col.ResizeGripHovered, MED(0.78))
     set(col.ResizeGripActive, MED(1.00))
@@ -191,7 +194,7 @@ function M.CherryTheme()
     set(col.PlotHistogramHovered, MED(1.00))
     set(col.TextSelectedBg, MED(0.43))
     -- [...]
-    set(col.ModalWindowDarkening, BG(0.73))
+    --set(col.ModalWindowDarkening, BG(0.73))
 
     style.WindowPadding = ImVec2(6, 4)
     style.WindowRounding = 0.0
@@ -215,6 +218,7 @@ end
 
 --- by @ebachard
 function M.LightGreen()
+    im.styleColorsLight()
     style.WindowRounding = 2.0    -- Radius of window corners rounding. Set to 0.0f to have rectangular windows
     style.ScrollbarRounding = 3.0 -- Radius of grab corners rounding for scrollbar
     style.GrabRounding = 2.0      -- Radius of grabs corners rounding. Set to 0.0f to have rectangular slider grabs.
@@ -261,9 +265,9 @@ function M.LightGreen()
     set(col.Header, ImVec4(0.71, 0.78, 0.69, 0.31))
     set(col.HeaderHovered, ImVec4(0.71, 0.78, 0.69, 0.80))
     set(col.HeaderActive, ImVec4(0.71, 0.78, 0.69, 1.00))
-    set(col.Column, ImVec4(0.39, 0.39, 0.39, 1.00))
-    set(col.ColumnHovered, ImVec4(0.26, 0.59, 0.98, 0.78))
-    set(col.ColumnActive, ImVec4(0.26, 0.59, 0.98, 1.00))
+    --set(col.Column, ImVec4(0.39, 0.39, 0.39, 1.00))
+    --set(col.ColumnHovered, ImVec4(0.26, 0.59, 0.98, 0.78))
+    --set(col.ColumnActive, ImVec4(0.26, 0.59, 0.98, 1.00))
     set(col.Separator, ImVec4(0.39, 0.39, 0.39, 1.00))
     set(col.SeparatorHovered, ImVec4(0.14, 0.44, 0.80, 0.78))
     set(col.SeparatorActive, ImVec4(0.14, 0.44, 0.80, 1.00))
@@ -275,7 +279,7 @@ function M.LightGreen()
     set(col.PlotHistogram, ImVec4(0.90, 0.70, 0.00, 1.00))
     set(col.PlotHistogramHovered, ImVec4(1.00, 0.60, 0.00, 1.00))
     set(col.TextSelectedBg, ImVec4(0.26, 0.59, 0.98, 0.35))
-    set(col.ModalWindowDarkening, ImVec4(0.20, 0.20, 0.20, 0.35))
+    --set(col.ModalWindowDarkening, ImVec4(0.20, 0.20, 0.20, 0.35))
     set(col.DragDropTarget, ImVec4(0.26, 0.59, 0.98, 0.95))
     copy(col.NavHighlight, col.HeaderHovered)
     set(col.NavWindowingHighlight, ImVec4(0.70, 0.70, 0.70, 0.70))
@@ -283,6 +287,7 @@ end
 
 --- by @Derydoca
 function M.AdobeDark()
+    im.styleColorsDark()
     set(col.Text, ImVec4(1.000, 1.000, 1.000, 1.000))
     set(col.TextDisabled, ImVec4(0.500, 0.500, 0.500, 1.000))
     set(col.WindowBg, ImVec4(0.180, 0.180, 0.180, 1.000))
@@ -348,6 +353,7 @@ end
 
 --- by @malamanteau
 function M.CorporateGrey()
+    im.styleColorsDark()
     -- 0 = FLAT APPEARENCE
     -- 1 = MORE "3D" LOOK
     local is3D = 0
@@ -437,6 +443,7 @@ end
 
 --- by @Raikiri
 function M.DarkTheme2()
+    im.styleColorsDark()
     style.FrameRounding = 4.0
     style.GrabRounding = 4.0
 
