@@ -47,8 +47,15 @@ local function get_error_message(id)
     if sz == 0 and M.GetLastError() == 8 then
         error('out of memory getting error message for %d', id)
     end
-    assert(sz ~= 0, 'error getting error message for %d: %d', id, GetLastError())
+    assert(sz ~= 0, 'error getting error message for %d: %d', id, M.GetLastError())
     return ffi.string(buf, sz)
+end
+
+function M.GetLastErrorMessage()
+    local code = M.GetLastError()
+    if code ~= 0 then
+        return get_error_message(code)
+    end
 end
 
 M.SEM_FAILCRITICALERRORS = 0x0001
