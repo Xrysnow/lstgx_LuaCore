@@ -32,11 +32,6 @@ function M:submit(value)
     if value == nil then
         value = self:getValue()
     end
-    str = str or tostring(value)
-    --if self._master then
-    --    self._master:submit(self)
-    --else
-    --end
     self._node:setAttrEditType(self._idx, self._type)
     self._node:setAttrEditValue(self._idx, self._type, value)
     require('xe.SceneTree').submit()
