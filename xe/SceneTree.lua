@@ -62,12 +62,16 @@ function M.checkAllow(parent, child)
 end
 
 ---@param node xe.SceneNode
+---@param parent xe.SceneNode
 function M.checkAncestor(node, parent)
     -- NOTE: node may not inserted to parent now
     local ret
     local ty = node:getType()
     local anc = nodeType[ty].needancestor
-    local ancStack = table.append(node:getAncestorTypes(), parent:getAncestorTypes())
+    local ancStack = node:getAncestorTypes()
+    for _, v in ipairs(parent:getAncestorTypes()) do
+        table.insert(ancStack, v)
+    end
     if anc then
         ret = false
         for _, v in ipairs(ancStack) do
@@ -103,11 +107,9 @@ function M.checkAncestor(node, parent)
         end
     end
     if node:getChildrenCount() > 0 then
-        --table.insert(ancStack, ty)
         for _, child in node:children() do
             ret = ret and M.checkAncestor(child, parent)
         end
-        --ancStack[#ancStack] = nil
     end
     return ret
 end
