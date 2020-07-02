@@ -21,7 +21,6 @@ function M:ctor(...)
 end
 
 function M:newNode(type)
-    print('newNode', type)
     self:insertDefault(type)
 end
 
@@ -38,8 +37,10 @@ function M.checkAllow(parent, child)
     assert(parent and child)
     local ctype = child:getType()
     local ptype = parent:getType()
-    local ct = assert(nodeType[ctype], ('invalid type: %s'):format(ctype))
-    local pt = assert(nodeType[ptype], ('invalid type: %s'):format(ptype))
+    local ct = assert(nodeType[ctype],
+                      ('invalid child type: %s'):format(ctype))
+    local pt = assert(nodeType[ptype] or ptype == 'root',
+                      ('invalid parent type: %s'):format(ptype))
     if ptype == 'root' then
         pt = {}
     end
