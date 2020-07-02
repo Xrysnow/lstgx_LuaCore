@@ -64,6 +64,17 @@ local M = {
     render_skip    = 0,
     --
     imgui_visible  = false,
+    xe             = {
+        frame_size             = { 1280, 720 },
+        auto_save              = true,
+        editor_tree_padding    = 0,
+        editor_tree_indent     = nil,
+        cheat                  = false,
+        pack_to_engine_path    = false,
+        code_editor_font_scale = 100,
+        code_editor_theme      = 'Light',
+        theme                  = 'Light',
+    }
 }
 
 return M
