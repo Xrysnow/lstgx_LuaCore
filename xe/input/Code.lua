@@ -1,0 +1,111 @@
+local base = require('xe.input.Base')
+---@class xe.input.Code:xe.input.Base
+local M = class('xe.input.Code', base)
+local im = imgui
+local wi = require('imgui.Widget')
+local _id = 'Edit Code'
+
+function M:ctor(node, idx, param)
+    base.ctor(self, node, idx, 'code')
+    param = param or {}
+
+    local value = self:getEditValue()
+    if value == '' then
+        value = node:getAttrValue(idx) or ''
+    end
+    self._lang = 'txt'
+
+    local input = im.ColorTextEdit()
+    self._input = input
+    input:setText(value)
+    input:setPaletteLight()
+    input:setShowWhitespaces(false)
+    --
+    self:_applyTheme()
+    --
+    if param.lang == 'lua' then
+        self._lang = 'lua'
+        input:setLanguageLua()
+        input:addLanguageIdentifier(require('xe.input.code_lua_doc'))
+    end
+    --
+    input:addTo(self)
+
+    self._title = 'Edit code'
+
+    local icon = require('xe.ifont').Edit
+    local btn = wi.Button(icon, function()
+        self:_applyTheme()
+        im.openPopup(_id)
+        require('xe.main').backupKeyEvent()
+        require('xe.main').setKeyEventEnabled(false)
+    end)
+    btn:addTo(self)
+
+    local editor = wi.Widget(std.bind(self._render, self))
+    editor:addTo(self)
+    self._open = true
+end
+
+function M:_applyTheme()
+    local theme = setting.xe.code_editor_theme
+    local input = self._input
+    if theme == 'Light' then
+        input:setPaletteLight()
+    elseif theme == 'Dark' then
+        input:setPaletteDark()
+    elseif theme == 'Retro blue' then
+        input:setPaletteRetroBlue()
+    end
+end
+
+function M:_render()
+    im.setNextWindowSize(im.vec2(300, 350), im.Cond.Once)
+    local ret = { im.beginPopupModal(_id, true) }
+    if self._open and not ret[2] then
+        -- closed
+        self:submit()
+        require('xe.main').restoreKeyEvent()
+    end
+    self._open = ret[2]
+    if ret[1] then
+        local input = self._input
+        local cpos = input:getCursorPosition()
+
+        local font_scale = setting.xe.code_editor_font_scale
+        if font_scale then
+            im.setWindowFontScale(font_scale / 100)
+        end
+
+        --local hh = -im.getFrameHeightWithSpacing()
+        local hh = -im.getTextLineHeightWithSpacing()
+        input:render(self._title, im.vec2(-1, hh), true)
+
+        if font_scale then
+            im.setWindowFontScale(1)
+        end
+
+        im.text(('%6d/%6d %6d lines  | %s | %s'):format(
+                cpos[1] + 1, cpos[2] + 1, input:getTotalLines(),
+                input:isOverwrite() and 'Ovr' or 'Ins',
+                self._lang:capitalize()))
+
+        if not input:isReadOnly() then
+            if im.checkKeyboard('ctrl', 's') then
+                self:submit()
+            end
+        end
+
+        im.endPopup()
+    end
+end
+
+function M:getValue()
+    return self._input:getText()
+end
+
+function M:setValue(v)
+    self._input:setText(v)
+end
+
+return M
