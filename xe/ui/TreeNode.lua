@@ -292,6 +292,20 @@ end
 function M:isLeaf()
     return self:getChildrenCount() == 0
 end
+
+function M:getLastVisibleChild()
+    if self:isFold() then
+        return self
+    else
+        local n = self:getChildrenCount()
+        if n == 0 then
+            return self
+        else
+            return self:getChildAt(n):getLastVisibleChild()
+        end
+    end
+end
+
 function M:getTreeNext()
     if self:getChildrenCount() >= 1 then
         return self:getChildAt(1)
