@@ -433,6 +433,12 @@ function M:_handler()
     if im.isItemClicked() then
         self:select()
     end
+    if self._renderContextItem then
+        if im.beginPopupContextItem() then
+            self:_renderContextItem()
+            im.endPopup()
+        end
+    end
 
     if self:isRoot() then
         local cursor = im.getCursorScreenPos()
