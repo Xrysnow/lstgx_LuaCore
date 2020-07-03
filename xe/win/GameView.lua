@@ -59,6 +59,14 @@ function M:ctor()
     for i, v in ipairs(names) do
         self._btns[v][1]:addTo(self):addChild(im.sameLine)
         self._btns[v][2]:addTo(self):addChild(im.sameLine)
+        local tooltip = self:_makeTooltip(v)
+        if tooltip then
+            self:addChild(function()
+                if im.isItemHovered() then
+                    im.setTooltip(tooltip)
+                end
+            end)
+        end
     end
     self:_setEnable(false, true, true, false, false)
 
@@ -121,6 +129,14 @@ function M:_applyEnable()
     end
 end
 
+function M:isEnabled(name)
+    local map = { run = 1, stop = 2, pause = 3, step = 4, step_over = 5 }
+    if not map[name] then
+        return false
+    end
+    return self._states[map[name]]
+end
+
 function M:_render()
     local rt = GetFrameBuffer()
     if not rt then
@@ -150,6 +166,53 @@ function M:_render()
     -- flip verticle
     a, b = cc.p(a.x, b.y), cc.p(b.x, a.y)
     dl:addImage(sp, a, b)
+end
+
+M.KeyEvent = {
+    { 'f5', nil, 'run' },
+    { 'shift', 'f5', 'stop' },
+    { 'f6', nil, 'pause' },
+    { 'f11', nil, 'step' },
+    { 'f10', nil, 'step_over' },
+}
+
+M._tooltip = {
+    run       = {
+        en = 'Resume',
+        zh = '继续'
+    },
+    stop      = {
+        en = 'Stop',
+        zh = '停止'
+    },
+    pause     = {
+        en = 'Pause',
+        zh = '暂停'
+    },
+    step      = {
+        en = 'Step 1 frame',
+        zh = '步进1帧'
+    },
+    step_over = {
+        en = 'Step multi-frames',
+        zh = '步进多帧'
+    },
+}
+function M:_makeTooltip(name)
+    local t = M._tooltip[name]
+    if t then
+        local s = i18n(t)
+        for _, v in ipairs(M.KeyEvent) do
+            if v[3] == name then
+                local hint = v[1]:capitalize()
+                if v[2] then
+                    hint = hint .. '+' .. v[2]:capitalize()
+                end
+                s = ('%s (%s)'):format(s, hint)
+            end
+        end
+        return s
+    end
 end
 
 return M
