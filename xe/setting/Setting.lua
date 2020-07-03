@@ -13,22 +13,45 @@ function M:ctor()
     self:scheduleUpdateWithPriorityLua(std.bind(self._update, self), 1)
     --
     self:push()
+
+    local data = require('xe.setting.data')
+    self._curPage = 1
     self:addChild(function()
-        local sz = im.vec2(-1, -im.getFrameHeightWithSpacing())
-        if im.beginChildFrame(im.getID('xe.setting.content'), sz) then
+        local hh = -im.getFrameHeightWithSpacing()
+        local ww = im.getWindowContentRegionWidth()
+        local sz1 = im.vec2(math.max(ww * 0.3, 50), hh)
+        local sz2 = im.vec2(-1, hh)
+
+        if im.beginChildFrame(im.getID('xe.setting.group'), sz1) then
             local ret
-            local tmp = self._tmp
-            ret, tmp.cheat = im.checkbox('Cheat', tmp.cheat)
-
-            im.separator()
-
-            im.textWrapped('Editor tree padding')
-            ret, tmp.editor_tree_padding = im.sliderInt(
-                    '##', tmp.editor_tree_padding or 0, 0, 8)
-
-            im.separator()
-
+            for i, v in ipairs(data) do
+                ret = im.selectable(i18n(v.name) or 'N/A', i == self._curPage)
+                if ret then
+                    self._curPage = i
+                end
+            end
             im.endChildFrame()
+        end
+        im.sameLine()
+        im.pushStyleColor(im.Col.Border, 0)
+        if im.beginChildFrame(im.getID('xe.setting.content'), sz2) then
+            im.popStyleColor()
+            local tmp = self._tmp
+            local d = data[self._curPage]
+            im.columns(2, 'xe.setting.property')
+            for i, v in ipairs(d) do
+                if tmp[v.key] == nil then
+                    local default = v.default
+                    if type(default) == 'function' then
+                        default = default()
+                    end
+                    tmp[v.key] = default
+                end
+                wi.propertyInput(i18n(v.name), tmp, v.key, v)
+            end
+            im.endChildFrame()
+        else
+            im.popStyleColor()
         end
     end)
 
@@ -48,13 +71,35 @@ end
 
 function M:push()
     -- push temp values
-    self._tmp = table.clone(self._setting)
+    self._tmp = table.deepcopy(self._setting)
+end
+
+function M:_applyTheme(theme)
+    if theme == 'Light' then
+        im.styleColorsLight()
+    elseif theme == 'Dark' then
+        im.styleColorsDark()
+    else
+        local t = require('imgui.style')
+        if t[theme] then
+            t[theme]()
+        end
+    end
 end
 
 function M:pop()
     -- pop temp values
+    local s = self._setting
+    local tmp = self._tmp
+
+    -- apply theme
+    local theme = tmp.theme
+    if theme ~= s.theme then
+        self:_applyTheme(theme)
+    end
+
     for k, v in pairs(self._tmp) do
-        self._setting[k] = v
+        s[k] = table.deepcopy(v)
     end
 end
 
@@ -89,7 +134,7 @@ end
 
 local _id = 'Setting'
 function M:_handler()
-    im.setNextWindowSize(im.vec2(300, 300), im.Cond.Once)
+    im.setNextWindowSize(im.vec2(350, 300), im.Cond.Once)
     im.openPopup(_id)
     if im.beginPopupModal(_id) then
         wi._handler(self)

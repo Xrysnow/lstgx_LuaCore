@@ -120,7 +120,7 @@ function M:onEnter()
 
     self._edit_txt = require('xe.input.EditText')()
     self:_addDialog(self._edit_txt)
-    self._setting = require('xe.win.Setting')()
+    self._setting = require('xe.setting.Setting')()
     self:_addDialog(self._setting)
     self._newproj = require('xe.win.NewProject')()
     self:_addDialog(self._newproj)
@@ -164,14 +164,6 @@ function M.getGameLog()
 end
 
 --
-
-function M.getSetting(k)
-    return require('xe.win.Setting').getVar(k)
-end
-
-function M.setSetting(k, v)
-    return require('xe.win.Setting').setVar(k, v)
-end
 
 function M:showWithScene(transition, time, more)
     self:setVisible(true)
