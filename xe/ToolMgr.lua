@@ -11,7 +11,7 @@ end
 
 local function check_return(msg)
     if type(msg) == 'string' then
-        logger.log(msg, "Error")
+        logger.log(msg, "error")
         return false
     end
     return true
@@ -44,7 +44,6 @@ function M.merge()
     local path = require('xe.Project').getDir()
     local fileName, err = require('platform.FileDialog').open('lstgxproj,luastg', path)
     if fileName and fileName ~= '' then
-        --local fileName = fd:GetPath()
         local msg = proj._loadFromFile(fileName, true)
         if msg == nil then
             -- record history
@@ -123,7 +122,7 @@ function M.setting()
     --if not proj.getFile() then
     --    return
     --end
-    require('xe.win.Setting').show()
+    require('xe.setting.Setting').show()
 end
 
 function M.build(debugStage, debugSC)
@@ -190,16 +189,13 @@ function M.run()
 end
 
 function M.insertAfter()
-    print('setInsertPos after')
     get_tree():setInsertPos('after')
 end
 function M.insertBefore()
-    print('setInsertPos before')
-    get_tree:setInsertPos('before')
+    get_tree():setInsertPos('before')
 end
 function M.insertChild()
-    print('setInsertPos child')
-    get_tree:setInsertPos('child')
+    get_tree():setInsertPos('child')
 end
 
 local lineNum = 0
@@ -271,7 +267,7 @@ function M.moveDown()
     if not proj.getFile() then
         return
     end
-    local cur = proj.getTree():getCurrent()
+    local cur = get_tree():getCurrent()
     if cur then
         cur:moveDown()
     end
@@ -281,7 +277,7 @@ function M.moveUp()
     if not proj.getFile() then
         return
     end
-    local cur = proj.getTree():getCurrent()
+    local cur = get_tree():getCurrent()
     if cur then
         cur:moveUp()
     end
