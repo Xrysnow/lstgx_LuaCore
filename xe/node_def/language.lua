@@ -32,7 +32,7 @@ local codeblock = {
     end,
 }
 local code = {
-    { 'Code', 'any', CheckCode },
+    { 'Code', 'code_lua', CheckCode },
     disptype   = {
         en = 'code',
         zh = '添加代码',
@@ -40,11 +40,12 @@ local code = {
     allowchild = {},
     editfirst  = true,
     totext     = function(nodedata)
+        local code = nodedata.attr[1]
         local start, finish = string.find(nodedata.attr[1], '^.-\n')
         if start == nil then
-            return nodedata.attr[1]
+            return code == '' and '(empty)' or code
         else
-            return string.sub(nodedata.attr[1], 1, finish - 1) .. ' ...'
+            return string.sub(code, 1, finish - 1) .. ' ...'
         end
     end,
     tohead     = function(nodedata)
