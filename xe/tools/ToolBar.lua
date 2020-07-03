@@ -35,19 +35,6 @@ function M:ctor()
         local cb = function()
             print(string.format('[TOOL] %s', fname))
             require('xe.ToolMgr')[fname]()
-            if fname == 'insertAfter' then
-                self:disable('insertAfter')
-                self:enable('insertChild')
-                self:enable('insertBefore')
-            elseif fname == 'insertChild' then
-                self:disable('insertChild')
-                self:enable('insertAfter')
-                self:enable('insertBefore')
-            elseif fname == 'insertBefore' then
-                self:disable('insertBefore')
-                self:enable('insertChild')
-                self:enable('insertAfter')
-            end
         end
 
         local btn, btn_disable = self:_addContent(sp, cb)
@@ -73,9 +60,7 @@ function M:ctor()
         self:_applyEnable()
     end)
 
-    self:disableAll()
-    self:enable('new')
-    self:enable('open')
+    self:onClose()
 end
 ---@param sp cc.Sprite
 function M:_addContent(sp, cb)
@@ -84,12 +69,23 @@ function M:_addContent(sp, cb)
     return btn, btn_disable
 end
 
+function M:onOpen()
+    self:enableAll()
+    self:disable('debugSC')
+    self:disable('debugStage')
+    self:disable('insertChild')
+end
+
+function M:onClose()
+    self:disableAll()
+    self:enable('new')
+    self:enable('open')
+    self:enable('setting')
+end
+
 function M:disable(name)
-    local v = self._btns[name]
-    if v then
+    if self:_checkName(name) then
         self._states[name] = false
-    else
-        print('invalid tool name:', name)
     end
 end
 function M:disableAll()
@@ -100,11 +96,8 @@ function M:disableAll()
     self._states = states
 end
 function M:enable(name)
-    local v = self._btns[name]
-    if v then
+    if self:_checkName(name) then
         self._states[name] = true
-    else
-        print('invalid tool name:', name)
     end
 end
 function M:enableAll()
@@ -115,14 +108,29 @@ function M:enableAll()
     self._states = states
 end
 function M:setEnabled(name, b)
-    local v = self._btns[name]
-    if v then
+    if self:_checkName(name) then
         self._states[name] = b and true or false
-    else
-        print('invalid tool name:', name)
     end
 end
+function M:isEnabled(name)
+    if self:_checkName(name) then
+        return self._states[name]
+    end
+end
+
+function M:_checkName(name)
+    local v = self._btns[name]
+    if not v then
+        print('invalid tool name:', name)
+    end
+    return v and true or false
+end
 function M:_applyEnable()
+    local tree = require('xe.main').getTree()
+    local pos = tree:getInsertPos()
+    self:setEnabled('insertAfter', pos ~= 'after')
+    self:setEnabled('insertChild', pos ~= 'child')
+    self:setEnabled('insertBefore', pos ~= 'before')
     for k, v in pairs(self._btns) do
         local b = self._states[k]
         v[1]:setVisible(b)
