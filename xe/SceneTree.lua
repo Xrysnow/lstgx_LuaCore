@@ -252,7 +252,6 @@ function M:deleteOp(node_id)
 end
 
 function M:deleteCurrent()
-    print('SceneTree:deleteCurrent')
     local cur = self:getCurrent()
     if not cur then
         return
@@ -328,7 +327,7 @@ function M:submitAttr(node, values)
 end
 
 function M:submitAttrToCurrent()
-    print('SceneTree:submitAttrToCurrent')
+    --print('SceneTree:submitAttrToCurrent')
     local cur = self:getCurrent()
     if M.isValid(cur) then
         local values = get_prop():collectValues()
@@ -337,7 +336,6 @@ function M:submitAttrToCurrent()
 end
 
 function M:submitAttrTo(node)
-    print('SceneTree:submitAttrTo')
     local values = get_prop():collectValues()
     return self:submitAttr(node, values)
 end
@@ -401,7 +399,6 @@ end
 
 ---@param next_node xe.SceneNode
 function M:onSelChanged(next_node)
-    print('SceneTree:onSelChanged')
     M.submit()
     self:setCurrent(next_node)
     local panel = get_prop()
@@ -428,20 +425,19 @@ function M:onSelChanged(next_node)
 end
 
 function M:onDelete(node)
-    print('SceneTree:onDelete')
     require('xe.TreeHelper').ClearWatch(node)
 end
 
 function M:copyCurrent()
     local cur = self:getCurrent()
-    if M.isValid(cur) then
+    if M.isValid(cur) and not cur:isRoot() then
         require('platform.ClipBoard').set("\001LuaSTG" .. cur:serialize())
     end
 end
 
 function M:cutCurrent()
     local cur = self:getCurrent()
-    if M.isValid(cur) and not cur:isForbidDelete() then
+    if M.isValid(cur) and not cur:isRoot() and not cur:isForbidDelete() then
         self:copyCurrent()
         return self:deleteCurrent()
     end
