@@ -49,7 +49,7 @@ function M:ctor(node, idx)
     self._sel = map[value][1]
     self._path = map[value][2]
 
-    local sel_play = require('xe.main').getSetting(setting_sel_play)
+    local sel_play = setting.xe.prop_se_play
     self._sel_play = sel_play == nil and true or sel_play
 
     local btn, selector
@@ -76,7 +76,7 @@ function M:ctor(node, idx)
         self:_stop()
     end)):addChild(im.sameLine):addChild(wi.Checkbox('Play on select', self._sel_play, function(_, v)
         self._sel_play = v
-        require('xe.main').setSetting(setting_sel_play, v)
+        setting.xe.prop_se_play = v
     end))
 end
 
