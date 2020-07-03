@@ -36,8 +36,8 @@ function M:ctor(node, idx)
     end
     local num = #self._inputs
     assert(num > 0)
-    --TODO: set default edit type in setting
-    self._cur = require('xe.main').getSetting('prop.edit.' .. t) or 1
+    -- default edit type is saved in project
+    self._cur = 1
     if num == 1 then
         self._inputs[1]:setVisible(true)
     else
@@ -160,6 +160,8 @@ function M:_createInput(t)
         ret = require('xe.input.Vec2')(self._node, self._idx, self._types[t])
     elseif t == 'enum' then
         ret = require('xe.input.Enum')(self._node, self._idx, self._types[t])
+    elseif t == 'code' then
+        ret = require('xe.input.Code')(self._node, self._idx, self._types[t])
     else
         ret = require('xe.input.String')(self._node, self._idx, true)
     end
