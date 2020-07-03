@@ -57,8 +57,9 @@ local loadsound = {
         return string.format("load sound %q from %q", nodedata.attr[2], nodedata.attr[1])
     end,
     tohead      = function(nodedata)
-        local path = string.filename(nodedata.attr[1], true)
-        return string.format("LoadSound(%q, %q)\n", nodedata.attr[2], path)
+        local attr = nodedata.attr
+        --local path = string.filename(attr[1], true)
+        return string.format("LoadSound(%q, %q)\n", attr[2], attr[1])
     end,
     check       = function(nodedata)
         local _snd = M.getSoundList()
@@ -74,17 +75,10 @@ local loadsound = {
         if not absfn or absfn == '' then
             return string.format("Resource file %q does not exist", nodedata.attr[1])
         end
-        --local fn = wx.wxFileName(nodedata.attr[1]):GetFullName()
         local fn = string.filename(nodedata.attr[1], true)
         if not CheckResFileInPack(fn) then
             return string.format("Duplicated resource file name %q", fn)
         end
-        --local f, msg = io.open("editor\\tmp\\_pack_res.bat", "a")
-        --if msg then
-        --    return msg
-        --end
-        --f:write(string.format('..\\tools\\7z\\7z u -tzip -mcu=on "..\\game\\mod\\%s.zip" "%s"\n', outputName, absfn))
-        --f:close()
         require('xe.Project').addPackRes(absfn, 'loadsound')
     end
 }

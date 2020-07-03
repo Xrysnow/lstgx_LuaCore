@@ -163,13 +163,6 @@ function M.CheckAnonymous(name, fullname)
 end
 
 function M.MakeFullPath(path)
-    --local fn = wx.wxFileName(path)
-    --if not fn:IsAbsolute() then
-    --    fn:MakeAbsolute(curProjDir)
-    --    return fn:GetFullPath()
-    --else
-    --    return fn:GetFullPath()
-    --end
     return cc.FileUtils:getInstance():fullPathForFilename(path)
 end
 
