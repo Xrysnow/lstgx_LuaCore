@@ -86,14 +86,14 @@ M.pos = {
 }
 M.resfile = {
     'path',
-    loadsound    = { "wav", "ogg" },
-    loadbgm      = { "wav", "ogg" },
-    loadimage    = { "png", "jpg", "bmp" },
-    loadani      = { "png", "jpg", "bmp" },
-    bossdefine   = { "png", "jpg", "bmp" },
+    loadsound    = { "wav,ogg" },
+    loadbgm      = { "wav,ogg" },
+    loadimage    = { "png,jpg,bmp" },
+    loadani      = { "png,jpg,bmp" },
+    bossdefine   = { "png,jpg,bmp" },
     loadparticle = "psi",
     patch        = "lua",
-    loadFX       = { "fx", "vert", "frag" },
+    loadFX       = { "fx,vert,frag" },
 }
 M.selectenemystyle = {
     'enemy_style'
@@ -123,5 +123,12 @@ for k, v in pairs(M) do
         table.insert(v, 'string')
     end
 end
+
+M.code_lua = {
+    'code',
+    code = {
+        lang = 'lua',
+    }
+}
 
 return M
