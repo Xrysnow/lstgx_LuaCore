@@ -2,8 +2,8 @@ local M = {
     {
         class   = "tool", name = "New",
         tooltip = {
-            en = "Create a new project(Ctrl+N)",
-            zh = "新建工程(Ctrl+N)",
+            en = "Create a new project (Ctrl+N)",
+            zh = "新建工程 (Ctrl+N)",
         },
         --bitmap  = "new.png",
         bitmap  = "new.svg",
@@ -11,17 +11,26 @@ local M = {
     {
         class   = "tool", name = "Open",
         tooltip = {
-            en = "Open a project(Ctrl+O)",
-            zh = "打开工程(Ctrl+O)",
+            en = "Open a project (Ctrl+O)",
+            zh = "打开工程 (Ctrl+O)",
         },
         --bitmap  = "open.png",
         bitmap  = "open.svg",
     },
     {
+        class   = "tool", name = "Setting",
+        tooltip = {
+            en = "Settings",
+            zh = "设置",
+        },
+        --bitmap  = "setting.png",
+        bitmap  = "setting.svg",
+    },
+    {
         class   = "tool", name = "Save",
         tooltip = {
-            en = "Save project(Ctrl+S)",
-            zh = "保存工程(Ctrl+S)",
+            en = "Save project (Ctrl+S)",
+            zh = "保存工程 (Ctrl+S)",
         },
         --bitmap  = "save.png",
         bitmap  = "save.svg",
@@ -29,8 +38,8 @@ local M = {
     {
         class   = "tool", name = "Close",
         tooltip = {
-            en = "Close project(Ctrl+W)",
-            zh = "关闭工程(Ctrl+W)",
+            en = "Close project (Ctrl+W)",
+            zh = "关闭工程 (Ctrl+W)",
         },
         --bitmap  = "delete.png",
         bitmap  = "close.svg",
@@ -66,8 +75,8 @@ local M = {
     {
         class   = "tool", name = "Copy",
         tooltip = {
-            en = "Copy node(Ctrl+C)",
-            zh = "复制节点(Ctrl+C)",
+            en = "Copy node (Ctrl+C)",
+            zh = "复制节点 (Ctrl+C)",
         },
         --bitmap  = "copy.png",
         bitmap  = "copy.svg",
@@ -75,8 +84,8 @@ local M = {
     {
         class   = "tool", name = "Cut",
         tooltip = {
-            en = "Cut node(Ctrl+X)",
-            zh = "剪切节点(Ctrl+X)",
+            en = "Cut node (Ctrl+X)",
+            zh = "剪切节点 (Ctrl+X)",
         },
         --bitmap  = "cut.png",
         bitmap  = "cut.svg",
@@ -84,8 +93,8 @@ local M = {
     {
         class   = "tool", name = "Paste",
         tooltip = {
-            en = "Paste node(Ctrl+V)",
-            zh = "粘贴节点(Ctrl+V)",
+            en = "Paste node (Ctrl+V)",
+            zh = "粘贴节点 (Ctrl+V)",
         },
         --bitmap  = "paste.png",
         bitmap  = "paste.svg",
@@ -93,26 +102,17 @@ local M = {
     {
         class   = "tool", name = "Delete",
         tooltip = {
-            en = "Delete node(Del)",
-            zh = "删除节点(Del)",
+            en = "Delete node (Del)",
+            zh = "删除节点 (Del)",
         },
         --bitmap  = "delete.png",
         bitmap  = "delete.svg",
     },
     {
-        class   = "tool", name = "Setting",
-        tooltip = {
-            en = "Settings",
-            zh = "设置",
-        },
-        --bitmap  = "setting.png",
-        bitmap  = "setting.svg",
-    },
-    {
         class   = "tool", name = "Build",
         tooltip = {
-            en = "Build project(F7)",
-            zh = "编译工程(F7)",
+            en = "Build project (F7)",
+            zh = "编译工程 (F7)",
         },
         --bitmap  = "pack.png",
         bitmap  = "build.svg",
@@ -129,8 +129,8 @@ local M = {
     {
         class   = "tool", name = "DebugStage",
         tooltip = {
-            en = "Debug stage from current node(F6)",
-            zh = "运行当前关卡(F6)",
+            en = "Debug stage from current node (F6)",
+            zh = "运行当前关卡 (F6)",
         },
         --bitmap  = "debugstage.png",
         bitmap  = "debug_stage.svg",
@@ -138,8 +138,8 @@ local M = {
     {
         class   = "tool", name = "DebugSC",
         tooltip = {
-            en = "Debug spell card(Shift+F6)",
-            zh = "运行当前符卡(Shift+F6)",
+            en = "Debug spell card (Shift+F6)",
+            zh = "运行当前符卡 (Shift+F6)",
         },
         --bitmap  = "debugsc.png",
         bitmap  = "debug_sc.svg",
@@ -147,8 +147,8 @@ local M = {
     {
         class   = "tool", name = "Run",
         tooltip = {
-            en = "Run whole project(F5)",
-            zh = "运行(F5)",
+            en = "Run whole project (F5)",
+            zh = "运行 (F5)",
         },
         --bitmap  = "run.png",
         bitmap  = "debug.svg",
@@ -156,8 +156,8 @@ local M = {
     {
         class   = "tool", name = "InsertAfter",
         tooltip = {
-            en = "Insert after",
-            zh = "优先插入为后继节点",
+            en = "Insert after (Ctrl+Down)",
+            zh = "优先插入为后继节点 (Ctrl+Down)",
         },
         --bitmap  = "down.png",
         bitmap  = "insert_after.svg",
@@ -165,8 +165,8 @@ local M = {
     {
         class   = "tool", name = "InsertBefore",
         tooltip = {
-            en = "Insert before",
-            zh = "优先插入为前序节点",
+            en = "Insert before (Ctrl+Up)",
+            zh = "优先插入为前序节点 (Ctrl+Up)",
         },
         --bitmap  = "up.png",
         bitmap  = "insert_before.svg",
@@ -174,8 +174,8 @@ local M = {
     {
         class   = "tool", name = "InsertChild",
         tooltip = {
-            en = "Insert as child",
-            zh = "优先插入为子节点",
+            en = "Insert as child (Ctrl+Right)",
+            zh = "优先插入为子节点 (Ctrl+Right)",
         },
         --bitmap  = "child.png",
         bitmap  = "insert_child.svg",
@@ -193,8 +193,8 @@ local M = {
     {
         class   = "tool", name = "MoveDown",
         tooltip = {
-            en = "Move down",
-            zh = "向下移动",
+            en = "Move down (Alt+Down)",
+            zh = "向下移动 (Alt+Down)",
         },
         --bitmap  = "down.png",
         bitmap  = "move_down.svg",
@@ -202,8 +202,8 @@ local M = {
     {
         class   = "tool", name = "MoveUp",
         tooltip = {
-            en = "Move up",
-            zh = "向上移动",
+            en = "Move up (Alt+Up)",
+            zh = "向上移动 (Alt+Up)",
         },
         --bitmap  = "up.png",
         bitmap  = "move_up.svg",
