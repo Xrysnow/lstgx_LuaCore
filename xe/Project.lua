@@ -230,8 +230,69 @@ function M.new()
     end
 end
 
+local _no_pack = {
+    luastg = true, lstgxproj = true, lstgxsln = true, zip = true
+}
+
 function M.pack()
-    --TODO
+    if not curProjFile then
+        return
+    end
+    local fu = cc.FileUtils:getInstance()
+
+    local tree = require('xe.main').getAssetsTree()
+    local root_path = tree:getRoot()._attr.path
+    print(root_path)
+    local entries = {}
+    for i, v in ipairs(tree._arr) do
+        if v.mode == 'file' then
+            local entry, num = v.path:gsub(root_path, '')
+            if num == 0 then
+                logger.log(('invalid file path: %q'):format(v.path), 'error')
+                return false
+            end
+            if not _no_pack[string.fileext(entry):lower()] then
+                table.insert(entries, { entry, v.path })
+            end
+        end
+    end
+
+    local zip_path
+    if setting.xe.pack_to_engine_path then
+        zip_path = fu:fullPathForFilename('mod/')
+    else
+        zip_path = M.getDir() .. '/'
+    end
+    local name = string.filename(curProjFile)
+    zip_path = zip_path .. name .. '.zip'
+
+    if fu:isFileExist(zip_path) then
+        local ok, msg = os.remove(zip_path)
+        if not ok then
+            logger.log(('failed to delete file: %q'):format(msg), 'error')
+            return false
+        end
+    end
+
+    local zip = lstg.ZipArchive:create(zip_path)
+    if not zip then
+        logger.log(('failed to create zip file %q'):format(zip_path), 'error')
+        return false
+    end
+    if not zip:open(lstg.ZipArchive.OpenMode.NEW) then
+        zip:unlink()
+        logger.log(('failed to open zip file %q'):format(zip_path), 'error')
+        return false
+    end
+    for i, v in ipairs(entries) do
+        if not zip:addFile(v[1], v[2]) then
+            zip:unlink()
+            logger.log(('failed add entry %q to zip file'):format(v[1]), 'error')
+            return false
+        end
+    end
+    zip:close()
+    return true
 end
 
 function M.compileToString(...)

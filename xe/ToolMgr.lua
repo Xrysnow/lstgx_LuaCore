@@ -139,7 +139,9 @@ function M.pack()
     if not proj.getFile() then
         return
     end
-    --TODO
+    if not proj.pack() then
+        logger.log('failed to pack project', 'error')
+    end
 end
 
 function M.debugStage()
