@@ -34,7 +34,7 @@ function M.getDir()
 end
 
 function M.saveEditorSetting()
-    require('xe.win.Setting').save()
+    require('xe.setting.Setting').save()
 end
 
 function M._setCurFile(s)
@@ -45,19 +45,18 @@ function M._setCurFile(s)
         logger.clear()
         require('xe.main').getToolPanel():disableAll()
         local toolbar = require('xe.main').getToolBar()
-        toolbar:disableAll()
-        toolbar:enable('new')
-        toolbar:enable('open')
+        toolbar:onClose()
+
+        require('xe.main').getAssetsTree():close()
     else
         SetTitle(string.filename(curProjFile) .. " - LuaSTG-x Editor")
         M.saveEditorSetting()
         require('xe.main').getToolPanel():enableAll()
         local toolbar = require('xe.main').getToolBar()
-        toolbar:enableAll()
-        toolbar:disable('debugSC')
-        toolbar:disable('debugStage')
-        toolbar:disable('insertChild')
+        toolbar:onOpen()
         get_tree():setInsertPos('child')
+
+        require('xe.main').getAssetsTree():open(M.getDir())
 
         info("current project file: %s", curProjFile)
         info("current project folder: %s", M.getDir())
@@ -125,8 +124,7 @@ function M._autoSavePath()
     return ('%s/autosave.lstgxproj'):format(M._autoSaveDir())
 end
 
-function M.autoSave()
-    print('proj autoSave')
+function M.autoBackup()
     --TODO
 end
 
