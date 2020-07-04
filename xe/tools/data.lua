@@ -321,12 +321,14 @@ local M = {
             { name   = "Insert_objectsetimg",
               bitmap = 'objectsetimg.png',
             },
+            --[[
         },
     },
     {
         label   = 'Unit',
         name    = "PanelUnit",
         content = {
+            --]]
             { name   = "Insert_callbackfunc",
               bitmap = 'callbackfunc.png',
             },
