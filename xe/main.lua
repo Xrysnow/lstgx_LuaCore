@@ -5,37 +5,46 @@ local im = imgui
 local wi = require('imgui.Widget')
 ---@type xe.main
 local _instance
-
---function M:ctor()
---end
-
-function M:onCreate()
-    _instance = self
-end
-
+local window_flags = bit.bor(
+        im.WindowFlags.MenuBar,
+        im.WindowFlags.NoDocking,
+        im.WindowFlags.NoTitleBar,
+        im.WindowFlags.NoCollapse,
+        im.WindowFlags.NoResize,
+        im.WindowFlags.NoMove,
+        im.WindowFlags.NoBringToFrontOnFocus,
+        im.WindowFlags.NoNavFocus,
+        im.WindowFlags.NoBackground)
 ---@return xe.main
 function M:getInstance()
     return _instance
 end
 
-function M:onEnter()
+--function M:onEnter()
+function M:onCreate()
+    _instance = self
     if self._editor then
         return
     end
-    cc.Director:getInstance():getRunningScene():addChild(assert(cc.Sprite('null.png')))
+    self:setVisible(true)
+    ---@type cc.Scene
+    local scene = display.newScene('xe.main')
+    scene:addChild(self)
+    display.runScene(scene)
+    local la = im.on(scene)
+    self._la = la
+
+    setting.xe = setting.xe or {}
+
     cc.Director:getInstance():setDisplayStats(false)
     --cc.Director:getInstance():setDisplayStats(true)
     lstg.loadData()
     SetResourceStatus('global')
-    --Include('THlib.lua')
-    --DoFile('core/score.lua')
-    --RegistClasses()
 
-    local la = im.get()
+    --local la = im.get()
     im.show()
     im.clear()
-    im.styleColorsLight()
-    im.getStyle().FrameBorderSize = 1
+
     local cfg = im.ImFontConfig()
     cfg.OversampleH = 2
     cfg.OversampleV = 2
@@ -66,17 +75,6 @@ function M:onEnter()
         fa.IconMin, fa.IconMax, 0
     })
     --
-    local window_flags = bit.bor(
-            im.WindowFlags.MenuBar,
-            im.WindowFlags.NoDocking,
-            im.WindowFlags.NoTitleBar,
-            im.WindowFlags.NoCollapse,
-            im.WindowFlags.NoResize,
-            im.WindowFlags.NoMove,
-            im.WindowFlags.NoBringToFrontOnFocus,
-            im.WindowFlags.NoNavFocus,
-            im.WindowFlags.NoBackground
-    )
     local dock = wi.wrapper(function()
         local viewport = im.getMainViewport()
         im.setNextWindowPos(viewport.Pos)
@@ -92,6 +90,7 @@ function M:onEnter()
         im.endToLua()
     end)
     dock:addTo(la)
+    --TODO
     local menu_bar = wi.MenuBar()
     local menu = wi._begin_end_wrapper(im.beginMenu, im.endMenu, { 'File' })
     dock:addChildChain(menu_bar, menu, function()
@@ -114,6 +113,8 @@ function M:onEnter()
     self._console = require('imgui.ui.Console').createWindow('Console')
     la:addChild(self._console)
 
+    self._assets = require('xe.assets.AssetsManager')()
+    la:addChild(self._assets)
     --la:addChild(im.showDemoWindow)
 
     -- dialogs
@@ -128,10 +129,17 @@ function M:onEnter()
     self._game_log = require('imgui.ui.LogWindow')()
     local win = require('imgui.widgets.Window')('Log')
     la:addChild(win:addChild(self._game_log))
+
+    im.styleColorsLight()
+    self._setting:_applyTheme(setting.xe.theme)
+    im.getStyle().FrameBorderSize = 1
+
+    --require('xe.input.code_lua_doc')
+    la:addChild(M._handleGlobalKeyboard)
 end
 
 function M:_addDialog(v)
-    v:setVisible(false):addTo(im.get())
+    v:setVisible(false):addTo(self._la)
 end
 
 function M.hideProperty()
@@ -163,14 +171,26 @@ function M.getGameLog()
     return M:getInstance()._game_log
 end
 
+function M.getGameView()
+    return M:getInstance()._editor._game
+end
+
+---@return xe.AssetsTree
+function M.getAssetsTree()
+    return M:getInstance()._assets:getTree()
+end
+
+--
+
+local key_event = require('xe.key_event')
+M.setKeyEventEnabled = key_event.setKeyEventEnabled
+M.backupKeyEvent = key_event.backupKeyEvent
+M.restoreKeyEvent = key_event.restoreKeyEvent
+M._handleGlobalKeyboard = key_event._handleGlobalKeyboard
+
 --
 
 function M:showWithScene(transition, time, more)
-    self:setVisible(true)
-    local scene = display.newScene('xe.main')
-    scene:addChild(self)
-    display.runScene(scene, transition, time, more)
-    im.on(scene)
     return self
 end
 
