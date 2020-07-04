@@ -29,10 +29,14 @@ function M.start(rank, player, stage_, debugStage, debugSC)
         imgui.configFlagDisable(flag)
     end
 
+    local xe = require('xe.main')
     -- clear game log
-    require('xe.main').getGameLog():clear()
+    xe.getGameLog():clear()
     -- show game property
-    require('xe.main').getProperty():setGame()
+    xe.getProperty():setGame()
+    xe.getEditor():setGame()
+    xe.setKeyEventEnabled(false)
+    xe.setKeyEventEnabled('game', true)
 
     -- clear tasks
     M._ed:removeAllListeners()
@@ -130,13 +134,20 @@ function M.start(rank, player, stage_, debugStage, debugSC)
     function stage_menu:render()
     end
 
+    local ok, msg
+
     --
     SetResourceStatus('global')
     --lstg.loadPlugins()
 
     lstg.eventDispatcher:dispatchEvent('load.THlib.before')
-    Include 'THlib.lua'
-    Include '_editor_output.lua'
+    Include('THlib.lua')
+
+    ok, msg = pcall(Include, '_editor_output.lua')
+    if not ok then
+        return false, msg
+    end
+
     --M.loadStage()
     lstg.eventDispatcher:dispatchEvent('load.THlib.after')
     DoFile('core/score.lua')
@@ -158,7 +169,6 @@ function M.start(rank, player, stage_, debugStage, debugSC)
     --print(stringify(ranks))
     --print(stringify(rank_names))
 
-    local ok, msg
     ok, msg = content.setRank(rank or ranks[1])
     if not ok then
         return false, msg
@@ -194,29 +204,20 @@ function M.start(rank, player, stage_, debugStage, debugSC)
     lstg.loadViewParams()
     _SetBound()
 
+    if setting.xe.cheat then
+        cheat = true
+    else
+        cheat = nil
+    end
+
     if not node then
         node = cc.Node()
         node:addTo(imgui.get())
         node:scheduleUpdateWithPriorityLua(M._update, 0)
     end
     stage.next_stage = stage_menu
-    require('xe.main').getEditor():setGame()
 
     return true
-end
-
-function M._update(dt)
-    --
-    local _
-    _ = profiler and profiler.tic('FrameFunc')
-    FrameFunc()
-    _ = profiler and profiler.toc('FrameFunc')
-
-    _ = profiler and profiler.tic('RenderFunc')
-    RenderFunc()
-    _ = profiler and profiler.toc('RenderFunc')
-
-    M._ed:dispatchEvent('update')
 end
 
 function M._return()
@@ -230,12 +231,15 @@ local fvoid = function()
 end
 
 local function _stop()
-    --TODO: clear registered classes
     --all_class = {}
     --class_name = {}
     --
-    --lstg.ResourceMgr:getInstance():clear()
     FrameReset()
+    -- clear resource pool
+    RemoveResource('stage')
+    RemoveResource('global')
+    -- clear object pool
+    ResetPool()
     --
     lstg.included = {}
     lstg.current_script_path = { '' }
@@ -247,14 +251,12 @@ local function _stop()
     lstg.tmpvar = {}
     lstg.paused = false
     lstg.quit_flag = false
-    -- clear resource pool
-    RemoveResource('stage')
-    RemoveResource('global')
-    -- clear object pool
-    ResetPool()
     --
-    require('xe.main').getEditor():setEditor()
-    require('xe.main').getProperty():setEditor()
+    local xe = require('xe.main')
+    xe.getEditor():setEditor()
+    xe.getProperty():setEditor()
+    xe.setKeyEventEnabled(false)
+    xe.setKeyEventEnabled('editor', true)
     -- restore
     if NavEnableKeyboard then
         imgui.configFlagEnable(imgui.ConfigFlags.NavEnableKeyboard)
@@ -359,6 +361,27 @@ function M.addTask(f, priority, tag)
     M._ed:addListener('update', f, priority, tag)
 end
 
+function M._update(dt)
+    local _, ok, msg
+    _ = profiler and profiler.tic('FrameFunc')
+    ok, msg = pcall(FrameFunc)
+    _ = profiler and profiler.toc('FrameFunc')
+
+    _ = profiler and profiler.tic('RenderFunc')
+    if ok then
+        ok, msg = pcall(RenderFunc)
+    end
+    _ = profiler and profiler.toc('RenderFunc')
+    if not ok then
+        M.stop()
+        M._ed:removeAllListeners()
+        require('xe.logger').log(msg, 'error')
+        return
+    end
+
+    M._ed:dispatchEvent('update')
+end
+
 function M._defineSpellStage()
     stage.group.New('menu', {}, "SC Debugger",
                     { lifeleft = 7, power = 400, faith = 50000, bomb = 2 }, false)
@@ -376,8 +399,12 @@ function M._defineSpellStage()
             task._Wait(60)
             _play_music("spellcard")
             local _boss_wait = true
-            local _ref = New(_editor_class[_boss_class_name], _editor_class[_boss_class_name].cards)
-            --local _ref = New(_editor_class[_boss_class_name], _debug_cards)
+            local _ref
+            if setting.xe.debug_sc_current_only then
+                _ref = New(_editor_class[_boss_class_name], _debug_cards)
+            else
+                _ref = New(_editor_class[_boss_class_name], _editor_class[_boss_class_name].cards)
+            end
             last = _ref
             if _boss_wait then
                 while IsValid(_ref) do
@@ -390,7 +417,6 @@ function M._defineSpellStage()
             while coroutine.status(self.task[1]) ~= 'dead' do
                 task.Wait()
             end
-            print('task 2 start')
             _stop_music()
             --task.Wait(30)
             stage.group.FinishStage()
