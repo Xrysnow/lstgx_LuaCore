@@ -65,6 +65,14 @@ local M = {
             key  = 'cheat',
             type = 'bool',
         },
+        {
+            name = {
+                zh = '仅调试当前符卡',
+                en = 'Debug current SC only',
+            },
+            key  = 'debug_sc_current_only',
+            type = 'bool',
+        },
     },
     {
         name = {
