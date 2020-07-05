@@ -118,8 +118,8 @@ end
 ---@param child xe.SceneNode
 function M.insertNode(parent, child, idx)
     if not M.checkAllow(parent, child) then
-        log(format('can not insert %q as child of %q',
-                   child:getType(), parent:getType()), "Error")
+        --log(format('can not insert %q as child of %q',
+        --           child:getType(), parent:getType()), "Error")
         return false
     end
     if not M.checkAncestor(child, parent) then
@@ -138,14 +138,30 @@ end
 ---@param node xe.SceneNode
 function M:insertCurrent(node_ctor)
     local p = self._insert_pos
-    if p == 'child' or self:getCurrent():isRoot() then
+    local order = {
+        child  = { 'insertToCurrent', 'insertAfterCurrent', 'insertBeforeCurrent', },
+        after  = { 'insertAfterCurrent', 'insertToCurrent', 'insertBeforeCurrent', },
+        before = { 'insertBeforeCurrent', 'insertToCurrent', 'insertAfterCurrent', },
+    }
+    if self:getCurrent():isRoot() then
         return self:insertToCurrent(node_ctor)
-    elseif p == 'after' then
-        return self:insertAfterCurrent(node_ctor)
-    elseif p == 'before' then
-        return self:insertBeforeCurrent(node_ctor)
     else
-        error('invalid insert position')
+        local t = order[p]
+        if not t then
+            error('invalid insert position')
+        end
+        local op, ret
+        for _, v in ipairs(t) do
+            op, ret = self[v](self, node_ctor)
+            if ret then
+                break
+            end
+        end
+        if not ret then
+            log(format("can't insert to %q",
+                       self:getCurrent():getType()), "error")
+        end
+        return op, ret
     end
 end
 
