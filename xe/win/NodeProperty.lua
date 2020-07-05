@@ -36,14 +36,19 @@ function M:getSetter(idx)
     return self._setters[idx]
 end
 
+function M:_clear()
+    self._node = nil
+    self._setters = {}
+    self:removeAllChildren()
+end
+
 ---@param node xe.SceneNode
 function M:showNode(node)
     if self._node == node then
         return
     end
+    self:_clear()
     self._node = node
-    self._setters = {}
-    self:removeAllChildren()
     if not node then
         return
     end
@@ -69,6 +74,7 @@ function M:showNode(node)
     self:addChild(function()
         im.columns(1)
     end)
+    --[[
     self:addChild(function()
         for i, v in ipairs(node.attr) do
             local s = stringify(v)
@@ -79,6 +85,7 @@ function M:showNode(node)
         im.separator()
         im.text(node:toFoot() or 'N/A')
     end)
+    --]]
 end
 
 function M:setEditor()
@@ -86,7 +93,7 @@ function M:setEditor()
         return
     end
     self._mode = 'editor'
-    self:showNode(nil)
+    self:_clear()
 end
 
 function M:showAssets(node)
@@ -96,7 +103,7 @@ function M:showAssets(node)
             return
         end
         self._mode = 'assets'
-        self:showNode(nil)
+        self:_clear()
     end
     self:removeAllChildren()
     if node == nil then
@@ -111,7 +118,7 @@ function M:setGame()
         return
     end
     self._mode = 'game'
-    self:showNode(nil)
+    self:_clear()
     self:addChildChain(
             wi.TreeNode('Game Resource'),
             require('imgui.lstg.GameResInfo')())
