@@ -145,6 +145,7 @@ function M.start(rank, player, stage_, debugStage, debugSC)
 
     ok, msg = pcall(Include, '_editor_output.lua')
     if not ok then
+        M._stop()
         return false, msg
     end
 
@@ -171,10 +172,12 @@ function M.start(rank, player, stage_, debugStage, debugSC)
 
     ok, msg = content.setRank(rank or ranks[1])
     if not ok then
+        M._stop()
         return false, msg
     end
     ok, msg = content.setPlayer(player or 1)
     if not ok then
+        M._stop()
         return false, msg
     end
     --ok, msg = content.setStage(stage_ or 1)
@@ -190,6 +193,7 @@ function M.start(rank, player, stage_, debugStage, debugSC)
     else
         ok, msg = content.setStage(stage_ or 1)
         if not ok then
+            M._stop()
             return false, msg
         end
         lstg.practice = nil
@@ -265,12 +269,9 @@ local function _stop()
         imgui.configFlagEnable(imgui.ConfigFlags.NavEnableGamepad)
     end
 end
+M._stop = _stop
 
-function M.stop()
-    if not started then
-        return
-    end
-    --
+function M._stopUpdate()
     if FrameFunc ~= fvoid then
         M._FrameFunc = FrameFunc
     end
@@ -279,7 +280,14 @@ function M.stop()
         M._RenderFunc = RenderFunc
     end
     _G[_RenderFunc] = fvoid
+end
 
+function M.stop()
+    if not started then
+        return
+    end
+    --
+    M._stopUpdate()
     audio.Engine:stop()
 
     -- resources should be cleared after render
@@ -299,6 +307,7 @@ local function _pause()
 
     _pause_music()
 end
+M._pause = _pause
 
 function M.pause()
     if not started then
@@ -365,17 +374,31 @@ function M._update(dt)
     local _, ok, msg
     _ = profiler and profiler.tic('FrameFunc')
     ok, msg = pcall(FrameFunc)
+    if not ok then
+        print('error in FrameFunc')
+    end
     _ = profiler and profiler.toc('FrameFunc')
 
     _ = profiler and profiler.tic('RenderFunc')
     if ok then
         ok, msg = pcall(RenderFunc)
+        if not ok then
+            print('error in RenderFunc')
+        end
     end
     _ = profiler and profiler.toc('RenderFunc')
+
     if not ok then
-        M.stop()
+        M._stopUpdate()
+        audio.Engine:stop()
+
         M._ed:removeAllListeners()
         require('xe.logger').log(msg, 'error')
+        M._stop()
+
+        local win = require('xe.win.Message')('Error', msg)
+        win:addHandler('OK')
+        imgui.get():addChild(win)
         return
     end
 
