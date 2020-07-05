@@ -121,6 +121,7 @@ function M:_updateAttr(t)
 end
 
 function M:_renderContextItem()
+    self:select()
     local t = M._ctxItem
     if im.selectable(i18n(t.open)) then
         self:openFile()

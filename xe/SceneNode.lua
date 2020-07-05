@@ -645,6 +645,8 @@ end
 
 --
 
+---
+---@param typ string @spellcard/stage
 function M:isDebuggable(typ)
     if typ == 'spellcard' then
         return self:getType() == 'bossspellcard'
@@ -703,5 +705,60 @@ end
 function M:getWatch()
     return self._watch
 end
+
+--
+
+function M:_renderContextItem()
+    if self:isRoot() then
+        imgui.closeCurrentPopup()
+        return
+    end
+    self:select()
+    ---@type xe.SceneTree
+    --local tree = self:getView()
+    local tool = require('xe.ToolMgr')
+    local items = M._ctxItem
+    for i = 1, 2 do
+        local v = items[i]
+        if imgui.selectable(i18n(v)) then
+            tool[v.name]()
+        end
+    end
+    local ii = 3
+    if self:isDebuggable('stage') then
+        if imgui.selectable(i18n(items[ii])) then
+            tool[items[ii].name]()
+        end
+    end
+    ii = ii + 1
+    if self:isDebuggable('spellcard') then
+        if imgui.selectable(i18n(items[ii])) then
+            tool[items[ii].name]()
+        end
+    end
+end
+
+M._ctxItem = {
+    {
+        name = 'copy',
+        en   = 'Copy',
+        zh   = '复制',
+    },
+    {
+        name = 'paste',
+        en   = 'Paste',
+        zh   = '粘贴',
+    },
+    {
+        name = 'debugStage',
+        en   = 'Debug stage here',
+        zh   = '运行当前关卡',
+    },
+    {
+        name = 'debugSC',
+        en   = 'Debug SC here',
+        zh   = '运行当前符卡',
+    },
+}
 
 return M
