@@ -38,7 +38,7 @@ function M:addHandler(name, f)
 end
 
 function M:_handler()
-    im.setNextWindowSize(im.vec2(0, 200), im.Cond.Once)
+    im.setNextWindowSize(im.vec2(300, 200), im.Cond.Once)
     im.openPopup(self._title)
     if im.beginPopupModal(self._title) then
         wi._handler(self)
