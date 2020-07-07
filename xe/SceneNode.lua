@@ -236,13 +236,40 @@ end
 function M:getAttrCount()
     return #self.attr
 end
-
+--- check at compile
 function M:checkAttr(idx)
     assert(1 <= idx and idx <= self:getAttrCount())
     local f = self:getConfig()[idx][3]
     local msg
     if f then
-        msg = f(self.attr[idx].value)
+        msg = f(self:getAttrValue(idx))
+    end
+    if msg then
+        return false, msg
+    else
+        return true
+    end
+end
+--- check at edit
+function M:checkAttrEdit(idx)
+    assert(1 <= idx and idx <= self:getAttrCount())
+    local f = self:getConfig()[idx][3]
+    local checker = require('xe.node_def._checker')
+    local t = {
+        [checker.CheckClassName]     = checker.CheckNonBlank,
+        [checker.CheckResFileInPack] = true,
+        [checker.CheckAnonymous]     = true,
+    }
+    if t[f] then
+        if type(t[f]) == 'function' then
+            f = t[f]
+        else
+            return true
+        end
+    end
+    local msg
+    if f then
+        msg = f(self:getAttrValue(idx))
     end
     if msg then
         return false, msg
