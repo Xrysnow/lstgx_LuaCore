@@ -504,7 +504,6 @@ function M:serialize()
 end
 
 function M:reset()
-    print('SceneTree:reset')
     self:getRoot():deleteAllChildren()
     get_prop():showNode(nil)
 end
@@ -536,7 +535,10 @@ function M.submit(self)
         changed = true
         require('xe.history').add(op)
     end
-    --TODO: auto save
+    -- auto save
+    if changed and setting.xe.auto_save then
+        require('xe.Project').save()
+    end
     return changed
 end
 
