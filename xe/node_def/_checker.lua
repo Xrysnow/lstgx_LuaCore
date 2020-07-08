@@ -34,6 +34,37 @@ function M.reset()
     M.difficulty = nil
 end
 
+local err_str = {
+    name          = {
+        en = "must be a string of letters, digits, spaces, and underscores, not beginning with a space",
+        zh = "必须由字母、数字、下划线和空格组成，不能由空格开始",
+    },
+    vname         = {
+        en = "must be a string of letters, digits, and underscores, not beginning with a digit",
+        zh = "必须由字母、数字和下划线组成，不能由数字开始",
+    },
+    not_empty     = {
+        en = "can not be empty",
+        zh = "不能为空",
+    },
+    param_count   = {
+        en = "wrong number of parameters: %d, was expecting %d",
+        zh = "参数数量错误：%d， 需要 %d",
+    },
+    dup_type      = {
+        en = "duplicated type name %q",
+        zh = "重复的类型名称 %q",
+    },
+    dup_res       = {
+        en = "duplicated resource name %q",
+        zh = "重复的资源名称 %q",
+    },
+    res_not_exist = {
+        en = "resource file %q does not exist",
+        zh = "资源文件 %q 不存在",
+    },
+}
+
 function M.CalcParamNum(s)
     if string.match(s, "^[%s]*$") then
         return 0
@@ -66,17 +97,17 @@ local CalcParamNum = M.CalcParamNum
 
 function M.CheckName(s)
     if string.match(s, "^[%w_][%w_ ]*$") == nil then
-        return "must be a string of letters, digits, spaces, and underscores, not beginning with a space"
+        return i18n(err_str.name)
     end
 end
 function M.CheckVName(s)
     if string.match(s, "^[%a_][%w_]*$") == nil then
-        return "must be a string of letters, digits, and underscores, not beginning with a digit"
+        return i18n(err_str.vname)
     end
 end
 function M.CheckExpr(s)
     if string.match(s, "^[%s]*$") then
-        return "can not be omitted"
+        return i18n(err_str.not_empty)
     end
     local _, msg = loadstring("return " .. s)
     if msg ~= nil then
@@ -85,14 +116,15 @@ function M.CheckExpr(s)
 end
 function M.CheckPos(s)
     if string.match(s, "^[%s]*$") then
-        return "can not be omitted"
+        return i18n(err_str.not_empty)
     end
     local _, msg = loadstring("return " .. s)
     if msg ~= nil then
         return msg
     end
-    if CalcParamNum(s) ~= 2 then
-        return "invalid expression of position"
+    local np = CalcParamNum(s)
+    if np ~= 2 then
+        return i18n(err_str.param_count, np, 2)
     end
 end
 function M.CheckExprOmit(s)
@@ -115,15 +147,15 @@ function M.CheckParam(s)
 end
 function M.CheckNonBlank(s)
     if string.match(s, "^[%s]*$") then
-        return "can not be blank"
+        return i18n(err_str.not_empty)
     end
 end
 function M.CheckClassName(s)
     if string.match(s, "^[%s]*$") then
-        return "can not be blank"
+        return i18n(err_str.not_empty)
     else
         if M.checkClassName[s] then
-            return string.format("duplicated type name %q", s)
+            return i18n(err_str.dup_type, s)
         else
             M.checkClassName[s] = true
         end
@@ -170,15 +202,15 @@ function M.AddPackRes(path, name, check, from_type)
     if check[name] == nil then
         check[name] = true
     else
-        return string.format("Repeated resource name %q", name)
+        return i18n(err_str.dup_res, name)
     end
     local absfn = M.MakeFullPath(path)
     if not absfn or absfn == '' then
-        return string.format("Resource file %q does not exist", path)
+        return i18n(err_str.res_not_exist, path)
     end
     local fn = string.filename(path, true)
     if not M.CheckResFileInPack(fn) then
-        return string.format("Repeated resource file name %q", fn)
+        return i18n(err_str.dup_res, fn)
     end
     require('xe.Project').addPackRes(absfn, 'loadbgm')
 end
@@ -186,19 +218,19 @@ end
 function M.AddPackBgm(path, name, from_type)
     local absfn = M.MakeFullPath(path)
     if not absfn or absfn == '' then
-        return string.format("Resource file %q does not exist", path)
+        return i18n(err_str.res_not_exist, path)
     end
     if M.checkBgmName[name] == nil then
         M.checkBgmName[name] = path
         --local fn = wx.wxFileName(nodedata.attr[1]):GetFullName()
         local fn = string.filename(path, true)
         if not M.CheckResFileInPack(fn) then
-            return string.format("Repeated resource file name %q", fn)
+            return i18n(err_str.dup_res, fn)
         end
         require('xe.Project').addPackRes(absfn, 'loadbgm')
     else
         if M.checkBgmName[name] ~= path then
-            return string.format("Repeated resource name %q", name)
+            return i18n(err_str.dup_res, name)
         end
     end
 end
