@@ -84,32 +84,23 @@ function M:ctor()
 end
 
 function M:_run()
-    self:_setEnable(false, true, true, false, false)
     require('xe.game').resume()
 end
 
 function M:_stop()
-    self:_setEnable(true, true, true, false, false)
     require('xe.game').stop()
 end
 
 function M:_pause()
-    self:_setEnable(true, true, false, true, true)
     require('xe.game').pause()
 end
 
 function M:_step()
-    self:_setEnable(false, false, false, false, false)
-    require('xe.game').step(1, function()
-        self:_setEnable(true, true, false, true, true)
-    end)
+    require('xe.game').step(1)
 end
 
 function M:_step_over()
-    self:_setEnable(false, false, false, false, false)
-    require('xe.game').step(10, function()
-        self:_setEnable(true, true, false, true, true)
-    end)
+    require('xe.game').step(10)
 end
 
 function M:_setEnable(run, stop, pause, step, step_over)
@@ -117,6 +108,19 @@ function M:_setEnable(run, stop, pause, step, step_over)
 end
 
 function M:_applyEnable()
+    local started, paused, stepping = require('xe.game')._getState()
+    --im.text(('%s %s %s'):format(started, paused, stepping))
+    if started then
+        self:_setEnable(
+                paused and not stepping,
+                not stepping,
+                not paused and not stepping,
+                paused and not stepping,
+                paused and not stepping)
+    else
+        self:_setEnable(true, false, false, false, false)
+    end
+
     local states = self._states
     local names = { 'run', 'stop', 'pause', 'step', 'step_over' }
     for i = 1, #names do
