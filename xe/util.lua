@@ -128,4 +128,45 @@ function M.createTextButton(str, padding, cb, color)
     return style1, style2
 end
 
+local PaletteIndex = im.ColorTextEdit.PaletteIndex
+-- ABGR
+local darkPalette = {
+    0xFFC8C8C8, -- Default,
+    0xFFD69A56, -- Keyword,
+    0xFFA8CEB5, -- Number,
+    0xFF859DD6, -- String,
+    0xFF3E54CC, -- CharLiteral,
+    0xFFC8C8C8, -- Punctuation,
+    0xFF808040, -- Preprocessor,
+    0xFFC8C8C8, -- Identifier,
+    0xFF8B8B00, -- KnownIdentifier,
+    0xFFFF3D48, -- PreprocIdentifier,
+    0xFF4AA657, -- Comment,
+    0xFF559762, -- MultiLineComment,
+    0xFF000000, -- Background,
+    0xFFBBBBBB, -- Cursor,
+    0x80a0a0a0, -- Selection,
+    0x80ff2000, -- ErrorMarker,
+    0xFF5AC2C2, -- Breakpoint,
+    0xFF858585, -- LineNumber,
+    0x32a0a0a0, -- CurrentLineFill,
+    0x40a0a0a0, -- CurrentLineFillInactive,
+    0x40a0a0a0, -- CurrentLineEdge,
+}
+local lightPalette = table.clone(darkPalette)
+lightPalette[PaletteIndex.Default + 1] = 0xFF404040
+lightPalette[PaletteIndex.Background + 1] = 0xFFFFFFFF
+lightPalette[PaletteIndex.Cursor + 1] = 0xFF404040
+lightPalette[PaletteIndex.Punctuation + 1] = 0xFF404040
+lightPalette[PaletteIndex.Identifier + 1] = 0xFF404040
+lightPalette[PaletteIndex.Selection + 1] = 0x80606060
+lightPalette[PaletteIndex.Breakpoint + 1] = 0xFF28CAFF
+
+function M.getCodeDarkPalette()
+    return darkPalette
+end
+function M.getCodeLightPalette()
+    return lightPalette
+end
+
 return M
