@@ -130,6 +130,9 @@ function M.build(debugStage, debugSC)
         return
     end
     local dir = proj.getDir()
+    local root_path = dir .. '/root.lua'
+    local root = "Include('THlib.lua')\nInclude('_editor_output.lua')"
+    cc.FileUtils:getInstance():writeStringToFile(root, root_path)
     local path = dir .. '/_editor_output.lua'
     return proj.compileToFile(path, debugStage, debugSC)
 end
