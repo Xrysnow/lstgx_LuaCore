@@ -3,10 +3,24 @@ local M = {}
 M._ed = require('core_x.EventDispatcher').create()
 local started
 local paused
+local stepping
 ---@type cc.Node
 local node
 local NavEnableKeyboard
 local NavEnableGamepad
+
+local _FrameFunc = 'FrameFunc'
+local _RenderFunc = 'RenderFunc'
+local fvoid = function()
+end
+local function _saveFunc()
+    if FrameFunc ~= fvoid then
+        M._FrameFunc = FrameFunc
+    end
+    if RenderFunc ~= fvoid then
+        M._RenderFunc = RenderFunc
+    end
+end
 
 function M.start(rank, player, stage_, debugStage, debugSC)
     if started then
@@ -15,7 +29,6 @@ function M.start(rank, player, stage_, debugStage, debugSC)
         end
         return true
     end
-    started = true
 
     -- disable keyboard
     local flag = imgui.ConfigFlags.NavEnableKeyboard
@@ -221,17 +234,15 @@ function M.start(rank, player, stage_, debugStage, debugSC)
     end
     stage.next_stage = stage_menu
 
+    _saveFunc()
+    started = true
+    paused = false
     return true
 end
 
 function M._return()
     --
     M.stop()
-end
-
-local _FrameFunc = 'FrameFunc'
-local _RenderFunc = 'RenderFunc'
-local fvoid = function()
 end
 
 local function _stop()
@@ -268,17 +279,14 @@ local function _stop()
     if NavEnableGamepad then
         imgui.configFlagEnable(imgui.ConfigFlags.NavEnableGamepad)
     end
+    started = false
+    paused = false
 end
 M._stop = _stop
 
 function M._stopUpdate()
-    if FrameFunc ~= fvoid then
-        M._FrameFunc = FrameFunc
-    end
+    _saveFunc()
     _G[_FrameFunc] = fvoid
-    if RenderFunc ~= fvoid then
-        M._RenderFunc = RenderFunc
-    end
     _G[_RenderFunc] = fvoid
 end
 
@@ -295,17 +303,13 @@ function M.stop()
         _stop()
         M._ed:removeListenerByTag('stop')
     end, 10, 'stop')
-
-    started = false
 end
 
 local function _pause()
-    if FrameFunc ~= fvoid then
-        M._FrameFunc = FrameFunc
-    end
+    _saveFunc()
     _G[_FrameFunc] = fvoid
-
     _pause_music()
+    paused = true
 end
 M._pause = _pause
 
@@ -328,8 +332,8 @@ local function _resume()
     if M._RenderFunc then
         _G[_RenderFunc] = M._RenderFunc
     end
-
     _resume_music()
+    paused = false
 end
 
 function M.resume()
@@ -349,11 +353,13 @@ function M.step(n, onFinish)
         return
     end
     local ii = 1
+    stepping = true
     M._ed:addListener('update', function()
         if ii <= n then
             ii = ii + 1
             _resume()
         else
+            stepping = false
             _pause()
             if onFinish then
                 onFinish()
@@ -364,6 +370,10 @@ function M.step(n, onFinish)
             error('should not be here')
         end
     end, 1, 'step')
+end
+
+function M._getState()
+    return started, paused, stepping
 end
 
 function M.addTask(f, priority, tag)
