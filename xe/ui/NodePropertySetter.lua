@@ -134,6 +134,7 @@ end
 function M:_createInput(t)
     -- NOTE: input only submit its value when edit finished
     local nt = self._node:getType()
+    ---@type xe.input.Base
     local ret
     if t == 'path' then
         --TODO: loadFX
@@ -168,6 +169,7 @@ function M:_createInput(t)
     ret._master = self
     -- submit here because init value may differ from current
     require('xe.SceneTree').submit()
+    ret:_checkValid()
     return ret
 end
 
@@ -179,11 +181,27 @@ function M:_createConst(v)
 end
 
 function M:_handler()
-    --TODO: tip
-    wi.propertyHeader(self._title, self, '')
+    --TODO: tooltip
+    local error
+    local input = self._inputs[self._cur]
+    if input then
+        error = input:getError()
+    end
+
+    local pos1 = im.getCursorScreenPos()
+    wi.propertyHeader(self._title, self, '', { tooltip = error })
     im.nextColumn()
     wi._handler(self)
+    local pos2 = im.getCursorScreenPos()
     im.nextColumn()
+
+    if error then
+        local dl = im.getWindowDrawList()
+        dl:addRectFilled(pos1, pos2, im.color32(255, 0, 0, 63))
+        self._error = true
+    else
+        self._error = false
+    end
 end
 
 return M
