@@ -67,9 +67,13 @@ function M:_applyTheme()
     end
 end
 
+function M:_checkLua()
+    return loadstring(self:getValue(), '')
+end
+
 function M:_render()
     im.setNextWindowSize(im.vec2(300, 350), im.Cond.Once)
-    local ret = { im.beginPopupModal(_id, true) }
+    local ret = { im.beginPopupModal(_id, true, im.WindowFlags.MenuBar) }
     if self._open and not ret[2] then
         -- closed
         self:submit()
@@ -77,6 +81,12 @@ function M:_render()
     end
     self._open = ret[2]
     if ret[1] then
+        self:_renderMenu()
+
+        if self._lang == 'lua' and self._luaError then
+            im.textWrapped(self._luaError)
+        end
+
         local input = self._input
         local cpos = input:getCursorPosition()
 
@@ -112,6 +122,36 @@ function M:_render()
         end
 
         im.endPopup()
+    end
+end
+
+function M:_renderMenu()
+    local input = self._input
+    if im.beginMenuBar() then
+        if im.beginMenu('File') then
+            if im.menuItem('Save', 'Ctrl+S') then
+                self:submit()
+            end
+            if self._lang == 'lua' then
+                if im.menuItem('Check lua code') then
+                    local _, msg = self:_checkLua()
+                    self._luaError = msg
+                end
+            end
+            im.endMenu()
+        end
+        if im.beginMenu('View') then
+            local show_space = input:isShowingWhitespaces()
+            if im.menuItem('Show whitespaces', '', show_space) then
+                input:setShowWhitespaces(not show_space)
+            end
+            local show_short_tab = input:isShowingShortTabGlyphs()
+            if im.menuItem('Show short tab', '', show_short_tab) then
+                input:setShowShortTabGlyphs(not show_short_tab)
+            end
+            im.endMenu()
+        end
+        im.endMenuBar()
     end
 end
 
