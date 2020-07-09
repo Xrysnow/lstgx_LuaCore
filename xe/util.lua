@@ -169,4 +169,42 @@ function M.getCodeLightPalette()
     return lightPalette
 end
 
+local luaKeywords = {
+    "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while", "goto"
+}
+function M.getLuaKeywords()
+    return luaKeywords
+end
+local luaBuiltin = {
+    -- function
+    "assert", "collectgarbage", "dofile", "error", "getmetatable", "ipairs", "load", "loadfile", "next", "pairs", "pcall", "print", "rawequal", "rawget", "rawset", "require", "select", "setmetatable", "tonumber", "tostring", "type", "xpcall",
+    -- constants
+    "_G", "_VERSION",
+    -- library
+    "coroutine", "package", "utf8", "string", "table", "math", "io", "os", "debug", "bit", "ffi", "jit",
+}
+function M.getLuaBuiltin()
+    return luaBuiltin
+end
+local luaToken = {
+    { "\\.\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(", PaletteIndex.Breakpoint },
+    { "\\.\\s*([a-zA-Z_][a-zA-Z0-9_]*)", PaletteIndex.CharLiteral },
+    { "\\:\\s*([a-zA-Z_][a-zA-Z0-9_]*)", PaletteIndex.Identifier },
+    { "L?\\\"(\\\\.|[^\\\"])*\\\"", PaletteIndex.String },
+    { "\\\'[^\\\']*\\\'", PaletteIndex.String },
+    { "0[xX][0-9a-fA-F]+[uU]?[lL]?[lL]?", PaletteIndex.Number },
+    { "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?[fF]?", PaletteIndex.Number },
+    { "[+-]?[0-9]+[Uu]?[lL]?[lL]?", PaletteIndex.Number },
+}
+for i, v in ipairs(luaBuiltin) do
+    local k = ([[[^\B\.\:]?\s*(%s)\b]]):format(v)
+    table.insert(luaToken, { k, PaletteIndex.KnownIdentifier })
+end
+table.insert(luaToken, { "[a-zA-Z_][a-zA-Z0-9_]*", PaletteIndex.Identifier })
+table.insert(luaToken, { "[\\[\\]\\{\\}\\!\\%\\^\\&\\*\\(\\)\\-\\+\\=\\~\\|\\<\\>\\?\\/\\;\\,\\.\\:]",
+                      PaletteIndex.Punctuation })
+function M.getLuaTokenRegex()
+    return luaToken
+end
+
 return M

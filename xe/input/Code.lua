@@ -4,6 +4,7 @@ local M = class('xe.input.Code', base)
 local im = imgui
 local wi = require('imgui.Widget')
 local _id = 'Edit Code'
+local PaletteIndex = im.ColorTextEdit.PaletteIndex
 
 function M:ctor(node, idx, param)
     base.ctor(self, node, idx, 'code')
@@ -17,15 +18,22 @@ function M:ctor(node, idx, param)
 
     local input = im.ColorTextEdit()
     self._input = input
+
     input:setText(value)
     input:setPaletteLight()
     input:setShowWhitespaces(false)
+    input:setAutoTooltip(false)
     --
     self:_applyTheme()
     --
     if param.lang == 'lua' then
         self._lang = 'lua'
-        input:setLanguageLua()
+        --input:setLanguageLua()
+        local u = require('xe.util')
+        local keywords = table.clone(u.getLuaKeywords())
+        table.insert(keywords, 'self')
+        input:setLanguageDefinition(
+                'Lua', keywords, {}, {}, u.getLuaTokenRegex(), '--[[', ']]', '--')
         input:addLanguageIdentifier(require('xe.input.code_lua_doc'))
     end
     --
@@ -51,9 +59,9 @@ function M:_applyTheme()
     local theme = setting.xe.code_editor_theme
     local input = self._input
     if theme == 'Light' then
-        input:setPaletteLight()
+        input:setPalette(require('xe.util').getCodeLightPalette())
     elseif theme == 'Dark' then
-        input:setPaletteDark()
+        input:setPalette(require('xe.util').getCodeDarkPalette())
     elseif theme == 'Retro blue' then
         input:setPaletteRetroBlue()
     end
@@ -80,6 +88,13 @@ function M:_render()
         --local hh = -im.getFrameHeightWithSpacing()
         local hh = -im.getTextLineHeightWithSpacing()
         input:render(self._title, im.vec2(-1, hh), true)
+
+        local dec = input:getHoveredDeclaration()
+        local word = input:getHoveredWord()
+        local idx = input:getHoveredWordIndex()
+        if word ~= '' and dec ~= '' and idx == PaletteIndex.KnownIdentifier then
+            im.setTooltip(('%s'):format(dec))
+        end
 
         if font_scale then
             im.setWindowFontScale(1)
