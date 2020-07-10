@@ -503,6 +503,178 @@ function M:serialize()
     return self:getRoot():serialize()
 end
 
+local _def_node_type = { enemydefine = true, bulletdefine = true, objectdefine = true, laserdefine = true, laserbentdefine = true, rebounderdefine = true }
+local _init_node_type = { enemyinit = true, bulletinit = true, objectinit = true, laserinit = true, laserbentinit = true, rebounderinit = true }
+---@param node xe.SceneNode
+local function CalcParamNumAll(node)
+    local checker = require('xe.node_def._checker')
+    local ty = node:getType()
+    if _def_node_type[ty] then
+        for _, v in node:children() do
+            if _init_node_type[v:getType()] then
+                checker.paramNumDict[node:getAttrValue(1)] = checker.CalcParamNum(v:getAttrValue(1))
+                break
+            end
+        end
+    elseif ty == 'folder' then
+        for _, v in node:children() do
+            CalcParamNumAll(v)
+        end
+    end
+end
+
+local _indents = {}
+---@return table|boolean,string,xe.SceneNode
+function M:compile(debugCur, debugSC)
+    --
+    local debugCode, debugNode
+    if debugCur and self:getCurrent() then
+        print('compile to debug stage')
+        local curNode = self:getCurrent()
+        local taskNode = curNode:getParentNode()
+        if taskNode:getType() == 'stagetask' then
+            local stageNode = taskNode:getParentNode()
+            local groupNode = stageNode:getParentNode()
+            local stageName = stageNode:getAttrValue(1)
+            local groupName = groupNode:getAttrValue(1)
+            debugCode = ("_debug_stage_name = '%s@%s'\nInclude ('THlib/UI/debugger.lua')\n"):format(stageName, groupName)
+            local firstNode = taskNode:getChildAt(1)
+            if firstNode ~= curNode then
+                debugNode = { firstNode, curNode }
+            end
+        else
+            log("must debug from direct child node of stagetask node", 'error')
+            return
+        end
+    end
+    --
+    local scDebugNode
+    if debugSC and self:getCurrent() then
+        print('compile to debug SC')
+        scDebugNode = self:getCurrent()
+        if scDebugNode:getType() ~= 'bossspellcard' then
+            log('current node is not a spell card node', 'error')
+            return
+        end
+    end
+    --
+    local checker = require('xe.node_def._checker')
+    checker.reset()
+    for _, v in self:getRoot():children() do
+        CalcParamNumAll(v)
+    end
+    --
+    local watchDict = checker.watchDict
+    local watch = require('xe.TreeHelper').watch
+    ---@param wdata table<xe.SceneNode,boolean>
+    for key, wdata in pairs(watch) do
+        watchDict[key] = {}
+        if key == "sound" then
+            for node, _ in pairs(wdata) do
+                assert(node.getAttrValue, ('invalid object in watch: %s'):format(getclassname(node)))
+                local k = node:getAttrValue(2)
+                watchDict[key][k] = true
+            end
+        elseif key ~= 'image' then
+            for node, _ in pairs(wdata) do
+                assert(node.getAttrValue, ('invalid object in watch: %s'):format(getclassname(node)))
+                local k = node:getAttrValue(1)
+                watchDict[key][k] = true
+            end
+        end
+    end
+    watchDict.imageonly = {}
+    for node, _ in pairs(watch.image) do
+        local ty = node:getType()
+        local name = node:getAttrValue(2)
+        if ty == 'loadimage' then
+            watchDict.image['image:' .. name] = true
+            watchDict.imageonly['image:' .. name] = true
+        elseif ty == 'loadani' then
+            watchDict.image['ani:' .. name] = true
+        elseif ty == 'loadparticle' then
+            watchDict.image['particle:' .. name] = true
+        end
+    end
+    --
+    local ret = {}
+    local insert = table.insert
+    local t, msg, node = {}
+    --
+    local t1 = {}
+    if debugNode then
+        t1[debugNode[2]] = 'end '
+    end
+    local t2 = {}
+    if debugNode then
+        t2[debugNode[1]] = 'if false then '
+    end
+    if scDebugNode then
+        if setting.xe.debug_sc_current_only then
+            t2[scDebugNode] = '_boss_class_name = $qp1\n'
+                    .. '_debug_cards = { boss.move.New(0, 144, 60, MOVE_NORMAL), _tmp_sc }\n'
+        else
+            t2[scDebugNode] = '_boss_class_name = $qp1\n'
+                    .. '_editor_class[$qp1].cards = { boss.move.New(0, 144, 60, MOVE_NORMAL), _tmp_sc }\n'
+        end
+    end
+    for _, _ in pairs(t1) do
+        t.beforeHead = function(item)
+            return t1[item]
+        end
+        break
+    end
+    for _, _ in pairs(t2) do
+        t.afterFoot = function(item)
+            return t2[item]
+        end
+        break
+    end
+    --
+    t, msg, node = self:getRoot():compile(t)
+    if not t then
+        if node then
+            -- select on error
+            node:select()
+            msg = ('%s | %s | %s'):format(msg, node:getType(), node:getID())
+            log(msg, 'error', node:getType())
+        else
+            log(tostring(msg), 'error')
+        end
+        return
+    end
+    for i, v in ipairs(t) do
+        local s, indent = v[1], v[2]
+        if indent <= 0 then
+            insert(ret, s)
+        else
+            local ind_str = _indents[indent]
+            if not ind_str then
+                ind_str = ('\t'):rep(indent)
+                _indents[indent] = ind_str
+            end
+            local strip
+            if s:sub(-1) == '\n' then
+                strip = true
+            end
+            local str = ind_str .. s:gsub('\n', '\n' .. ind_str)
+            if strip then
+                str = str:sub(1, -#ind_str - 1)
+            end
+            insert(ret, str)
+        end
+    end
+    -- use xe.game
+    --if debugCode then
+    --    table.insert(ret, debugCode)
+    --end
+    --if debugSC then
+    --    table.insert(ret, "Include('THlib/UI/scdebugger.lua')\n")
+    --end
+    --
+    return table.concat(ret)
+end
+
 function M:reset()
     self:getRoot():deleteAllChildren()
     get_prop():showNode(nil)
