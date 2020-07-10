@@ -6,9 +6,11 @@ local wi = require('imgui.Widget')
 
 function M:ctor()
     base.ctor(self, 'Scene Editor')
-    --self:addChild(function()
-    --    im.setWindowFontScale(1.25)
-    --end)
+    self:addChild(function()
+        if im.isWindowFocused(im.FocusedFlags.ChildWindows) then
+            self:_handleKeyboard()
+        end
+    end)
 
     self._toolbar = require('xe.tools.ToolBar')()
     self:addChild(self._toolbar)
@@ -18,8 +20,16 @@ function M:ctor()
     self._toolpanel:disableAll()
 
     local win = wi.ChildWindow('xe.scene.tree', im.vec2(-1, -1), true)
-    self:addChild(win)--:addChild(im.separator)
+    self:addChild(win)
     self._treewin = win
+
+    -- replace default navigation in tree
+    win:addChild(function()
+        self:_handleNav()
+        if im.isWindowFocused(im.FocusedFlags.ChildWindows) then
+            self:_handleTreeKeyboard()
+        end
+    end)
 
     local setting = setting.xe
     local style = wi.style(nil, {
@@ -55,5 +65,129 @@ function M:setGame()
     self._treewin:setVisible(false)
     self._game:setVisible(true)
 end
+
+local kbNav, gpNav
+local kbNavFlag = im.ConfigFlags.NavEnableKeyboard
+local gpNavFlag = im.ConfigFlags.NavEnableGamepad
+local disabled
+function M:_handleNav()
+    if im.isWindowFocused() then
+        if not disabled then
+            kbNav = im.configFlagCheck(kbNavFlag)
+            gpNav = im.configFlagCheck(gpNavFlag)
+            disabled = true
+        end
+        im.configFlagDisable(kbNavFlag, gpNavFlag)
+    else
+        disabled = false
+        if kbNav then
+            im.configFlagEnable(kbNavFlag)
+        end
+        if gpNav then
+            im.configFlagEnable(gpNavFlag)
+        end
+    end
+end
+
+function M:_handleKeyboard()
+    -- only handle node operations
+    if self._treewin:isVisible() then
+        -- editor
+        local tool = require('xe.ToolMgr')
+        local t = {
+            { 'ctrl', 'c', tool.copy },
+            { 'ctrl', 'x', tool.cut },
+            { 'ctrl', 'v', tool.paste },
+            { 'delete', nil, tool.delete },
+        }
+        for _, v in ipairs(t) do
+            if im.checkKeyboard(v[1], v[2]) then
+                v[3]()
+                break
+            end
+        end
+    end
+end
+
+function M:_handleTreeKeyboard()
+    if self._treewin:isVisible() then
+        -- tree navigation
+        local tree = self._tree
+        local cur = tree:getCurrent()
+        if not cur then
+            return
+        end
+        local skip = { 'ctrl', 'alt', 'shift' }
+        for _, v in ipairs(skip) do
+            if im.checkKeyboard(v) then
+                return
+            end
+        end
+
+        if im.checkKeyboard('up') then
+            local prev = cur:getBrotherPrev()
+            if prev then
+                prev = prev:getLastVisibleChild()
+            end
+            if not prev then
+                prev = cur:getParentNode()
+            end
+            if prev then
+                prev:select()
+            end
+        elseif im.checkKeyboard('down') then
+            local next
+            if not cur:isFold() and cur:getChildrenCount() > 0 then
+                next = cur:getChildAt(1)
+            end
+            if not next then
+                next = cur:getBrotherNext()
+            end
+            if not next then
+                local p = cur:getParentNode()
+                local idx = cur:getIndex()
+                while p do
+                    if p:getChildrenCount() > idx then
+                        next = p:getChildAt(idx + 1)
+                    else
+                        idx = p:getIndex()
+                    end
+                    if next then
+                        break
+                    end
+                    p = p:getParentNode()
+                end
+            end
+            if next then
+                next:select()
+            end
+        elseif im.checkKeyboard('left') then
+            if cur:getChildrenCount() > 0 then
+                cur:fold()
+            end
+        elseif im.checkKeyboard('right') then
+            if cur:getChildrenCount() > 0 then
+                cur:unfold()
+            end
+        end
+    end
+end
+
+M.KeyEvent = {
+    { 'ctrl', 'n', 'new' },
+    { 'ctrl', 'o', 'open' },
+    { 'ctrl', 's', 'save' },
+    { 'ctrl', 'w', 'close' },
+    { 'f7', nil, 'build' },
+    { 'f6', nil, 'debugStage' },
+    { 'shift', 'f6', 'debugSC' },
+    { 'f5', nil, 'run' },
+
+    { 'alt', 'up', 'moveUp' },
+    { 'alt', 'down', 'moveDown' },
+    { 'ctrl', 'up', 'insertBefore' },
+    { 'ctrl', 'down', 'insertAfter' },
+    { 'ctrl', 'right', 'insertChild' },
+}
 
 return M
