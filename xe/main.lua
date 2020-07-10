@@ -37,7 +37,14 @@ function M:onCreate()
     setting.xe = setting.xe or {}
 
     cc.Director:getInstance():setDisplayStats(false)
-    --cc.Director:getInstance():setDisplayStats(true)
+
+    local bg = cc.Sprite('xe/background.png')
+    local bg_sz
+    if bg then
+        bg:addTo(scene):setLocalZOrder(-1)
+        bg_sz = bg:getContentSize()
+    end
+
     lstg.loadData()
     SetResourceStatus('global')
 
@@ -48,7 +55,7 @@ function M:onCreate()
     local cfg = im.ImFontConfig()
     cfg.OversampleH = 2
     cfg.OversampleV = 2
-    im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 14, cfg, {
+    local font_default = im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 14, cfg, {
         --0x0080, 0x00FF, -- Basic Latin + Latin Supplement
         0x2000, 0x206F, -- General Punctuation
         0x3000, 0x30FF, -- CJK Symbols and Punctuations, Hiragana, Katakana
@@ -75,6 +82,32 @@ function M:onCreate()
         fa.IconMin, fa.IconMax, 0
     })
     --
+    cfg = im.ImFontConfig()
+    cfg.OversampleH = 2
+    cfg.OversampleV = 2
+    cfg.MergeMode = false
+    local font_mono = im.addFontTTF('font/JetBrainsMono-Regular.ttf', 14, cfg, {
+        0x0020, 0x00FF, -- Basic Latin + Latin Supplement
+        0x2000, 0x206F, -- General Punctuation
+        0
+    })
+
+    local built
+    la:addChild(wi.Widget(function()
+        if built then
+            return
+        end
+        built = im.getIO().Fonts:isBuilt()
+        if built then
+            -- reuse CJK glyphs
+            font_mono:mergeGlyphs(font_default, 0x3000, 0x30FF)
+            font_mono:mergeGlyphs(font_default, 0x31F0, 0x31FF)
+            font_mono:mergeGlyphs(font_default, 0xFF00, 0xFFEF)
+            font_mono:mergeGlyphs(font_default, 0x4e00, 0x9FAF)
+        end
+    end))
+
+    --
     local dock = wi.wrapper(function()
         local viewport = im.getMainViewport()
         im.setNextWindowPos(viewport.Pos)
@@ -86,6 +119,20 @@ function M:onCreate()
         im.begin('Dock Space', nil, window_flags)
         im.popStyleVar(3)
         im.dockSpace(im.getID('xe.dock_space'), im.p(0, 0), im.DockNodeFlags.PassthruCentralNode)
+
+        if bg then
+            im.getStyle().Alpha = 0.85
+            local fsz = glv:getFrameSize()
+            local dl = im.getBackgroundDrawList()
+            local pos = im.getWindowPos()
+            local scale = math.max(fsz.width / bg_sz.width, fsz.height / bg_sz.height)
+            local w = bg_sz.width * scale
+            local h = bg_sz.height * scale
+            local a = im.vec2((fsz.width - w) / 2, (fsz.height - h) / 2)
+            a = cc.pAdd(a, pos)
+            local b = cc.pAdd(a, im.vec2(w, h))
+            dl:addImage(bg, a, b)
+        end
     end, function()
         im.endToLua()
     end)
@@ -115,7 +162,6 @@ function M:onCreate()
 
     self._assets = require('xe.assets.AssetsManager')()
     la:addChild(self._assets)
-    --la:addChild(im.showDemoWindow)
 
     -- dialogs
 
