@@ -1,22 +1,55 @@
 local M = {
     { title = 'File', content = {
-        { title = 'New...' },
-        { title = 'Open...' },
-        { title = 'Save' },
-        { title = 'Save as...' },
-        { title = 'Close' },
-        { title = 'Exit' },
-    } },
-    { title = 'Edit', content = {
-        { title = 'Undo' },
-        { title = 'Redo' },
-        { title = 'Delete' },
-        { title = 'Copy' },
-        { title = 'Cut' },
-        { title = 'Paste' },
+        {
+            title    = {
+                en = 'New project...',
+                zh = '新建工程...',
+            },
+            event    = 'new',
+            shortcut = 'Ctrl+N',
+        },
+        {
+            title    = {
+                en = 'Open project...',
+                zh = '打开工程...',
+            },
+            event    = 'open',
+            shortcut = 'Ctrl+O',
+        },
+        {
+            title     = {
+                en = 'Save project',
+                zh = '保存工程',
+            },
+            event     = 'save',
+            shortcut = 'Ctrl+S',
+            need_proj = true,
+        },
+        {
+            title     = {
+                en = 'Close project',
+                zh = '关闭工程',
+            },
+            event     = 'close',
+            shortcut = 'Ctrl+W',
+            need_proj = true,
+        },
+        {
+            title = {
+                en = 'Settings...',
+                zh = '设置...',
+            },
+            event = 'setting',
+        },
     } },
     { title = 'Help', content = {
-        { title = 'About' },
+        {
+            title = {
+                en = 'About',
+                zh = '关于',
+            },
+            event = 'about',
+        },
     } },
 }
 
