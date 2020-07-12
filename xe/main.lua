@@ -64,6 +64,7 @@ function M:onCreate()
         0x4e00, 0x9FAF, -- CJK Ideograms
         0,
     })
+    self._font_default = font_default
     --
     cfg = im.ImFontConfig()
     cfg.OversampleH = 3
@@ -91,6 +92,7 @@ function M:onCreate()
         0x2000, 0x206F, -- General Punctuation
         0
     })
+    self._font_mono = font_mono
 
     local built
     la:addChild(wi.Widget(function()

@@ -97,7 +97,9 @@ function M:_render()
 
         --local hh = -im.getFrameHeightWithSpacing()
         local hh = -im.getTextLineHeightWithSpacing()
+        im.pushFont(require('xe.main'):getInstance()._font_mono)
         input:render(self._title, im.vec2(-1, hh), true)
+        im.popFont()
 
         local dec = input:getHoveredDeclaration()
         local word = input:getHoveredWord()
