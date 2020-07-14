@@ -9,9 +9,15 @@ function M:ctor(title, msg, param)
     local glv = dir:getOpenGLView()
     local sz = glv:getDesignResolutionSize()
     local helper = require('cc.ui.helper')
-
-    local size_min = param.minSize or cc.size(200 - 24, 40)
-    local size_max = param.maxSize or cc.size(600 - 24, 300)
+    local size_min = param.minSize
+    local size_max = param.maxSize
+    if plus.isDesktop() then
+        size_min = size_min or cc.size(200 - 24, 40)
+        size_max = size_max or cc.size(600 - 24, 300)
+    else
+        size_min = size_min or cc.size(sz.width / 3, sz.width / 3)
+        size_max = size_max or cc.size(sz.width / 2, sz.width / 2)
+    end
 
     self:setContentSize(sz)
     local ch = sc:getChildren()

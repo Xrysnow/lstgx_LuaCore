@@ -1,5 +1,9 @@
 --
 local M = {}
+local font_size = 14
+if require('cocos.framework.device').isMobile then
+    font_size = 30
+end
 
 local function set_align(label, hAlign, vAlign)
     if hAlign then
@@ -25,7 +29,7 @@ end
 
 ---@return cc.Label
 function M.create(str, fontSize)
-    local lb = cc.Label:createWithSystemFont(str, 'Arial', fontSize or 14)
+    local lb = cc.Label:createWithSystemFont(str, 'Arial', fontSize or font_size)
     lb:setTextColor(cc.BLACK)
     lb:arrangeLeftCenter()
     return lb
@@ -38,7 +42,7 @@ end
 ---@param vAlign string @optional 'top'/'center'/'bottom'
 ---@return cc.Label
 function M.TTF(str, fontSize, hAlign, vAlign)
-    local lb = cc.Label:createWithTTF(str, 'font/WenQuanYiMicroHeiMono.ttf', fontSize or 14)
+    local lb = cc.Label:createWithTTF(str, 'font/WenQuanYiMicroHeiMono.ttf', fontSize or font_size)
     set_align(lb, hAlign, vAlign)
     return lb
 end
