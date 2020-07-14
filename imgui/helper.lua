@@ -344,6 +344,15 @@ function imgui.getColorU32(idx, alpha_mul)
     end
 end
 
+function imgui.getStyleColorU32(idx)
+    local v = imgui.getStyleColorVec4(idx)
+    if v then
+        return imgui.colorConvertFloat4ToU32(v)
+    else
+        return 0
+    end
+end
+
 function imgui.unpack(t)
     return unpack(t, 1, table.maxn(t))
 end
