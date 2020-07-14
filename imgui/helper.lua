@@ -361,14 +361,18 @@ function imgui.configFlagCheck(flag)
     return bit.band(imgui.getIO().ConfigFlags, flag) > 0
 end
 
-function imgui.configFlagEnable(flag)
+function imgui.configFlagEnable(flag, ...)
     local io = imgui.getIO()
-    io.ConfigFlags = bit.bor(io.ConfigFlags, flag)
+    for _, v in ipairs({ flag, ... }) do
+        io.ConfigFlags = bit.bor(io.ConfigFlags, v)
+    end
 end
 
-function imgui.configFlagDisable(flag)
+function imgui.configFlagDisable(flag, ...)
     local io = imgui.getIO()
-    io.ConfigFlags = bit.band(io.ConfigFlags, bit.bnot(flag))
+    for _, v in ipairs({ flag, ... }) do
+        io.ConfigFlags = bit.band(io.ConfigFlags, bit.bnot(v))
+    end
 end
 
 function imgui.ImFontConfig.__call()
