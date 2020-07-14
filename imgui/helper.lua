@@ -4,6 +4,7 @@ local dir = cc.Director:getInstance()
 local fu = cc.FileUtils:getInstance()
 local _iniFile = 'imgui.ini'
 local _globalSchedule
+local _canToggle = true
 
 ---@return cc.Layer
 function imgui.create()
@@ -17,7 +18,7 @@ function imgui.create()
     -- toggle with grave key
     local e = cc.EventListenerKeyboard()
     e:registerScriptHandler(function(k)
-        if k == require('keycode').GRAVE then
+        if k == 123 and _canToggle then
             imgui.setVisible(not imgui.isVisible())
         end
     end, cc.Handler.EVENT_KEYBOARD_PRESSED)
@@ -37,9 +38,9 @@ function imgui.create()
                 io.WantSaveIniSettings = false
             end
             -- check error
-            if imgui.error then
-                error(imgui.error)
-            end
+            --if imgui.error then
+            --    error(imgui.error)
+            --end
         end, 0, false)
     end
     return la
@@ -138,6 +139,10 @@ end
 
 function imgui.show()
     imgui.setVisible(true)
+end
+--- set if imgui can be toggled by keyboard
+function imgui.setToggleEnable(b)
+    _canToggle = b
 end
 
 function imgui.clear()
