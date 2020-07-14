@@ -117,9 +117,9 @@ function M:addString(str, type)
     if #self.items > self.max_item_count then
         table.remove(self.items, 1)
     end
-    local scr = self._sub:getScrollMaxY()
-    --Print(scr, self._sub:getScrollY())
-    self._sub:setAutoScrollY(scr - self._sub:getScrollY() < 30)
+    --local scr = self._sub:getScrollMaxY()
+    --self._sub:setAutoScrollY(scr - self._sub:getScrollY() < 30)
+    self._sub:setAutoScrollY(true)
     self._inAdd = false
 end
 
@@ -145,6 +145,10 @@ function M:_toolbar()
     imgui.sameLine()
     if imgui.button('Copy') then
         imgui.setClipboardText(self:getContent())
+    end
+    imgui.sameLine()
+    if imgui.arrowButton('##', imgui.Dir.Down) then
+        self._sub:setScrollY(self._sub:getScrollMaxY())
     end
     imgui.separator()
 end
