@@ -254,6 +254,42 @@ function imgui.color(...)
     end
     return cc.vec4(0, 0, 0, 0)
 end
+---@return number @ABGR
+function imgui.color32(...)
+    local arg = { ... }
+    if #arg == 1 then
+        arg = arg[1]
+        local ty = type(arg)
+        if ty == 'number' then
+            arg = clamp(arg, 0, 0xFFFFFFFF)
+            -- ARGB -> ABGR
+            local b = bit.band(arg, 0xFF)
+            local g = bit.band(arg, 0xFF00)
+            local r = bit.band(arg, 0xFF0000)
+            local a = bit.band(arg, 0xFF000000)
+            return a + b * 0x10000 + g + r / 0x10000
+        end
+        if arg.r then
+            local a = 0xFF
+            if arg.a then
+                a = clamp(arg.a, 0, 0xFF)
+            end
+            return imgui.color32(arg.r, arg.g, arg.b, arg.a)
+        elseif arg.x then
+            return imgui.colorConvertFloat4ToU32(arg)
+        end
+    elseif #arg >= 3 then
+        local a = 0xFF000000
+        if arg[4] then
+            a = clamp(arg[4], 0, 0xFF) * 0x1000000
+        end
+        local r = clamp(arg[1], 0, 0xFF)
+        local g = clamp(arg[2], 0, 0xFF) * 0x100
+        local b = clamp(arg[3], 0, 0xFF) * 0x10000
+        return a + b + g + r
+    end
+    return 0
+end
 
 function imgui.c4b(r, g, b, a)
     return cc.vec4(r / 255, g / 255, b / 255, a / 255)
