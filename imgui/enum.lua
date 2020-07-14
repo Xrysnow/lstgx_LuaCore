@@ -96,6 +96,30 @@ ImGuiTreeNodeFlags.CollapsingHeader = ImGuiTreeNodeFlags.Framed + ImGuiTreeNodeF
 
 --------------------------------------------------
 
+--- Flags for OpenPopup*(), BeginPopupContext*(), IsPopupOpen() functions.
+--- - To be backward compatible with older API which took an 'int mouse_button = 1' argument, we need to treat
+---   small flags values as a mouse button index, so we encode the mouse button in the first few bits of the flags.
+---   It is therefore guaranteed to be legal to pass a mouse button index in ImGuiPopupFlags.
+--- - For the same reason, we exceptionally default the ImGuiPopupFlags argument of BeginPopupContextXXX functions to 1 instead of 0.
+
+local ImGuiPopupFlags={}
+im.ImGuiPopupFlags = ImGuiPopupFlags
+im.PopupFlags = ImGuiPopupFlags
+
+ImGuiPopupFlags.None                    = 0
+ImGuiPopupFlags.MouseButtonLeft         = 0        --- For BeginPopupContext*(): open on Left Mouse release. Guaranted to always be == 0 (same as ImGuiMouseButton_Left)
+ImGuiPopupFlags.MouseButtonRight        = 1        --- For BeginPopupContext*(): open on Right Mouse release. Guaranted to always be == 1 (same as ImGuiMouseButton_Right)
+ImGuiPopupFlags.MouseButtonMiddle       = 2        --- For BeginPopupContext*(): open on Middle Mouse release. Guaranted to always be == 2 (same as ImGuiMouseButton_Middle)
+ImGuiPopupFlags.MouseButtonMask_        = 0x1F
+ImGuiPopupFlags.MouseButtonDefault_     = 1
+ImGuiPopupFlags.NoOpenOverExistingPopup = 2 ^  5   --- For OpenPopup*(), BeginPopupContext*(): don't open if there's already a popup at the same level of the popup stack
+ImGuiPopupFlags.NoOpenOverItems         = 2 ^  6   --- For BeginPopupContextWindow(): don't return true when hovering items, only when hovering empty space
+ImGuiPopupFlags.AnyPopupId              = 2 ^  7   --- For IsPopupOpen(): ignore the ImGuiID parameter and test for any popup.
+ImGuiPopupFlags.AnyPopupLevel           = 2 ^  8   --- For IsPopupOpen(): search/test at any level of the popup stack (default test in the current level)
+ImGuiPopupFlags.AnyPopup                = ImGuiPopupFlags.AnyPopupId + ImGuiPopupFlags.AnyPopupLevel
+
+--------------------------------------------------
+
 local ImGuiSelectableFlags = {}
 --- Flags for ImGui::Selectable()
 im.ImGuiSelectableFlags = ImGuiSelectableFlags
@@ -159,6 +183,7 @@ ImGuiTabItemFlags.UnsavedDocument = 2 ^ 0   --- Append '*' to title without affe
 ImGuiTabItemFlags.SetSelected = 2 ^ 1   --- Trigger flag to programmatically make the tab selected when calling BeginTabItem()
 ImGuiTabItemFlags.NoCloseWithMiddleMouseButton = 2 ^ 2   --- Disable behavior of closing tabs (that are submitted with p_open != NULL) with middle mouse button. You can still repro this behavior on user's side with if (IsItemHovered() && IsMouseClicked(2)) *p_open = false.
 ImGuiTabItemFlags.NoPushId = 2 ^ 3    --- Don't call PushID(tab->ID)/PopID() on BeginTabItem()/EndTabItem()
+ImGuiTabItemFlags.NoTooltip = 2 ^ 4    --- Disable tooltip for the given tab
 
 --------------------------------------------------
 
@@ -192,18 +217,18 @@ im.FocusedFlags = ImGuiFocusedFlags
 ImGuiFocusedFlags.None = 0
 ImGuiFocusedFlags.ChildWindows = 2 ^ 0   --- IsWindowFocused(): Return true if any children of the window is focused
 ImGuiFocusedFlags.RootWindow = 2 ^ 1   --- IsWindowFocused(): Test from root window (top most parent of the current hierarchy)
-ImGuiFocusedFlags.AnyWindow = 2 ^ 2   --- IsWindowFocused(): Return true if any window is focused. Important: If you are trying to tell how to dispatch your low-level inputs do NOT use this. Use ImGui::GetIO().WantCaptureMouse instead.
+ImGuiFocusedFlags.AnyWindow = 2 ^ 2   --- IsWindowFocused(): Return true if any window is focused. Important: If you are trying to tell how to dispatch your low-level inputs, do NOT use this. Use 'io.WantCaptureMouse' instead! Please read the FAQ!
 ImGuiFocusedFlags.RootAndChildWindows = ImGuiFocusedFlags.RootWindow + ImGuiFocusedFlags.ChildWindows
 
 --------------------------------------------------
 
 local ImGuiHoveredFlags = {}
 --- Flags for ImGui::IsItemHovered() ImGui::IsWindowHovered()
---- Note: if you are trying to check whether your mouse should be dispatched to imgui or to your app you should use the 'io.WantCaptureMouse' boolean for that. Please read the FAQ!
+--- Note: if you are trying to check whether your mouse should be dispatched to Dear ImGui or to your app, you should use 'io.WantCaptureMouse' instead! Please read the FAQ!
 --- Note: windows with the ImGuiWindowFlags.NoInputs flag are ignored by IsWindowHovered() calls.
 im.ImGuiHoveredFlags = ImGuiHoveredFlags
 --- Flags for ImGui::IsItemHovered() ImGui::IsWindowHovered()
---- Note: if you are trying to check whether your mouse should be dispatched to imgui or to your app you should use the 'io.WantCaptureMouse' boolean for that. Please read the FAQ!
+--- Note: if you are trying to check whether your mouse should be dispatched to Dear ImGui or to your app, you should use 'io.WantCaptureMouse' instead! Please read the FAQ!
 --- Note: windows with the ImGuiWindowFlags.NoInputs flag are ignored by IsWindowHovered() calls.
 im.HoveredFlags = ImGuiHoveredFlags
 
@@ -309,13 +334,27 @@ ImGuiKey.COUNT = 21
 
 --------------------------------------------------
 
+local ImGuiKeyModFlags={}
+--- To test io.KeyMods (which is a combination of individual fields io.KeyCtrl, io.KeyShift, io.KeyAlt set by user/back-end)
+im.ImGuiKeyModFlags = ImGuiKeyModFlags
+--- To test io.KeyMods (which is a combination of individual fields io.KeyCtrl, io.KeyShift, io.KeyAlt set by user/back-end)
+im.KeyModFlags = ImGuiKeyModFlags
+
+ImGuiKeyModFlags.None       = 0
+ImGuiKeyModFlags.Ctrl       = 2 ^  0
+ImGuiKeyModFlags.Shift      = 2 ^  1
+ImGuiKeyModFlags.Alt        = 2 ^  2
+ImGuiKeyModFlags.Super      = 2 ^  3
+
+--------------------------------------------------
+
 local ImGuiNavInput = {}
---- Gamepad/Keyboard directional navigation
+--- Gamepad/Keyboard navigation
 --- Keyboard: Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard to enable. NewFrame() will automatically fill io.NavInputs[] based on your io.KeysDown[] + io.KeyMap[] arrays.
 --- Gamepad:  Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad to enable. Back-end: set ImGuiBackendFlags.HasGamepad and fill the io.NavInputs[] fields before calling NewFrame(). Note that io.NavInputs[] is cleared by EndFrame().
 --- Read instructions in imgui.cpp for more details. Download PNG/PSD at http:--goo.gl/9LgVZW.
 im.ImGuiNavInput = ImGuiNavInput
---- Gamepad/Keyboard directional navigation
+--- Gamepad/Keyboard navigation
 --- Keyboard: Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard to enable. NewFrame() will automatically fill io.NavInputs[] based on your io.KeysDown[] + io.KeyMap[] arrays.
 --- Gamepad:  Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad to enable. Back-end: set ImGuiBackendFlags.HasGamepad and fill the io.NavInputs[] fields before calling NewFrame(). Note that io.NavInputs[] is cleared by EndFrame().
 --- Read instructions in imgui.cpp for more details. Download PNG/PSD at http:--goo.gl/9LgVZW.
@@ -445,12 +484,20 @@ ImGuiCol.COUNT = 50
 
 local ImGuiStyleVar = {}
 --- Enumeration for PushStyleVar() / PopStyleVar() to temporarily modify the ImGuiStyle structure.
---- NB: the enum only refers to fields of ImGuiStyle which makes sense to be pushed/popped inside UI code. During initialization feel free to just poke into ImGuiStyle directly.
---- NB: if changing this enum you need to update the associated internal table GStyleVarInfo[] accordingly. This is where we link enum values to members offset/type.
+--- - The enum only refers to fields of ImGuiStyle which makes sense to be pushed/popped inside UI code.
+---   During initialization or between frames, feel free to just poke into ImGuiStyle directly.
+--- - Tip: Use your programming IDE navigation facilities on the names in the _second column_ below to find the actual members and their description.
+---   In Visual Studio IDE: CTRL+comma ("Edit.NavigateTo") can follow symbols in comments, whereas CTRL+F12 ("Edit.GoToImplementation") cannot.
+---   With Visual Assist installed: ALT+G ("VAssistX.GoToImplementation") can also follow symbols in comments.
+--- - When changing this enum, you need to update the associated internal table GStyleVarInfo[] accordingly. This is where we link enum values to members offset/type.
 im.ImGuiStyleVar = ImGuiStyleVar
 --- Enumeration for PushStyleVar() / PopStyleVar() to temporarily modify the ImGuiStyle structure.
---- NB: the enum only refers to fields of ImGuiStyle which makes sense to be pushed/popped inside UI code. During initialization feel free to just poke into ImGuiStyle directly.
---- NB: if changing this enum you need to update the associated internal table GStyleVarInfo[] accordingly. This is where we link enum values to members offset/type.
+--- - The enum only refers to fields of ImGuiStyle which makes sense to be pushed/popped inside UI code.
+---   During initialization or between frames, feel free to just poke into ImGuiStyle directly.
+--- - Tip: Use your programming IDE navigation facilities on the names in the _second column_ below to find the actual members and their description.
+---   In Visual Studio IDE: CTRL+comma ("Edit.NavigateTo") can follow symbols in comments, whereas CTRL+F12 ("Edit.GoToImplementation") cannot.
+---   With Visual Assist installed: ALT+G ("VAssistX.GoToImplementation") can also follow symbols in comments.
+--- - When changing this enum, you need to update the associated internal table GStyleVarInfo[] accordingly. This is where we link enum values to members offset/type.
 im.StyleVar = ImGuiStyleVar
 
 -- Enum name ---------------------- --- Member in ImGuiStyle structure (see ImGuiStyle for descriptions)
@@ -497,6 +544,7 @@ ImGuiColorEditFlags.NoTooltip = 2 ^ 6   ---              --- ColorEdit ColorPick
 ImGuiColorEditFlags.NoLabel = 2 ^ 7   ---              --- ColorEdit ColorPicker: disable display of inline text label (the label is still forwarded to the tooltip and picker).
 ImGuiColorEditFlags.NoSidePreview = 2 ^ 8   ---              --- ColorPicker: disable bigger color preview on right side of the picker use small colored square preview instead.
 ImGuiColorEditFlags.NoDragDrop = 2 ^ 9   ---              --- ColorEdit: disable drag and drop target. ColorButton: disable drag and drop source.
+ImGuiColorEditFlags.NoBorder = 2 ^ 10   ---              --- ColorButton: disable border (which is enforced by default)
 
 --- User Options (right-click on widget to change some of them).
 ImGuiColorEditFlags.AlphaBar = 2 ^ 16  ---              --- ColorEdit ColorPicker: show vertical alpha bar/gradient in picker.
@@ -550,8 +598,9 @@ im.ImGuiCond = ImGuiCond
 --- Important: Treat as a regular enum! Do NOT combine multiple values using binary operators! All the functions above treat 0 as a shortcut to ImGuiCond_Always.
 im.Cond = ImGuiCond
 
-ImGuiCond.Always = 2 ^ 0   --- Set the variable
-ImGuiCond.Once = 2 ^ 1   --- Set the variable once per runtime session (only the first call with succeed)
+ImGuiCond.None = 0   --- No condition (always set the variable), same as _Always
+ImGuiCond.Always = 2 ^ 0   --- No condition (always set the variable)
+ImGuiCond.Once = 2 ^ 1   --- Set the variable once per runtime session (only the first call will succeed)
 ImGuiCond.FirstUseEver = 2 ^ 2   --- Set the variable if the object/window has no persistently saved data (no entry in .ini file)
 ImGuiCond.Appearing = 2 ^ 3    --- Set the variable if the object/window is appearing after being hidden/inactive (or the first time)
 
@@ -572,4 +621,5 @@ ImGuiViewportFlags.NoInputs = 2 ^ 4   --- Platform Window: Make mouse pass throu
 ImGuiViewportFlags.NoRendererClear = 2 ^ 5   --- Platform Window: Renderer doesn't need to clear the framebuffer ahead (because we will fill it entirely).
 ImGuiViewportFlags.TopMost = 2 ^ 6   --- Platform Window: Display on top (for tooltips only)
 ImGuiViewportFlags.Minimized = 2 ^ 7   --- Platform Window: Window is minimized, can skip render. When minimized we tend to avoid using the viewport pos/size for clipping window or testing if they are contained in the viewport.
-ImGuiViewportFlags.CanHostOtherWindows = 2 ^ 8    --- Main viewport: can host multiple imgui windows (secondary viewports are associated to a single window)
+ImGuiViewportFlags.NoAutoMerge = 2 ^ 8   --- Platform Window: Avoid merging this window into another host window. This can only be set via ImGuiWindowClass viewport flags override (because we need to now ahead if we are going to create a viewport in the first place!).
+ImGuiViewportFlags.CanHostOtherWindows = 2 ^ 9    --- Main viewport: can host multiple imgui windows (secondary viewports are associated to a single window)
