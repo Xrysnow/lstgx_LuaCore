@@ -24,15 +24,25 @@ THE SOFTWARE.
 
 local device = {}
 
-device.platform    = "unknown"
-device.model       = "unknown"
+device.platform = "unknown"
+device.model = "unknown"
+device.isDesktop = false
+device.isMobile = true
 
 local app = cc.Application:getInstance()
 local target = app:getTargetPlatform()
 if target == cc.PLATFORM_OS_WINDOWS then
     device.platform = "windows"
+    device.isDesktop = true
+    device.isMobile = false
+elseif target == cc.PLATFORM_OS_LINUX then
+    device.platform = "linux"
+    device.isDesktop = true
+    device.isMobile = false
 elseif target == cc.PLATFORM_OS_MAC then
     device.platform = "mac"
+    device.isDesktop = true
+    device.isMobile = false
 elseif target == cc.PLATFORM_OS_ANDROID then
     device.platform = "android"
 elseif target == cc.PLATFORM_OS_IPHONE or target == cc.PLATFORM_OS_IPAD then
@@ -95,7 +105,7 @@ if device.platform == "windows" then
     device.directorySeparator = "\\"
     device.pathSeparator = ";"
 end
-
+--[[
 printInfo("# device.platform              = " .. device.platform)
 printInfo("# device.model                 = " .. device.model)
 printInfo("# device.language              = " .. device.language)
@@ -103,5 +113,5 @@ printInfo("# device.writablePath          = " .. device.writablePath)
 printInfo("# device.directorySeparator    = " .. device.directorySeparator)
 printInfo("# device.pathSeparator         = " .. device.pathSeparator)
 printInfo("#")
-
+--]]
 return device
