@@ -219,11 +219,23 @@ end
 function imgui.vec4(x, y, z, w)
     return cc.vec4(x, y, z, w)
 end
-
+local function clamp(v, lo, hi)
+    return math.min(hi, math.max(v, lo))
+end
+---@return vec4_table
 function imgui.color(...)
     local arg = { ... }
     if #arg == 1 then
         arg = arg[1]
+        local ty = type(arg)
+        if ty == 'number' then
+            arg = clamp(arg, 0, 0xFFFFFFFF)
+            local b = bit.band(arg, 0xFF) / 0xFF
+            local g = bit.band(arg, 0xFF00) / 0xFF00
+            local r = bit.band(arg, 0xFF0000) / 0xFF0000
+            local a = bit.band(arg, 0xFF000000) / 0xFF000000
+            return cc.vec4(r, g, b, a)
+        end
         if arg.r then
             local a = 1
             if arg.a then
