@@ -1,7 +1,7 @@
 ---
 --- ffi.lua
 ---
---- Copyright (C) 2018-2019 Xrysnow. All rights reserved.
+--- Copyright (C) 2018-2020 Xrysnow. All rights reserved.
 ---
 
 
@@ -39,5 +39,10 @@ end
 
 function ffi.convert_ptr(userdata, cdata_ptr_t)
     return cast(cdata_ptr_t or _ptr_t, userdata)
+end
+
+function ffi.try_cdef(s)
+    assert(type(s) == 'string')
+    pcall(ffi.cdef, s)
 end
 
