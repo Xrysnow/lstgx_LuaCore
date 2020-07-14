@@ -154,6 +154,60 @@ end
 
 --
 
+local keycode = require('imgui.keycode')
+---
+---@param key string @key name
+function imgui.checkKeyboard(key, ...)
+    local args = { key, ... }
+    if #args == 0 then
+        return false
+    end
+    local io = imgui.getIO()
+    local osx = io.ConfigMacOSXBehaviors
+    local shift = io.KeyShift
+    local ctrl, alt
+    if osx then
+        ctrl = io.KeySuper
+        alt = io.KeyCtrl
+    else
+        ctrl = io.KeyCtrl
+        alt = io.KeyAlt
+    end
+    for _, v in ipairs(args) do
+        local ty = type(v)
+        if ty == 'string' then
+            v = string.upper(v)
+            if v == 'SHIFT' then
+                if not shift then
+                    return false
+                end
+            elseif v == 'CTRL' then
+                if not ctrl then
+                    return false
+                end
+            elseif v == 'ALT' then
+                if not alt then
+                    return false
+                end
+            else
+                v = assert(keycode[v], ('invalid value %q'):format(v))
+                if not imgui.isKeyPressed(v) then
+                    return false
+                end
+            end
+        elseif ty == 'number' then
+            if not imgui.isKeyPressed(v) then
+                return false
+            end
+        else
+            error(('invalid param type %q'):format(ty))
+        end
+    end
+    return true
+end
+
+--
+
 function imgui.p(x, y)
     return cc.p(x or 0, y or 0)
 end
