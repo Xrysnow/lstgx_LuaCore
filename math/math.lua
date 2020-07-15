@@ -1,7 +1,7 @@
 ---
 --- math.lua
 ---
---- Copyright (C) 2018-2019 Xrysnow. All rights reserved.
+--- Copyright (C) 2018-2020 Xrysnow. All rights reserved.
 ---
 
 --local math = math
