@@ -13,14 +13,16 @@ function MainScene.setSkip(skip_set, skip_sel)
     skip_setting, skip_selection = skip_set, skip_sel
 end
 
-function MainScene:onCreate()
-end
-
 function MainScene:onEnter()
     if not skip_setting then
-        local ok, _ = pcall(require, 'main_scene')
+        local ok, ret = pcall(require, 'main_scene')
         if not ok then
-            require('platform.launcher_ui')()
+            if not LAUNCH_XE then
+                require('platform.launcher_ui')()
+                --require('platform.launcher')():showWithScene()
+            else
+                require('xe.main')():showWithScene()
+            end
         end
     elseif not skip_selection then
         local scene = require('app.views.GameScene'):create(nil, setting.mod)
