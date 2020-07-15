@@ -107,7 +107,7 @@ function M:_set()
     local setting = self._setting
     local glv = cc.Director:getInstance():getOpenGLView()
     local fsz = setting.frame_size
-    if fsz then
+    if fsz and require('cocos.framework.device').isDesktop then
         glv:setFrameSize(fsz[1], fsz[2])
     end
 end
