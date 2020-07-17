@@ -37,7 +37,7 @@ end
 --
 
 lstg.eventDispatcher:addListener('load.THlib.after', function()
-    Include('x/__init__.lua')
+    Include('game/after_load.lua')
 end, 1, 'load.data.x')
 
 function lstg.loadMod()
@@ -61,7 +61,7 @@ function lstg.loadMod()
     lstg.loadPlugins()
 
     lstg.eventDispatcher:dispatchEvent('load.THlib.before')
-    Include 'root.lua'
+    Include('root.lua')
     lstg.eventDispatcher:dispatchEvent('load.THlib.after')
     DoFile('core/score.lua')
 
