@@ -13,10 +13,6 @@ local launcher_reader
 local launcher_scene
 local lc
 
---local ASSETS_PATH = 'src/mod/demo/assets/'
---local px          = ASSETS_PATH .. 'pixel.png'
---local wqy         = ASSETS_PATH .. 'font/WenQuanYiMicroHeiMono.ttf'
-
 local function enumMods(path)
     SystemLog(string.format('enum MODs in %q', path))
     local ret = {}
@@ -94,9 +90,9 @@ local function setMod(lc)
         item.btn:addTouchEventListener(function(t, e)
             if e == 0 then
                 if not item.is_selected then
-                    for _, v in ipairs(lc.mod_scv:getChildren()) do
-                        if v.setSelected then
-                            v:setSelected(false)
+                    for _, vv in ipairs(lc.mod_scv:getChildren()) do
+                        if vv.setSelected then
+                            vv:setSelected(false)
                         end
                     end
                     setting.mod = item.mod_name
@@ -245,30 +241,10 @@ local function listenCtrStart()
     ctr_last = nil
     ctr_curr = nil
     scene_tasks[1] = function()
-        --local k = GetLastControllerKey()
-        --if k and k.iKey then
-        --    if ctr_labels._set then
-        --        ctr_labels._set(k)
-        --    end
-        --end
-        --ctr_last = ctr_curr
         ctr_curr = controllerHelper.getLast()
         if ctr_curr then
             ctr_labels._set(ctr_last, ctr_curr)
         end
-        --if ctr_curr and (not ctr_curr.is_axis) then
-        --    ctr_last = ctr_curr
-        --end
-        --if ctr_last and ctr_curr then
-        --    local b1 = ctr_last.id == ctr_curr.id
-        --    local b2 = ctr_last.key == ctr_curr.key
-        --    local b3 = ctr_last.is_axis == ctr_curr.is_axis
-        --    --local b4 = ctr_last.isAnalog == ctr_curr.isAnalog
-        --    local b = b1 and b2 and b3-- and b4
-        --    if ctr_labels._set and b then
-        --        ctr_labels._set(ctr_last, ctr_curr)
-        --    end
-        --end
     end
 end
 local function listenCtrStop()
@@ -462,6 +438,22 @@ local function CreateLauncherUI()
         end
     end)
 
+    local title_data = require('platform.launcher_ui_data').title
+    local label_data = require('platform.launcher_ui_data').label
+    for k, v in pairs(lc) do
+        if string.starts_with(k, 'button_') then
+            local name = k:sub(8)
+            local lb = v:getChildren()[2]
+            local s = title_data[name]
+            if s and lb then
+                lb:setString(i18n(s))
+            end
+        end
+        if label_data[k] then
+            v:setString(label_data[k].en)
+        end
+    end
+
     setMod(lc)
 
     setSound(lc)
@@ -480,100 +472,32 @@ local function CreateLauncherUI()
     local inf_label = lc._warning:getChildren()[1]
     inf_label:setString(inf)
 
-    if imgui then
-        require('imgui.__init__')
-         local la = imgui.on(launcher_scene)
-        imgui.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 16)
-        --la:addChild(imgui.showDemoWindow)
-        la:addChild(require('imgui.ui.Console')('Console'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.ui.LogWindow')('Log'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.ui.StyleSetting')('Setting'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.ui.VariableWatch')('Watch'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.lstg.GameInfo')('Game Info'):setContentSize(cc.size(500, 500)))
-        imgui.setVisible(setting.imgui_visible)
-    end
-    --lc._warning:setVisible(false)
-    --print('---------------     load     ----------------')
-    --local m=cc.Sprite3D:create('mod/obj_bindnode_test/model/out7.c3b')
-    --if not m then
-    --    error("can't load")
-    --end
-    --m:setPosition(cc.p(500,100))
-    --m:setScale(20)
-    --launcher_scene:addChild(m)
-    --m:setGlobalZOrder(10)
+    require('imgui.lstg.util').load(launcher_scene)
 
-    --local p=cc.ParticleSystemQuad:create('particle_texture.plist')
+    --local ui_layer = cc.Layer:create()
+    --ui_layer:setAnchorPoint(0, 0)
+    --launcher_scene:addChild(ui_layer)
+    --require('platform.controller_ui')(ui_layer)
+
+    --[[
+    local sp = video.Player:create('[Touhou 3D] Subterranean Stars.mp4')
+    sp:addTo(launcher_scene)
+    local sz = sp:getContentSize()
+    sp:setPosition(sz.width / 2, sz.height / 2)
+    sp:vplay()
+    ]]
+
+    --lc._warning:setVisible(false)
+
+    --local p = cc.ParticleSystemQuad:create('particle_texture.plist')
     --if not p then
     --    error("can't load")
     --end
     --p:setPosition(cc.p(800,100))
     --launcher_scene:addChild(p)
 
-    -- local font = 'x/assets/font/WenQuanYiMicroHeiMono.ttf'
-    -- local debug_lb = cc.Label:createWithTTF('_', font, 24)
-    -- launcher_scene:addChild(debug_lb)
-    -- debug_lb:setPosition(cc.p(200, 200))
-    -- debug_lb:setGlobalZOrder(9)
-
-    --[[
-    launcher_scene:removeAllChildren()
-
-    local model = l2d.Model:create('kagerou', 'kagerou.model3.json')
-    --local model = l2d.Model:create('Haru', 'Haru.model3.json')
-    if not model then
-        error('failed')
-    end
-    --Print(stringify(model:getContentSize()))
-    model:setPosition(cc.p(500, 600))
-    model:setScale(2)
-    model:setGlobalZOrder(10)
-    Print(stringify(model:getContentSize()))
-    model:setDebugRectEnable(true)
-
-    model:setTouchEnabled(true)
-    model:setSwallowTouches(true)
-    model:addTouchEventListener(function(sender, e)
-        if e == ccui.TouchEventType.began then
-            --local pos = model:getTouchBeganPosition()
-            --Print(pos.x, pos.y)
-            return true
-        elseif e == ccui.TouchEventType.moved then
-            local pos = model:getTouchMovePosition()
-            model:setDragging(pos.x, pos.y)
-        elseif e == ccui.TouchEventType.ended then
-            local pos = model:convertToWorldSpace(cc.p(0, 0))
-            model:setDragging(pos.x, pos.y)
-        elseif e == ccui.TouchEventType.canceled then
-            local pos = model:convertToWorldSpace(cc.p(0, 0))
-            model:setDragging(pos.x, pos.y)
-        end
-    end)
-    model:addClickEventListener(function()
-        local pos = model:getTouchEndPosition()
-        if model:areaHitTest('Head', pos.x, pos.y) then
-            Print('hit at head')
-        end
-    end)
-
-    --local dsize=cc.Director:getInstance():getOpenGLView():getDesignResolutionSize()
-    --Print(dsize.width,dsize.height)
-
-    --model:setOnHitCallback(function(x, y)
-    --    Print('hit', x, y)
-    --    if model:hitTest('Head', x, y) then
-    --        Print('hit at', x, y)
-    --        model:setRandomExpression()
-    --    end
-    --end)
-    --model:setOnDraggingCallback(function(x, y)
-    --    model:setDragging(x, y)
-    --end)
-    --model:startRandomMotion('Idle',1)
-
-    launcher_scene:addChild(model)
-    Print(stringify(model:getCanvasRect()))
-    ]]
+    --local sp = require('qrcode.helper').sprite('https://github.com/Xrysnow/LuaSTG-x', 1)
+    --sp:addTo(launcher_scene):setPosition(800, 500):setScale(20)
 
     launcher_scene.update = function(self, dt)
         for i, v in pairs(scene_tasks) do
@@ -592,7 +516,15 @@ local function CreateLauncherUI()
         --    model:setParameterValue(param.EyeROpen,0,1)
         --    Print('set param')
         --end
-        --model:update(dt)
+        --[[
+        local pminfo = ''
+        for i, v in ipairs(pmname) do
+            local val = model:getParameterValue(v)
+            pminfo = string.format('%s\n%s: %.2f', pminfo, v:sub(6, -1), val)
+        end
+        _lb:setString(pminfo)
+        ]]
+
     end
     launcher_scene:scheduleUpdateWithPriorityLua(function(dt)
         launcher_scene:update(dt)

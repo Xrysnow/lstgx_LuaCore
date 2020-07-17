@@ -31,13 +31,6 @@ local function createListItem(lb, btn)
     return createItem(cc.size(_item_w, _item_h), nil, nil, 20, lb, btn)
 end
 
-local _titles = {
-    dif    = '选择难度',
-    player = '选择自机',
-    stage  = '选择关卡',
-    spell  = '选择符卡',
-    replay = '选择录像',
-}
 local contents = {
     game     = { 'dif', 'player' },
     practice = { 'dif', 'player', 'stage' },
@@ -66,7 +59,9 @@ end
 local function setList(mode)
     assert(_list_title and _list_scv and current_content)
     _list_scv:removeAllChildren()
-    _list_title:setString(_titles[mode])
+    local list_title_data = require('platform.launcher_ui2_data').list_title
+    _list_title:setString(i18n(list_title_data[mode]))
+
     if mode == 'dif' then
         local ranks, rank_names = game_content.enumRanks()
         for i, v in ipairs(ranks) do
@@ -188,22 +183,27 @@ end
 local function setPrevNext(pos)
     lc.next_content:setVisible(true)
     lc.next_btn:setEnabled(true)
+    local label_data = require('platform.launcher_ui2_data').button_label
+    local str_prev = i18n(label_data.prev)
+    local str_next = i18n(label_data.next)
+    local str_start = i18n(label_data.start)
+    lc.prev_lb:setString(str_prev)
     if pos == 'first' then
         lc.prev_content:setVisible(false)
         lc.prev_btn:setEnabled(false)
-        lc.next_lb:setString('下一步')
+        lc.next_lb:setString(str_next)
     elseif pos == 'last' then
         lc.prev_content:setVisible(true)
         lc.prev_btn:setEnabled(true)
-        lc.next_lb:setString('开始')
+        lc.next_lb:setString(str_start)
     elseif pos == 'only' then
         lc.prev_content:setVisible(false)
         lc.prev_btn:setEnabled(false)
-        lc.next_lb:setString('开始')
+        lc.next_lb:setString(str_start)
     else
         lc.prev_content:setVisible(true)
         lc.prev_btn:setEnabled(true)
-        lc.next_lb:setString('下一步')
+        lc.next_lb:setString(str_next)
     end
 end
 
@@ -218,6 +218,18 @@ local function CreateLauncher2UI()
         launcher_scene:setName('launcher_scene')
         lc = getChildrenWithName(launcher_scene)
         unsel_btns()
+
+        local title_data = require('platform.launcher_ui2_data').title
+        for k, v in pairs(lc) do
+            if string.starts_with(k, 'button_') then
+                local name = k:sub(8)
+                local lb = v:getChildren()[2]
+                local s = title_data[name]
+                if s and lb then
+                    lb:setString(i18n(s))
+                end
+            end
+        end
 
         --SystemLog(stringify(_sc_table))
         lc.caption_lb:setDimensions(480, 40)
