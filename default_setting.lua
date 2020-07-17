@@ -66,13 +66,20 @@ local M = {
     imgui_visible  = false,
     xe             = {
         frame_size             = { 1280, 720 },
+        -- editor
         auto_save              = true,
         editor_tree_padding    = 0,
         editor_tree_indent     = nil,
+        prop_se_play           = true,
+        -- debug
         cheat                  = false,
+        debug_sc_current_only  = false,
+        -- project
         pack_to_engine_path    = false,
+        -- code
         code_editor_font_scale = 100,
         code_editor_theme      = 'Light',
+        -- UI
         theme                  = 'Light',
     }
 }
