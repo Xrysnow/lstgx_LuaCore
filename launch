@@ -99,9 +99,9 @@ else
 end
 print = Print
 
-if plus.isDesktop() then
-    require('imgui.__init__')
-end
+--if plus.isDesktop() then
+require('imgui.__init__')
+--end
 
 local setting_util = require('setting_util')
 local str = Serialize(default_setting)
