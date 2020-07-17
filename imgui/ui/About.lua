@@ -4,43 +4,21 @@ local M = class('im.About', base)
 local im = imgui
 local wi = base
 local _platform = {
-    'Windows',
-    'Linux',
-    'macOS',
-    'Android',
-    'iPhone',
-    'iPad',
-    'BlackBerry',
-    'NACL',
-    'Emscripten',
-    'Tizen',
-    'WinRT',
-    'WP8', }
+    'Windows', 'Linux', 'macOS', 'Android', 'iPhone', 'iPad',
+    'BlackBerry', 'NACL', 'Emscripten', 'Tizen', 'WinRT', 'WP8', }
 local _languages = {
-    'english',
-    'chinese',
-    'french',
-    'italian',
-    'german',
-    'spanish',
-    'dutch',
-    'russian',
-    'korean',
-    'japanese',
-    'hungarian',
-    'portuguese',
-    'arabic',
-    'norwegian',
-    'polish',
-    'turkish',
-    'ukrainian',
-    'romanian',
-    'bulgarian',
-    'belarusian', }
+    'english', 'chinese', 'french', 'italian', 'german',
+    'spanish', 'dutch', 'russian', 'korean', 'japanese',
+    'hungarian', 'portuguese', 'arabic', 'norwegian', 'polish',
+    'turkish', 'ukrainian', 'romanian', 'bulgarian', 'belarusian', }
 
-function M:ctor()
+function M:ctor(isPopup)
     base.ctor(self)
     self._setting = setting.xe
+    if isPopup == nil then
+        isPopup = true
+    end
+    self._isPopup = isPopup
     local app = cc.Application:getInstance()
     local platform = _platform[app:getTargetPlatform() + 1]
     local lang = _languages[app:getCurrentLanguage() + 1] or 'unknown'
@@ -53,7 +31,9 @@ function M:ctor()
     local d = M._data
     self:addChild(function()
         local hh = -im.getFrameHeightWithSpacing()
-        --local ww = im.getWindowContentRegionWidth()
+        if not isPopup then
+            hh = -1
+        end
 
         if im.beginChildFrame(im.getID('lstg.about'), im.vec2(-1, hh)) then
             im.setWindowFontScale(1.5)
@@ -77,19 +57,25 @@ function M:ctor()
         end
     end)
 
-    local ok = wi.Button('OK', function()
-        self:setVisible(false)
-    end)
-    self:addChildren(ok)
+    if isPopup then
+        local ok = wi.Button('OK', function()
+            self:setVisible(false)
+        end)
+        self:addChildren(ok)
+    end
 end
 
 local _id = 'About'
 function M:_handler()
-    im.setNextWindowSize(im.vec2(350, 350), im.Cond.Once)
-    im.openPopup(_id)
-    if im.beginPopupModal(_id) then
+    if self._isPopup then
+        im.setNextWindowSize(im.vec2(350, 350), im.Cond.Once)
+        im.openPopup(_id)
+        if im.beginPopupModal(_id) then
+            wi._handler(self)
+            im.endPopup()
+        end
+    else
         wi._handler(self)
-        im.endPopup()
     end
 end
 
@@ -103,6 +89,12 @@ function M:show()
     end
     self:setVisible(true)
     return self
+end
+
+function M.createWindow(...)
+    local ret = require('imgui.widgets.Window')(...)
+    ret:addChild(M(false))
+    return ret
 end
 
 M._data = {
