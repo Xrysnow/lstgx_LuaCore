@@ -53,7 +53,10 @@ function M.load(target, docking, no_tool, no_font)
         la:addChild(require('imgui.ui.StyleSetting')('Setting'):setContentSize(cc.size(500, 500)))
         la:addChild(require('imgui.ui.VariableWatch').createWindow('Watch'):setContentSize(cc.size(500, 500)))
         la:addChild(require('imgui.lstg.GameInfo')('Game Info'):setContentSize(cc.size(500, 500)))
+        la:addChild(require('imgui.ui.About').createWindow('About'):setContentSize(cc.size(500, 500)))
     end
+    -- disable navigation
+    im.configFlagDisable(im.ConfigFlags.NavEnableKeyboard, im.ConfigFlags.NavEnableGamepad)
     im.setVisible(setting.imgui_visible)
 end
 
