@@ -139,13 +139,9 @@ function M:onCreate()
         im.endToLua()
     end)
     dock:addTo(la)
-    --TODO
+
     local menu_bar = wi.MenuBar()
-    local menu = wi._begin_end_wrapper(im.beginMenu, im.endMenu, { 'File' })
-    dock:addChildChain(menu_bar, menu, function()
-        im.menuItem('1')
-        im.menuItem('22')
-    end)
+    dock:addChildChain(menu_bar, M._menu)
 
     self._editor = require('xe.win.SceneEditor')()
     la:addChild(self._editor)
@@ -156,10 +152,10 @@ function M:onCreate()
     self._output = require('xe.win.Output')()
     la:addChild(self._output)
 
-    self._watch = require('imgui.ui.VariableWatch').createWindow('Watch')
+    self._watch = require('imgui.ui.VariableWatch').createWindow('Watch##xe')
     la:addChild(self._watch)
 
-    self._console = require('imgui.ui.Console').createWindow('Console')
+    self._console = require('imgui.ui.Console').createWindow('Console##xe')
     la:addChild(self._console)
 
     self._assets = require('xe.assets.AssetsManager')()
@@ -175,19 +171,62 @@ function M:onCreate()
     self:_addDialog(self._newproj)
 
     self._game_log = require('imgui.ui.LogWindow')()
-    local win = require('imgui.widgets.Window')('Log')
+    local win = require('imgui.widgets.Window')('Log##xe')
     la:addChild(win:addChild(self._game_log))
 
     im.styleColorsLight()
     self._setting:_applyTheme(setting.xe.theme)
     im.getStyle().FrameBorderSize = 1
 
-    --require('xe.input.code_lua_doc')
+    self._about = require('imgui.ui.About')()
+    self:_addDialog(self._about)
+
     la:addChild(M._handleGlobalKeyboard)
+
+    --la:addChild(im.showDemoWindow)
+    --la:addChild(im.showStyleEditor)
+    --la:addChild(implot.showDemoWindow)
+
+    local e = cc.EventListenerKeyboard()
+    e:registerScriptHandler(function(k, ev)
+        M._kbCode = k
+    end, cc.Handler.EVENT_KEYBOARD_PRESSED)
+    e:registerScriptHandler(function(k, ev)
+        M._kbCode = nil
+    end, cc.Handler.EVENT_KEYBOARD_RELEASED)
+    cc.Director:getInstance():getEventDispatcher():addEventListenerWithFixedPriority(e, 1)
 end
 
 function M:_addDialog(v)
     v:setVisible(false):addTo(self._la)
+end
+
+function M._menu()
+    local tool = require('xe.ToolMgr')
+    local opened = require('xe.Project').getFile() and true or false
+    local data = require('xe.menu.data')
+    for _, v in ipairs(data) do
+        if v.title and im.beginMenu(v.title) then
+            for _, item in ipairs(v.content) do
+                local f = tool[item.event or '']
+                local enabled = opened or not item.need_proj
+                if im.menuItem(i18n(item.title), item.shortcut, false, enabled) and f then
+                    f()
+                end
+            end
+            im.endMenu()
+        end
+    end
+    --local fsz = glv:getFrameSize()
+    --im.text(('(%d, %d)'):format(fsz.width, fsz.height))
+    if require('cocos.framework.device').isMobile then
+        local pos = im.getIO().MousePos
+        if M._kbCode then
+            im.text(('Key(%d)'):format(M._kbCode))
+        end
+        local dl = im.getForegroundDrawList()
+        dl:addCircle(pos, 10, 0xff0000ff)
+    end
 end
 
 function M.hideProperty()
