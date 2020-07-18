@@ -38,3 +38,8 @@ end
 function math.quat(...)
     return math.Quat(...)
 end
+
+local util = require('math._util')
+util.swizzleVec(math.Vec2, 'x', 'y')
+util.swizzleVec(math.Vec3, 'x', 'y', 'z')
+util.swizzleVec(math.Vec4, 'x', 'y', 'z', 'w')
