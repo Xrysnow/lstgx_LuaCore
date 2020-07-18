@@ -9,7 +9,6 @@ function M:ctor(...)
     self.plot = {}
     self.plotTargets = {}
     self.plotBufSize = 60
-    self.plotBufTrimSize = 600
 
     local dir = cc.Director:getInstance()
     self:setPlot('Frame Time', {
@@ -109,6 +108,22 @@ function M:ctor(...)
             return t * 1000
         end,
     })
+    self:setPlot('Lua Memory', {
+        label     = '',
+        overlay   = function(v)
+            return string.format('%.2fMB', v)
+        end,
+        min       = 0,
+        max       = 10,
+        min_range = { 0, 50 },
+        max_range = { 0, 50 },
+        buffer    = {},
+        offset    = 0,
+        size      = cc.p(0, 64),
+        source    = function()
+            return collectgarbage('count') / 1024
+        end,
+    })
     self.plotTargets = {
         'Frame Time',
         'FPS',
@@ -116,6 +131,7 @@ function M:ctor(...)
         'Game Object Frame Time',
         'Game Object Render Time',
         'Render Time',
+        'Lua Memory',
     }
 end
 
@@ -142,26 +158,11 @@ end
 
 function M:resetPlotBuffer(key)
     local buf = {}
-    for _ = 1, self.plotBufSize do
-        table.insert(buf, 0)
+    for i = 1, self.plotBufSize do
+        buf[i] = 0
     end
     local p = self.plot[key]
     p.buffer = buf
-    p.offset = 0
-    assert(#p.buffer == self.plotBufSize)
-end
-
-function M:trimPlotBuffer(key)
-    local p = self.plot[key]
-    if not p then
-        return
-    end
-    local buf = p.buffer
-    local new = {}
-    for i = p.offset + 1, #buf do
-        table.insert(new, buf[i])
-    end
-    p.buffer = new
     p.offset = 0
 end
 
@@ -171,10 +172,10 @@ function M:addPlotPoint(key, val)
         self:resetPlot(key)
         p = self.plot[key]
     end
-    table.insert(p.buffer, val)
     p.offset = p.offset + 1
-    if #p.buffer > self.plotBufTrimSize then
-        self:trimPlotBuffer(key)
+    p.buffer[p.offset] = val
+    if p.offset >= self.plotBufSize then
+        p.offset = 0
     end
 end
 
@@ -186,16 +187,19 @@ function M:_renderPlot(key)
     end
     local label = p.label
     local buf = p.buffer
+    local offset = p.offset
     if type(label) == 'function' then
-        label = label(buf[#buf])
+        label = label(buf[offset + 1])
     end
     local overlay = p.overlay
     if type(p.overlay) == 'function' then
-        overlay = overlay(buf[#buf])
+        overlay = overlay(buf[offset + 1])
     end
-    local data = { unpack(p.buffer, 1 + p.offset, #buf) }
     im.pushID(tostring(key))
-    im.plotLines(unpack({ label, data, 0, overlay, p.min, p.max, p.size }))
+    im.plotLines(unpack({ label, buf, #buf, offset,
+                          overlay, p.min, p.max, p.size }))
+    --im.plotLines(unpack({ label, buf, #buf, 0,
+    --                      overlay, p.min, p.max, p.size }))
     local ret
     local minr = p.min_range
     local maxr = p.max_range
