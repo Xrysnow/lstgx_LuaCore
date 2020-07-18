@@ -118,13 +118,6 @@ function M.paste()
     end
 end
 
-function M.setting()
-    --if not proj.getFile() then
-    --    return
-    --end
-    require('xe.setting.Setting').show()
-end
-
 function M.build(debugStage, debugSC)
     if not proj.getFile() then
         return
@@ -284,6 +277,14 @@ function M.moveUp()
     if cur then
         cur:moveUp()
     end
+end
+
+function M.setting()
+    require('xe.setting.Setting').show()
+end
+
+function M.about()
+    require('imgui.ui.About').show()
 end
 
 return M
