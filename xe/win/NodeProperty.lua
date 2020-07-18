@@ -88,6 +88,18 @@ function M:showNode(node)
     --]]
 end
 
+function M:hasError()
+    if self._mode ~= 'editor' then
+        return false
+    end
+    for _, v in ipairs(self._setters) do
+        if v._error then
+            return true
+        end
+    end
+    return false
+end
+
 function M:setEditor()
     if self._mode == 'editor' then
         return
