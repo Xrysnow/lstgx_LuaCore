@@ -81,7 +81,6 @@ function M.regist()
             end
         end
         if v.watch then
-            --Tree.watch[v.watch] = {}
             helper.watch[v.watch] = {}
         end
     end
