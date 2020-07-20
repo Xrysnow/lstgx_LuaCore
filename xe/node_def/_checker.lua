@@ -212,7 +212,7 @@ function M.AddPackRes(path, name, check, from_type)
     if not M.CheckResFileInPack(fn) then
         return i18n(err_str.dup_res, fn)
     end
-    require('xe.Project').addPackRes(absfn, 'loadbgm')
+    require('xe.Project').addPackRes(absfn, from_type)
 end
 
 function M.AddPackBgm(path, name, from_type)
@@ -227,7 +227,7 @@ function M.AddPackBgm(path, name, from_type)
         if not M.CheckResFileInPack(fn) then
             return i18n(err_str.dup_res, fn)
         end
-        require('xe.Project').addPackRes(absfn, 'loadbgm')
+        require('xe.Project').addPackRes(absfn, from_type)
     else
         if M.checkBgmName[name] ~= path then
             return i18n(err_str.dup_res, name)
