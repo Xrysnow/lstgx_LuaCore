@@ -180,7 +180,7 @@ local enemysimple = {
         for i = 1, 10 do
             attr[i] = nodedata.attr[i]
         end
-        return string.format("New(EnemySimple, %s, %s, %s, {%s, %s, %s}, %s, %s, %s, %s, function(self)\n",
+        return string.format("last = New(EnemySimple, %s, %s, %s, {%s, %s, %s}, %s, %s, %s, %s, function(self)\n",
                              unpack(attr))
     end,
     tofoot       = function(nodedata)

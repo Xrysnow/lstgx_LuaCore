@@ -148,21 +148,21 @@ repeat_ = {
         for i = 2, 11, 3 do
             if not IsBlank(attr[i]) then
                 ret = ret .. string.format(
-                        "    local %s, %s = (%s), (%s) ",
+                        "\tlocal %s, %s = (%s), (%s)\n",
                         attr[i], "_d_" .. attr[i], attr[i + 1], attr[i + 2])
             end
         end
-        return ret .. "    for _ = 1, " .. nodedata.attr[1] .. " do\n"
+        return ret .. "\tfor _ = 1, " .. nodedata.attr[1] .. " do\n"
     end,
     tofoot       = function(nodedata)
         local ret = ""
         local attr = nodedata.attr
         for i = 2, 11, 3 do
             if not IsBlank(attr[i]) then
-                ret = ret .. string.format("%s = %s + %s ", attr[i], attr[i], "_d_" .. attr[i])
+                ret = ret .. string.format("\t\t%s = %s + %s\n", attr[i], attr[i], "_d_" .. attr[i])
             end
         end
-        return ret .. "    end\nend\n"
+        return ret .. "\tend\nend\n"
     end,
     depth        = 2,
 }
