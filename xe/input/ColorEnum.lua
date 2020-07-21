@@ -3,7 +3,7 @@ local base = require('xe.input.Base')
 local M = class('xe.input.ColorEnum', base)
 local im = imgui
 local wi = require('imgui.Widget')
-local path = 'xe/color_enum/'
+local cache = cc.Director:getInstance():getTextureCache()
 local colors = {
     COLOR_DEEP_RED      = 1,
     COLOR_RED           = 2,
@@ -37,10 +37,12 @@ function M:ctor(node, idx)
     self._value = value
     self._sel = colors[value]
 
+    local tex = cache:addImage('xe/color_enum.png')
     local images = {}
     for i, v in ipairs(colors) do
-        local f = path .. v .. '.png'
-        local sp = cc.Sprite(f)
+        local xx = (i - 1) % 4 * 64
+        local yy = math.floor((i - 1) / 4) * 64
+        local sp = cc.Sprite:createWithTexture(tex, cc.rect(xx, yy, 64, 64))
         sp:addTo(self):setVisible(false)
         images[i] = sp
     end
