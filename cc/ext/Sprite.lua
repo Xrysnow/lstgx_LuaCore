@@ -38,3 +38,9 @@ function Sprite:createWithRawData(b, width, height, bitsPerComponent, preMulti)
     tex:initWithImage(img)
     return cc.Sprite:createWithTexture(tex)
 end
+
+--- clone sprite
+---@return cc.Sprite
+function Sprite:clone()
+    return cc.Sprite:createWithSpriteFrame(self:getSpriteFrame())
+end
