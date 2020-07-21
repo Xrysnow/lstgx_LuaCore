@@ -6,10 +6,16 @@ M.watch = watch
 watch.image = {}
 
 ---@param node xe.SceneNode
-function M.ClearWatch(node)
+function M.removeWatch(node)
     local watch = node:getConfig().watch
     if watch then
         M.watch[watch][node] = nil
+    end
+end
+
+function M.clearWatch()
+    for k, v in pairs(watch) do
+        watch[k] = {}
     end
 end
 

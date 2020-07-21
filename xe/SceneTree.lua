@@ -441,7 +441,7 @@ function M:onSelChanged(next_node)
 end
 
 function M:onDelete(node)
-    require('xe.TreeHelper').ClearWatch(node)
+    require('xe.TreeHelper').removeWatch(node)
 end
 
 function M:copyCurrent()
@@ -571,13 +571,15 @@ function M:compile(debugCur, debugSC)
         watchDict[key] = {}
         if key == "sound" then
             for node, _ in pairs(wdata) do
-                assert(node.getAttrValue, ('invalid object in watch: %s'):format(getclassname(node)))
+                assert(node.getAttrValue,
+                       ('invalid object in watch %s: %s'):format(key, getclassname(node)))
                 local k = node:getAttrValue(2)
                 watchDict[key][k] = true
             end
         elseif key ~= 'image' then
             for node, _ in pairs(wdata) do
-                assert(node.getAttrValue, ('invalid object in watch: %s'):format(getclassname(node)))
+                assert(node.getAttrValue,
+                       ('invalid object in watch %s: %s'):format(key, getclassname(node)))
                 local k = node:getAttrValue(1)
                 watchDict[key][k] = true
             end
@@ -678,6 +680,7 @@ end
 function M:reset()
     self:getRoot():deleteAllChildren()
     get_prop():showNode(nil)
+    require('xe.TreeHelper').clearWatch()
 end
 
 function M:setDirty(v)
