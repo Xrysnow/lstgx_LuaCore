@@ -9,7 +9,7 @@ function M:ctor(title)
 end
 
 function M:addContent(icon, tooltip, cb)
-    local sp = cc.Sprite(icon)
+    local sp = icon
     local btn, btn_disable = require('xe.util').createButton(sp, 2)
     self:addChild(btn):addChild(btn_disable)
     if cb then

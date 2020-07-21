@@ -20,7 +20,7 @@ function M:ctor()
     for _, v in ipairs(data) do
         local tab = self:_createTab(v.label)
         for i, item in ipairs(v.content) do
-            local icon = 'xe/node/' .. item.bitmap
+            local icon = require('xe.node.icon').getIcon(string.filename(item.bitmap))
             assert(item.name:sub(1, 7) == 'Insert_')
             local name = item.name:sub(8)
             local function f()

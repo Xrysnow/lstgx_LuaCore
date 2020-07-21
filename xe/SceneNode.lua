@@ -8,7 +8,7 @@ local DeSerialize = require('xe.TreeHelper').DeSerialize
 local nodeType = require('xe.node_def._def').getNodeType()
 
 local function _get_icon(type)
-    return string.format('xe/node_small/%s.png', type)
+    return require('xe.node.icon').getSmallIcon(type)
 end
 
 function M:ctor(type)
@@ -28,9 +28,8 @@ function M:ctor(type)
     self:setOnDelete(function()
         self:getView():onSelChanged(nil)
     end)
-    local icon = _get_icon(type)
     --TODO: should no put here
-    self._icon = cc.Sprite(icon)
+    self._icon = _get_icon(type)
     if self._icon then
         self._icon:addTo(self):setVisible(false)
     end
@@ -41,8 +40,6 @@ function M:ctor(type)
             v:setDirty(true)
         end
     end
-
-    --TODO: right click
 end
 
 local _ignore = { type = true, attr = true, child = true }
