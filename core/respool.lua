@@ -694,6 +694,7 @@ local _temp_rt = '::temp_rt::'
 --- 开始捕获绘制数据
 --- 从这一步开始，所有后续渲染操作都将在PostEffect缓冲区中进行
 --- 这一操作等价于PushRenderTarget(InternalPostEffectBuffer)
+---@deprecated
 function PostEffectCapture()
     assert(FindResRenderTarget(_temp_rt):push())
 end
@@ -710,6 +711,7 @@ end
 ---@param fx lstg.ResFX|string
 ---@param blend_mode lstg.RenderMode|string
 ---@param param table 其中key表示uniform变量名，value可以是数值、字符串（纹理名）、颜色
+---@deprecated
 function PostEffectApply(fx, blend_mode, param)
     fx = FindResFX(fx)
     _setResFX(fx, param or {})

@@ -1,4 +1,4 @@
---
+---@class math.hull
 local M = {}
 local vec2 = require('math.vec2')
 local intersection = require('math.intersection')
@@ -50,6 +50,9 @@ local function point_in_polygon(point, polygon)
     return false
 end
 
+---
+---@param points math.vec2[]
+---@param k number
 function M.concave(points, k)
     k = k or 3
     local size = #points
@@ -136,6 +139,8 @@ local function cross(o, a, b)
     return (ax - ox) * (by - oy) - (ay - oy) * (bx - ox)
 end
 
+---
+---@param points math.vec2[]
 function M.convex(points)
     if #points <= 1 then
         return points

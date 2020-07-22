@@ -1,5 +1,5 @@
 --- collision check
----@class x.collision
+---@class math.collision
 local M = {}
 local intersect = require('math.intersection')
 local vec2 = require('math.vec2')

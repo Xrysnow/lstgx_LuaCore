@@ -1,5 +1,5 @@
----@class geo.base
-local M = class('geo.base')
+---@class math.geometry
+local M = class('math.geometry')
 local mat4 = require('math.mat4')
 local vec3 = require('math.vec3')
 local sqrt = math.sqrt

@@ -20,7 +20,7 @@ local SG_MAGICCONST = 1.0 + log(4.5)
 --local BPF = 53        -- Number of bits in a float
 --local RECIP_BPF = pow(2, -BPF)
 
----@class x.random
+---@class math.Random
 local M = {}
 
 -------------------- integer methods  -------------------

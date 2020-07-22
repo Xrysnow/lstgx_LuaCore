@@ -11,6 +11,7 @@ local math = math
 -- c: total delta
 -- d: total step
 --
+---@class math.tween
 local M = {}
 
 function M.linear(t, b, c, d)

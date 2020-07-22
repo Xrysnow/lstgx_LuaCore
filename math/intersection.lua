@@ -1,5 +1,5 @@
 --- intersection between two geometries
----@class x.intersection
+---@class math.intersection
 local M = {}
 local vec2 = require('math.vec2')
 local distance = require('math.distance_point')

@@ -40,7 +40,7 @@ end
 ---@param t object
 ---@param src table
 ---@param default table
----@param isclone boolean @will use table.clone(src) if this is true.
+---@param isclone boolean will use table.clone(src) if this is true.
 function table.deploy(t, src, default, isclone)
     if default then
         for k, v in pairs(default) do

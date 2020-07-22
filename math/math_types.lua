@@ -105,7 +105,6 @@ local function chars2uint(c)
 end
 
 ---
----@class math.Int
 local Int = {}
 M.Int = Int
 
@@ -142,7 +141,6 @@ end
 
 ---
 ---## Better use with ctype.
----@class math.Int64
 local Int64 = {}
 M.Int64 = Int64
 
@@ -181,7 +179,6 @@ function Int64.fromhex(h)
 end
 
 ---
----@class math.UInt
 local UInt = {}
 M.UInt = UInt
 
@@ -214,7 +211,6 @@ end
 
 ---
 ---## Better use with ctype.
----@class math.UInt64
 local UInt64 = {}
 M.UInt64 = UInt64
 
@@ -250,7 +246,6 @@ end
 
 ---
 ---## Possible loss of precision, be careful.
----@class math.Float
 local Float = {}
 M.Float = Float
 
@@ -296,7 +291,6 @@ function Float.fromhex(h)
 end
 
 ---
----@class math.Double
 local Double = {}
 M.Double = Double
 
