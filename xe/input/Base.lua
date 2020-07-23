@@ -28,12 +28,16 @@ function M:getType()
     return self._type
 end
 
-function M:submit(value)
+function M:_setNodeValue(value)
     if value == nil then
         value = self:getValue()
     end
     self._node:setAttrEditType(self._idx, self._type)
     self._node:setAttrEditValue(self._idx, self._type, value)
+end
+
+function M:submit(value)
+    self:_setNodeValue(value)
     require('xe.SceneTree').submit()
     self:_checkValid()
 end
