@@ -57,7 +57,8 @@ function M.load(target, docking, no_tool, no_font)
     end
     -- disable navigation
     im.configFlagDisable(im.ConfigFlags.NavEnableKeyboard, im.ConfigFlags.NavEnableGamepad)
-    im.setVisible(setting.imgui_visible)
+    --im.setVisible(setting.imgui_visible)
+    la:setVisible(setting.imgui_visible)
 end
 
 function M.loadFont()
