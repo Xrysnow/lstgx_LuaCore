@@ -32,10 +32,17 @@ function M:ctor(node, idx, labels)
             wi.propertyHeader(label, self, '')
         end):addChild(im.nextColumn):addChild(input)
         self:addChild(function()
-            if im.isItemDeactivatedAfterEdit() then
+            local edit = im.isItemEdited()
+            local editFinish = im.isItemDeactivatedAfterEdit()
+            if edit or editFinish then
                 self._val[i] = input:getString()
                 self:_updateValue()
-                self:submit()
+                if editFinish then
+                    self:submit()
+                elseif edit then
+                    self:_setNodeValue()
+                    self:_checkValid()
+                end
             end
         end)
         if i < 2 then
