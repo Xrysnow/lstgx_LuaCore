@@ -35,6 +35,11 @@ function M:onCreate()
     self._la = la
 
     setting.xe = setting.xe or {}
+    ChangeVideoMode(
+            setting.windowsize_w,
+            setting.windowsize_h,
+            true,
+            setting.vsync)
 
     cc.Director:getInstance():setDisplayStats(false)
 
