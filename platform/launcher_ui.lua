@@ -157,6 +157,7 @@ local function setGraph(lc)
         tg:addEventListener(function(t, e)
             if e == 0 then
                 setting.res_ratio = v
+                setting.windowsize_w = math.ceil(setting.windowsize_h * ratio / 2) * 2
                 if plus.isDesktop() then
                     --glv:setFrameSize(setting.windowsize_w, setting.windowsize_h)
                     ChangeVideoMode(
@@ -351,14 +352,21 @@ local function setOthers(lc)
 
         lc.winsize_content:setVisible(false)
     else
+        local function applyVideoMode()
+            local ratio = 16 / 9
+            if setting.res_ratio then
+                ratio = setting.res_ratio[1] / setting.res_ratio[2]
+            end
+            setting.windowsize_w = math.ceil(setting.windowsize_h * ratio / 2) * 2
+            ChangeVideoMode(
+                    setting.windowsize_w,
+                    setting.windowsize_h,
+                    setting.windowed,
+                    setting.vsync)
+        end
         local tgname = 'winsize_tg'
         --glv:setFrameSize(setting.windowsize_w, setting.windowsize_h)
-        ChangeVideoMode(
-                setting.windowsize_w,
-                setting.windowsize_h,
-                setting.windowed,
-                setting.vsync
-        )
+        applyVideoMode()
         for i, v in ipairs({ 960, 720, 480 }) do
             local tg = lc[tgname .. i]
             if setting.windowsize_h == v and setting.windowed then
@@ -366,15 +374,10 @@ local function setOthers(lc)
             end
             tg:addEventListener(function(t, e)
                 if e == 0 then
-                    setting.windowsize_h = v
                     --glv:setFrameSize(setting.windowsize_w, v)
+                    setting.windowsize_h = v
                     setting.windowed = true
-                    ChangeVideoMode(
-                            setting.windowsize_w,
-                            v,
-                            setting.windowed,
-                            setting.vsync
-                    )
+                    applyVideoMode()
                 end
             end)
         end
@@ -386,12 +389,7 @@ local function setOthers(lc)
             if e == 0 then
                 --glv:setFrameSize(setting.windowsize_w, v)
                 setting.windowed = false
-                ChangeVideoMode(
-                        setting.windowsize_w,
-                        setting.windowsize_h,
-                        setting.windowed,
-                        setting.vsync
-                )
+                applyVideoMode()
             end
         end)
 
@@ -450,7 +448,7 @@ local function CreateLauncherUI()
             end
         end
         if label_data[k] then
-            v:setString(label_data[k].en)
+            v:setString(i18n(label_data[k]))
         end
     end
 
@@ -524,7 +522,6 @@ local function CreateLauncherUI()
         end
         _lb:setString(pminfo)
         ]]
-
     end
     launcher_scene:scheduleUpdateWithPriorityLua(function(dt)
         launcher_scene:update(dt)
