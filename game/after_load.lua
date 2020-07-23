@@ -62,6 +62,7 @@ lstg.eventDispatcher:addListener('ui.DrawFrame', function()
     _timer = _timer + 1
 
     Render('stage_bg', 320, 240, 0, 0.5)
+
     SetImageState('white', '', color.Red)
     local w = lstg.world
     local l, r, b, t = w.scrl, w.scrr, w.scrb, w.scrt
@@ -76,8 +77,8 @@ lstg.eventDispatcher:addListener('ui.DrawFrame', function()
     local dt = sw:get() * 1000
     sw:reset()
     local fps = calcFPS(dt)
-    --[[
     local str = ''
+    --[[
     local t_sum = 0
     for i, v in ipairs(pros) do
         local tt = profiler.getAverage(v)
