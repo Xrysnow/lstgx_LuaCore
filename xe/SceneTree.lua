@@ -467,8 +467,8 @@ function M:pasteToCurrent()
             cp = cp:sub(8, -1)
             local f = require('xe.SceneNode').deserialize
             local node_ctor = f(cp)
-            if not f(cp) then
-                log('Failed to deserialize node', 'error')
+            if not node_ctor then
+                log('failed to deserialize node', 'error')
                 return
             end
             return self:insertCurrent(node_ctor)
