@@ -1,9 +1,5 @@
 --
 local M = {
-    --any              = {},
-    --resfile          = {},
-    --bool             = { 'false', 'true' },
-    --['for']          = { 'i', 'j', 'k', 'l', 'm', 'n' },
     movetomode = { 'MOVE_NORMAL', 'MOVE_ACCEL', 'MOVE_DECEL', 'MOVE_ACC_DEC' },
     directmode = { "MOVE_X_TOWARDS_PLAYER", "MOVE_Y_TOWARDS_PLAYER", "MOVE_TOWARDS_PLAYER", "MOVE_RANDOM" },
     --bulletstyle      = {
@@ -29,11 +25,6 @@ local M = {
     --object           = { "player", "_boss", "self", "nil" },
     --calculus         = { "RECTANGULAR", "POLAR" },
     --direct           = { "clockwise", "anticlockwise" },
-    --sound            = {},
-    --image            = {},
-    --selecttype       = {},
-    --param            = {},
-    --typename         = {},
     difficulty = { '1', '2', '3', '4', '5' },
     stagegroup = { 'Easy', 'Normal', 'Hard', 'Lunatic', 'Extra' },
     --selectenemystyle = {},
@@ -42,30 +33,14 @@ local M = {
     item       = { 'item_power', 'item_faith', 'item_point', 'item_power_large', 'item_power_full', 'item_faith_minor',
                    'item_extend', 'item_chip', 'item_bomb', 'item_bomb_chip' },
     layer      = {
-        'LAYER_BG',
-        'LAYER_BG+1',
-        'LAYER_BG-1',
-        'LAYER_ENEMY',
-        'LAYER_ENEMY+1',
-        'LAYER_ENEMY-1',
-        'LAYER_PLAYER_BULLET',
-        'LAYER_PLAYER_BULLET+1',
-        'LAYER_PLAYER_BULLET-1',
-        'LAYER_PLAYER',
-        'LAYER_PLAYER+1',
-        'LAYER_PLAYER-1',
-        'LAYER_ITEM',
-        'LAYER_ITEM+1',
-        'LAYER_ITEM-1',
-        'LAYER_ENEMY_BULLET',
-        'LAYER_ENEMY_BULLET+1',
-        'LAYER_ENEMY_BULLET-1',
-        'LAYER_ENEMY_BULLET_EF',
-        'LAYER_ENEMY_BULLET_EF+1',
-        'LAYER_ENEMY_BULLET_EF-1',
-        'LAYER_TOP',
-        'LAYER_TOP+1',
-        'LAYER_TOP-1',
+        'LAYER_BG', 'LAYER_BG+1', 'LAYER_BG-1',
+        'LAYER_ENEMY', 'LAYER_ENEMY+1', 'LAYER_ENEMY-1',
+        'LAYER_PLAYER_BULLET', 'LAYER_PLAYER_BULLET+1', 'LAYER_PLAYER_BULLET-1',
+        'LAYER_PLAYER', 'LAYER_PLAYER+1', 'LAYER_PLAYER-1',
+        'LAYER_ITEM', 'LAYER_ITEM+1', 'LAYER_ITEM-1',
+        'LAYER_ENEMY_BULLET', 'LAYER_ENEMY_BULLET+1', 'LAYER_ENEMY_BULLET-1',
+        'LAYER_ENEMY_BULLET_EF', 'LAYER_ENEMY_BULLET_EF+1', 'LAYER_ENEMY_BULLET_EF-1',
+        'LAYER_TOP', 'LAYER_TOP+1', 'LAYER_TOP-1',
     },
     group      = {
         'GROUP_GHOST',
@@ -88,5 +63,15 @@ local M = {
         'mul+add', 'mul+alpha', 'add+add', 'add+alpha', 'mul+sub', 'mul+rev', 'add+sub', 'add+rev',
     },
 }
+
+local tween_type = {}
+for k, v in pairs(math.tween) do
+    if k ~= 'linear' then
+        table.insert(tween_type, k)
+    end
+end
+table.sort(tween_type)
+table.insert(tween_type, 1, 'linear')
+M.tween_type = tween_type
 
 return M

@@ -1,5 +1,6 @@
 --
 local M = {}
+local enum_type = require('xe.node.enum_type')
 
 M.any = {
 }
@@ -12,11 +13,11 @@ M.audio_pan = {
 }
 M.bgstage = {
     'enum',
-    enum = require('xe.node.enum_type').bgstage
+    enum = enum_type.bgstage
 }
 M.blend = {
     'enum',
-    enum = require('xe.node.enum_type').blend
+    enum = enum_type.blend
 }
 M.bool = {
     'bool'
@@ -30,23 +31,23 @@ M.color = {
 }
 M.difficulty = {
     'enum',
-    enum = require('xe.node.enum_type').difficulty
+    enum = enum_type.difficulty
 }
 M.directmode = {
     'enum',
-    enum = require('xe.node.enum_type').directmode
+    enum = enum_type.directmode
 }
 M.event = {
     -- only used in callbackfunc
     'enum',
-    enum = require('xe.node.enum_type').event
+    enum = enum_type.event
 }
 M.gop = {
     -- game object property
 }
 M.group = {
     'enum',
-    enum = require('xe.node.enum_type').group
+    enum = enum_type.group
 }
 M.image = {
     'image'
@@ -54,19 +55,19 @@ M.image = {
 M.item = {
     -- used in dropitem
     'enum',
-    enum = require('xe.node.enum_type').item
+    enum = enum_type.item
 }
 M.layer = {
     'enum',
-    enum = require('xe.node.enum_type').layer
+    enum = enum_type.layer
 }
 M.leftright = {
     'enum',
-    enum = require('xe.node.enum_type').leftright
+    enum = enum_type.leftright
 }
 M.movetomode = {
     'enum',
-    enum = require('xe.node.enum_type').movetomode
+    enum = enum_type.movetomode
 }
 M.number = {
     --'number'
@@ -106,7 +107,7 @@ M.sound = {
 }
 M.stagegroup = {
     'enum',
-    enum = require('xe.node.enum_type').stagegroup
+    enum = enum_type.stagegroup
 }
 M.string = {
 }
@@ -116,6 +117,14 @@ M.typename = {
 }
 M.vec2 = {
     'vec2'
+}
+
+--
+
+M.tween_type = {
+    'tween_type',
+    --'enum',
+    --enum = enum_type.tween_type
 }
 
 for k, v in pairs(M) do
