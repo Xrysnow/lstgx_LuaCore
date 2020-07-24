@@ -8,7 +8,12 @@ local DeSerialize = require('xe.TreeHelper').DeSerialize
 local nodeType = require('xe.node_def._def').getNodeType()
 
 local function _get_icon(type)
-    return require('xe.node.icon').getSmallIcon(type)
+    local cfg = nodeType[type]
+    if cfg and cfg.icon then
+        return require('xe.node.icon').getSmallIcon(cfg.icon)
+    else
+        return require('xe.node.icon').getSmallIcon(type)
+    end
 end
 
 function M:ctor(type)
