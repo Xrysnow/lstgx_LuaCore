@@ -41,6 +41,13 @@ local M = {
             },
             event = 'setting',
         },
+        {
+            title = {
+                en = 'Exit',
+                zh = '退出',
+            },
+            event = 'exit',
+        },
     } },
     { title = 'Help', content = {
         {

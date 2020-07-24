@@ -35,6 +35,16 @@ function M.close()
     check_return(proj.close())
 end
 
+function M.exit()
+    if not proj.getFile() then
+        GameExit()
+    else
+        proj.close(function()
+            GameExit()
+        end)
+    end
+end
+
 --
 
 function M.merge()
@@ -184,6 +194,8 @@ function M.run()
     end
 end
 
+--
+
 function M.insertAfter()
     get_tree():setInsertPos('after')
 end
@@ -193,6 +205,8 @@ end
 function M.insertChild()
     get_tree():setInsertPos('child')
 end
+
+--
 
 local lineNum = 0
 local function count_line(s)
