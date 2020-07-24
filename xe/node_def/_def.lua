@@ -6,6 +6,12 @@ function M.DefineNode(type, def)
     nodeType[type] = def
 end
 
+function M.DefineNodes(t)
+    for k, v in pairs(t) do
+        nodeType[k] = v
+    end
+end
+
 function M.UndefineNode(type)
     nodeType[type] = nil
 end
@@ -19,30 +25,9 @@ function M.getNodeType()
 end
 
 function M.regist()
-    require('xe.node_def.audio')
-    require('xe.node_def.background')
-    require('xe.node_def.boss')
-    require('xe.node_def.boss_effect')
-    require('xe.node_def.bullet')
-    require('xe.node_def.bullet_cleaner')
-    require('xe.node_def.bullet_prefab')
-    require('xe.node_def.callbackfunc')
-    require('xe.node_def.connect')
-    require('xe.node_def.enemy')
-    require('xe.node_def.folder')
-    require('xe.node_def.language')
-    require('xe.node_def.laser')
-    require('xe.node_def.laserbent')
-    require('xe.node_def.loadres')
-    require('xe.node_def.misc')
-    require('xe.node_def.object')
-    require('xe.node_def.patch')
-    require('xe.node_def.rebounder')
-    require('xe.node_def.render_object')
-    require('xe.node_def.setter')
-    require('xe.node_def.setting')
-    require('xe.node_def.stage')
-    require('xe.node_def.task')
+    require('xe.node_def.legacy.__init__')
+    require('xe.node_def.x.__init__')
+    i18n.addDict('xe.node', require('xe.node_def._dict'))
 
     local helper = require('xe.TreeHelper')
     for k, v in pairs(nodeType) do
