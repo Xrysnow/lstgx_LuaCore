@@ -9,6 +9,7 @@ function M:ctor(node, idx)
     self._node = node
     self._idx = idx
     self._title = node:getAttrName(idx) or ''
+    self._desc = node:getAttrDesc(idx)
     local t = node:getAttrType(idx)
     local types = require('xe.node.edit_type')[t]
     assert(types and #types > 0)
@@ -187,9 +188,10 @@ function M:_handler()
     if input then
         error = input:getError()
     end
+    local desc = error or self._desc
 
     local pos1 = im.getCursorScreenPos()
-    wi.propertyHeader(self._title, self, '', { tooltip = error })
+    wi.propertyHeader(self._title, self, '', { tooltip = desc })
     im.nextColumn()
     wi._handler(self)
     local pos2 = im.getCursorScreenPos()

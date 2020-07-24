@@ -279,6 +279,15 @@ function M:getAttrName(idx)
     return tostring(self:getConfig()[idx][1])
 end
 
+local _dict
+function M:getAttrDesc(idx)
+    _dict = _dict or i18n.getDict('xe.node')
+    local desc = self:getConfig()[idx].desc
+    if _dict and desc then
+        return _dict(desc)
+    end
+end
+
 function M:collectAttrValues()
     local ret = {}
     for i = 1, self:getAttrCount() do
