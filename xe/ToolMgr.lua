@@ -273,6 +273,8 @@ function M.find()
     --TODO
 end
 
+--
+
 function M.moveDown()
     if not proj.getFile() then
         return
@@ -293,9 +295,23 @@ function M.moveUp()
     end
 end
 
+--
+
+function M.exportNode()
+    proj.exportNode()
+end
+
+function M.importNode()
+    proj.importNode()
+end
+
+--
+
 function M.setting()
     require('xe.setting.Setting').show()
 end
+
+--
 
 function M.about()
     require('imgui.ui.About').show()

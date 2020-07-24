@@ -8,14 +8,6 @@ local curProjFile
 local curProjDir
 local auto_save_counter = 1
 
---
---local function getDirFromPath(path)
---    return string.filefolder(path)
---end
----Returns the name part of the filename (without extension).
---local function getNameFromPath(path)
---    return string.filename(path, false)
---end
 local function get_tree()
     return require('xe.main').getTree()
 end
@@ -228,6 +220,8 @@ function M.new()
     end
 end
 
+--
+
 local _no_pack = {
     luastg = true, lstgxproj = true, lstgxsln = true, zip = true
 }
@@ -321,20 +315,49 @@ function M.compileToFile(path, ...)
     return true
 end
 
-function M.onQuit()
-    M.close(function()
-        GameExit()
-    end)
-end
-
-function M.launchGame(...)
-    --TODO
-    require('xe.game').start(...)
-end
-
 function M.addPackRes(path, from_type)
     print('proj addPackRes', path, from_type)
     --TODO
+end
+
+function M.launchGame(...)
+    require('xe.game').start(...)
+end
+
+--
+
+function M.exportNode()
+    if not curProjFile then
+        return
+    end
+    local str = get_tree():exportCurrent()
+    if not str then
+        -- can't export
+        return
+    end
+    local path = require('platform.FileDialog').save('lstgxnode')
+    if not path then
+        return
+    end
+    local fu = cc.FileUtils:getInstance()
+    fu:writeStringToFile(str, path)
+end
+
+function M.importNode()
+    if not curProjFile then
+        return
+    end
+    local path = require('platform.FileDialog').open('lstgxnode')
+    if not path then
+        return
+    end
+    local fu = cc.FileUtils:getInstance()
+    local str = fu:getStringFromFile(path)
+    if str == '' then
+        err('empty file')
+        return
+    end
+    get_tree():importToCurrent(str)
 end
 
 return M

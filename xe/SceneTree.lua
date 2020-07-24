@@ -476,6 +476,31 @@ function M:pasteToCurrent()
     end
 end
 
+function M:exportCurrent()
+    local cur = self:getCurrent()
+    if not M.isValid(cur) or cur:isRoot() then
+        return
+    end
+    return cur:serialize()
+end
+
+function M:importToCurrent(str)
+    local cur = self:getCurrent()
+    if not M.isValid(cur) then
+        return false
+    end
+    local t = require('xe.TreeHelper').DeSerialize(str)
+    local f = require('xe.SceneNode').deserialize
+    local node_ctor = f(t)
+    if not node_ctor then
+        -- error
+        log('failed to deserialize node', 'error')
+        return false
+    end
+    self:insertCurrent(node_ctor)
+    return true
+end
+
 function M:setTypeHint(str)
     --TODO: should be shown in property
     str = str or 'N/A'
@@ -490,7 +515,7 @@ function M:deserialize(str)
         local node = f(v)()
         if not node then
             -- error
-            log('Failed to deserialize node', 'error')
+            log('failed to deserialize node', 'error')
             self:reset()
             return false
         end
