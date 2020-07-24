@@ -11,7 +11,18 @@ end
 local function call(t, arg1, ...)
     local ty = type(arg1)
     if ty == 'string' then
-        return M.string(arg1, ...)
+        if t == M then
+            -- global dict
+            return M.string(arg1, ...)
+        else
+            local v = t[arg1]
+            local ty1 = type(v)
+            if ty1 == 'string' then
+                return v:format(...)
+            else
+                return call(t, v, ...)
+            end
+        end
     elseif ty == 'table' then
         local narg = select('#', ...)
         local ret = arg1[M._code]
@@ -52,6 +63,22 @@ function M.string(str, ...)
         s = s:format(...)
     end
     return s
+end
+
+local _dicts = {}
+
+---
+---@param name string
+---@param t table
+function M.addDict(name, t)
+    _dicts[name] = setmetatable(t, { __call = call })
+end
+
+---
+---@param name string
+---@return function
+function M.getDict(name)
+    return _dicts[name]
 end
 
 return M
