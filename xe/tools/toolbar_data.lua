@@ -78,7 +78,6 @@ local M = {
             en = "Copy node (Ctrl+C)",
             zh = "复制节点 (Ctrl+C)",
         },
-        --bitmap  = "copy.png",
         bitmap  = "copy.svg",
     },
     {
@@ -87,7 +86,6 @@ local M = {
             en = "Cut node (Ctrl+X)",
             zh = "剪切节点 (Ctrl+X)",
         },
-        --bitmap  = "cut.png",
         bitmap  = "cut.svg",
     },
     {
@@ -96,7 +94,6 @@ local M = {
             en = "Paste node (Ctrl+V)",
             zh = "粘贴节点 (Ctrl+V)",
         },
-        --bitmap  = "paste.png",
         bitmap  = "paste.svg",
     },
     {
@@ -105,7 +102,6 @@ local M = {
             en = "Delete node (Del)",
             zh = "删除节点 (Del)",
         },
-        --bitmap  = "delete.png",
         bitmap  = "delete.svg",
     },
     {
@@ -114,7 +110,6 @@ local M = {
             en = "Build project (F7)",
             zh = "编译工程 (F7)",
         },
-        --bitmap  = "pack.png",
         bitmap  = "build.svg",
     },
     {
@@ -123,7 +118,6 @@ local M = {
             en = "Pack project",
             zh = "打包工程",
         },
-        --bitmap  = "pack.png",
         bitmap  = "pack.svg",
     },
     {
@@ -132,7 +126,6 @@ local M = {
             en = "Debug stage from current node (F6)",
             zh = "运行当前关卡 (F6)",
         },
-        --bitmap  = "debugstage.png",
         bitmap  = "debug_stage.svg",
     },
     {
@@ -141,7 +134,6 @@ local M = {
             en = "Debug spell card (Shift+F6)",
             zh = "运行当前符卡 (Shift+F6)",
         },
-        --bitmap  = "debugsc.png",
         bitmap  = "debug_sc.svg",
     },
     {
@@ -150,7 +142,6 @@ local M = {
             en = "Run whole project (F5)",
             zh = "运行 (F5)",
         },
-        --bitmap  = "run.png",
         bitmap  = "debug.svg",
     },
     {
@@ -159,7 +150,6 @@ local M = {
             en = "Insert after (Ctrl+Down)",
             zh = "优先插入为后继节点 (Ctrl+Down)",
         },
-        --bitmap  = "down.png",
         bitmap  = "insert_after.svg",
     },
     {
@@ -168,7 +158,6 @@ local M = {
             en = "Insert before (Ctrl+Up)",
             zh = "优先插入为前序节点 (Ctrl+Up)",
         },
-        --bitmap  = "up.png",
         bitmap  = "insert_before.svg",
     },
     {
@@ -177,7 +166,6 @@ local M = {
             en = "Insert as child (Ctrl+Right)",
             zh = "优先插入为子节点 (Ctrl+Right)",
         },
-        --bitmap  = "child.png",
         bitmap  = "insert_child.svg",
     },
     --[[
@@ -196,7 +184,6 @@ local M = {
             en = "Move down (Alt+Down)",
             zh = "向下移动 (Alt+Down)",
         },
-        --bitmap  = "down.png",
         bitmap  = "move_down.svg",
     },
     {
@@ -205,8 +192,23 @@ local M = {
             en = "Move up (Alt+Up)",
             zh = "向上移动 (Alt+Up)",
         },
-        --bitmap  = "up.png",
         bitmap  = "move_up.svg",
+    },
+    {
+        class   = "tool", name = "ExportNode",
+        tooltip = {
+            en = "Export node",
+            zh = "导出节点",
+        },
+        bitmap  = "export.svg",
+    },
+    {
+        class   = "tool", name = "ImportNode",
+        tooltip = {
+            en = "Import node",
+            zh = "导入节点",
+        },
+        bitmap  = "import.svg",
     },
 }
 

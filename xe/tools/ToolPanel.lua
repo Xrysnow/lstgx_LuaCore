@@ -20,19 +20,21 @@ function M:ctor()
     for _, v in ipairs(data) do
         local tab = self:_createTab(v.label)
         for i, item in ipairs(v.content) do
-            local icon = require('xe.node.icon').getIcon(string.filename(item.bitmap))
-            assert(item.name:sub(1, 7) == 'Insert_')
-            local name = item.name:sub(8)
-            local function f()
-                require('xe.main').getEditor():getTree():newNode(name)
-            end
-
-            local tooltip = name
+            --assert(item.name:sub(1, 7) == 'Insert_')
+            local name = item.name--:sub(8)
+            local icon_name = string.filename(item.bitmap or '')
             local d = def.getDefine(name)
+            if d and d.icon then
+                icon_name = d.icon
+            end
+            local icon = require('xe.node.icon').getIcon(icon_name)
+            local tooltip = name
             if d and d.disptype then
                 tooltip = i18n(d.disptype)
             end
-
+            local function f()
+                require('xe.main').getEditor():getTree():newNode(name)
+            end
             local btn, btn2 = tab:addContent(icon, tooltip, f)
             if i < #v.content then
                 tab:addChild(im.sameLine)
