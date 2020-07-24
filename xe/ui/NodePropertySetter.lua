@@ -164,6 +164,8 @@ function M:_createInput(t)
         ret = require('xe.input.Enum')(self._node, self._idx, self._types[t])
     elseif t == 'code' then
         ret = require('xe.input.Code')(self._node, self._idx, self._types[t])
+    elseif t == 'tween_type' then
+        ret = require('xe.input.TweenType')(self._node, self._idx)
     else
         ret = require('xe.input.String')(self._node, self._idx, true)
     end
