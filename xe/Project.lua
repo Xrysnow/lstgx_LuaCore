@@ -129,21 +129,23 @@ function M.needSave()
 end
 
 function M._close(onFinish)
+    local dir = M.getDir()
     M._setCurFile(nil)
     local tree = get_tree()
     tree:reset()
     logger.clear()
     -- remove search path
     local fu = cc.FileUtils:getInstance()
-    local paths = fu:getSearchPaths()
-    local dir = M.getDir()
-    for i = 1, #paths do
-        if paths[i] == dir then
-            table.remove(paths, i)
-            break
+    if dir then
+        local paths = fu:getSearchPaths()
+        local new_paths = {}
+        for i, v in ipairs(paths) do
+            if v ~= dir and v ~= dir .. '/' then
+                table.insert(new_paths, v)
+            end
         end
+        fu:setSearchPaths(new_paths)
     end
-    fu:setSearchPaths(paths)
     if onFinish then
         onFinish()
     end
