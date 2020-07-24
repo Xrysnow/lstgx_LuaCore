@@ -4,288 +4,210 @@
 --- Copyright (C) 2018-2020 Xrysnow. All rights reserved.
 ---
 
-local math = math
-
--- t: current step
--- b: begin
--- c: total delta
--- d: total step
---
 ---@class math.tween
 local M = {}
+local math = math
+local pi = math.pi
+local pi_2 = math.pi / 2
+local pix2 = math.pi * 2
 
-function M.linear(t, b, c, d)
-    d = d or 1
-    return c * t / d + b
+function M.linear(t)
+    return t
 end
 
-function M.quadIn(t, b, c, d)
-    d = d or 1
-    t = t / d
-    return c * t * t + b
+function M.quadIn(t)
+    return t * t
 end
-function M.quadOut(t, b, c, d)
-    d = d or 1
-    t = t / d
-    return -c * t * (t - 2) + b
+
+function M.quadOut(t)
+    return -t * (t - 2)
 end
-function M.quadInOut(t, b, c, d)
-    d = d or 1
-    t = t / (d / 2)
+
+function M.quadInOut(t)
+    t = t * 2
     if (t < 1) then
-        return c / 2 * t * t + b
+        return t * t / 2
     end
     t = t - 1
-    return -c / 2 * (t * (t - 2) - 1) + b
+    return -(t * (t - 2) - 1) / 2
 end
 
-function M.cubicIn(t, b, c, d)
-    d = d or 1
-    t = t / d
-    return c * t * t * t + b
+function M.cubicIn(t)
+    return t * t * t
 end
-function M.cubicOut(t, b, c, d)
-    d = d or 1
-    t = t / d - 1
-    return c * (t * t * t + 1) + b
+
+function M.cubicOut(t)
+    t = t - 1
+    return t * t * t + 1
 end
-function M.cubicInOut(t, b, c, d)
-    d = d or 1
-    t = t / (d / 2)
+
+function M.cubicInOut(t)
+    t = t * 2
     if (t < 1) then
-        return c / 2 * t * t * t + b
+        return t * t * t / 2
     end
     t = t - 2
-    return c / 2 * (t * t * t + 2) + b
+    return (t * t * t + 2) / 2
 end
 
-function M.quartIn(t, b, c, d)
-    d = d or 1
-    t = t / d
-    return c * t * t * t * t + b
+function M.powIn(t, p)
+    p = math.abs(p or 1)
+    return math.pow(t, p)
 end
-function M.quartOut(t, b, c, d)
-    d = d or 1
-    t = t / d - 1
-    return -c * (t * t * t * t - 1) + b
+
+function M.powOut(t, p)
+    p = math.abs(p or 1)
+    t = 1 - t
+    return 1 - math.pow(t, p)
 end
-function M.quartInOut(t, b, c, d)
-    d = d or 1
-    t = t / (d / 2)
+
+function M.powInOut(t, p)
+    p = math.abs(p or 1)
+    t = t * 2
     if (t < 1) then
-        return c / 2 * t * t * t * t + b
+        return math.pow(t, p) / 2
     end
-    t = t - 2
-    return -c / 2 * (t * t * t * t - 2) + b
+    t = 2 - t
+    return 1 - math.pow(t, p) / 2
 end
 
-function M.quintIn(t, b, c, d)
-    d = d or 1
-    t = t / d
-    return c * t * t * t * t * t + b
+function M.sineIn(t)
+    return 1 - math.cos(pi_2 * t)
 end
-function M.quintOut(t, b, c, d)
-    d = d or 1
-    t = t / d - 1
-    return c * (t * t * t * t * t + 1) + b
+
+function M.sineOut(t)
+    return math.sin(pi_2 * t)
 end
-function M.quintInOut(t, b, c, d)
-    d = d or 1
-    t = t / (d / 2)
+
+function M.sineInOut(t)
+    return (1 - math.cos(pi * t)) / 2
+end
+
+function M.expoIn(t, b)
+    b = b or 2
+    if (b == 1) then
+        return t
+    end
+    return (math.pow(b, t) - 1) / (b - 1)
+end
+
+function M.expoOut(t, b)
+    return 1 - M.expoIn(1 - t, b)
+end
+
+function M.expoInOut(t, b)
+    t = t * 2
     if (t < 1) then
-        return c / 2 * t * t * t * t * t + b
+        return M.expoIn(t, b) / 2
     end
-    t = t - 2
-    return c / 2 * (t * t * t * t * t + 2) + b
+    t = 2 - t
+    return 1 - M.expoIn(t, b) / 2
 end
 
-function M.sineIn(t, b, c, d)
-    d = d or 1
-    return -c * math.cos(t / d * (math.pi / 2)) + c + b
-end
-function M.sineOut(t, b, c, d)
-    d = d or 1
-    return c * math.sin(t / d * (math.pi / 2)) + b
-end
-function M.sineInOut(t, b, c, d)
-    d = d or 1
-    return -c / 2 * (math.cos(math.pi * t / d) - 1) + b
+function M.circIn(t)
+    return 1 - math.sqrt(1 - t * t)
 end
 
-function M.expoIn(t, b, c, d)
-    d = d or 1
-    if t == 0 then
-        return b
-    else
-        return c * math.pow(2, 10 * (t / d - 1)) + b
-    end
+function M.circOut(t)
+    t = 1 - t
+    return math.sqrt(1 - t * t)
 end
-function M.expoOut(t, b, c, d)
-    d = d or 1
-    if t == d then
-        return b + c
-    else
-        return c * (-math.pow(2, -10 * t / d) + 1) + b
+
+function M.circInOut(t)
+    t = t * 2
+    if (t < 1) then
+        return M.circIn(t) / 2
     end
+    t = 2 - t
+    return 1 - M.circIn(t) / 2
 end
-function M.expoInOut(t, b, c, d)
-    d = d or 1
+
+function M.elasticIn(t, a, p)
+    a = a or 1
+    p = p or 0.3
     if (t == 0) then
-        return b
+        return 0
     end
-    if (t == d) then
-        return b + c
-    end
-    t = t / (d / 2)
-    if (t < 1) then
-        return c / 2 * math.pow(2, 10 * (t - 1)) + b
+    local s
+    if (a < 1) then
+        a = 1
+        s = p / 4
+    else
+        s = p / pix2 * math.asin(1 / a)
     end
     t = t - 1
-    return c / 2 * (-math.pow(2, -10 * t) + 2) + b
+    return -(a * math.pow(2, 10 * t) * math.sin((t - s) * pix2 / p))
 end
 
-function M.circIn(t, b, c, d)
-    d = d or 1
-    t = t / d
-    return -c * (math.sqrt(1 - t * t) - 1) + b
-end
-function M.circOut(t, b, c, d)
-    d = d or 1
-    t = t / d - 1
-    return c * math.sqrt(1 - t * t) + b
-end
-function M.circInOut(t, b, c, d)
-    d = d or 1
-    t = t / (d / 2)
-    if (t < 1) then
-        return -c / 2 * (math.sqrt(1 - t * t) - 1) + b
-    end
-    t = t - 2
-    return c / 2 * (math.sqrt(1 - t * t) + 1) + b
-end
-
-function M.elasticIn(t, b, c, d, a, p)
-    d = d or 1
+function M.elasticOut(t, a, p)
+    a = a or 1
+    p = p or 0.3
     if (t == 0) then
-        return b
+        return 0
     end
-    t = t / d
     if (t == 1) then
-        return b + c
+        return 1
     end
-    if not p then
-        p = d * .3
-    end
-    local s
-    if not a or a < math.abs(c) then
-        a = c
-        s = p / 4
-    else
-        s = p / (2 * math.pi) * math.asin(c / a)
-    end
-    t = t - 1
-    return -(a * math.pow(2, 10 * t) * math.sin((t * d - s) * (2 * math.pi) / p)) + b
+    return 1 - M.elasticIn(1 - t, a, p)
 end
-function M.elasticOut(t, b, c, d, a, p)
-    d = d or 1
-    if (t == 0) then
-        return b
-    end
-    t = t / d
-    if (t == 1) then
-        return b + c
-    end
-    if not p then
-        p = d * .3
-    end
-    local s
-    if (not a or a < math.abs(c)) then
-        a = c
-        s = p / 4
-    else
-        s = p / (2 * math.pi) * math.asin(c / a)
-    end
-    return (a * math.pow(2, -10 * t) * math.sin((t * d - s) * (2 * math.pi) / p) + c + b)
-end
-function M.elasticInOut(t, b, c, d, a, p)
-    d = d or 1
-    if (t == 0) then
-        return b
-    end
-    t = t / (d / 2)
-    if (t == 2) then
-        return b + c
-    end
-    if not p then
-        p = d * (.3 * 1.5)
-    end
-    local s
-    if (not a or a < math.abs(c)) then
-        a = c
-        s = p / 4
-    else
-        s = p / (2 * math.pi) * math.asin(c / a)
-    end
+
+function M.elasticInOut(t, a, p)
+    a = a or 1
+    p = p or 0.45
+    t = t * 2
     if (t < 1) then
-        t = t - 1
-        return -.5 * (a * math.pow(2, 10 * t) * math.sin((t * d - s) * (2 * math.pi) / p)) + b
+        return M.elasticIn(t, a, p) / 2
     end
-    t = t - 1
-    return a * math.pow(2, -10 * t) * math.sin((t * d - s) * (2 * math.pi) / p) * .5 + c + b
+    t = 2 - t
+    return 1 - M.elasticIn(t, a, p) / 2
 end
 
-function M.backIn(t, b, c, d, s)
-    d = d or 1
+function M.backIn(t, s)
     s = s or 1.70158
-    t = t / d
-    return c * t * t * ((s + 1) * t - s) + b
-end
-function M.backOut(t, b, c, d, s)
-    d = d or 1
-    s = s or 1.70158
-    t = t / d - 1
-    return c * (t * t * ((s + 1) * t + s) + 1) + b
-end
-function M.backInOut(t, b, c, d, s)
-    d = d or 1
-    s = s or 1.70158
-    t = t / (d / 2)
-    if t < 1 then
-        s = s * 1.525
-        return c / 2 * (t * t * ((s + 1) * t - s)) + b
-    end
-    t = t - 2
-    s = s * 1.525
-    return c / 2 * (t * t * ((s + 1) * t + s) + 2) + b
+    return t * t * (t * (s + 1) - s)
 end
 
-function M.bounceIn(t, b, c, d)
-    d = d or 1
-    return c - M.bounceOut(d - t, 0, c, d) + b
+function M.backOut(t, s)
+    return 1 - M.backIn(1 - t, s)
 end
-function M.bounceOut(t, b, c, d)
-    d = d or 1
-    t = t / d
-    if (t < (1 / 2.75)) then
-        return c * (7.5625 * t * t) + b
-    elseif (t < (2 / 2.75)) then
+
+function M.backInOut(t, s)
+    s = s or 1.70158 * 1.525
+    t = t * 2
+    if (t < 1) then
+        return M.backIn(t, s) / 2
+    end
+    t = 2 - t
+    return 1 - M.backIn(t, s) / 2
+end
+
+function M.bounceIn(t)
+    return 1 - M.bounceOut(1 - t)
+end
+
+function M.bounceOut(t)
+    if (t < 1.0 / 2.75) then
+        return t * t * 7.5625
+    end
+    if (t < 2.0 / 2.75) then
         t = t - 1.5 / 2.75
-        return c * (7.5625 * t * t + .75) + b
-    elseif (t < (2.5 / 2.75)) then
+        return t * t * 7.5625 + 0.75
+    end
+    if (t < 2.5 / 2.75) then
         t = t - 2.25 / 2.75
-        return c * (7.5625 * t * t + .9375) + b
-    else
-        t = t - 2.625 / 2.75
-        return c * (7.5625 * t * t + .984375) + b
+        return t * t * 7.5625 + 0.9375
     end
+    t = t - 2.625 / 2.75
+    return t * t * 7.5625 + 0.984375
 end
-function M.bounceInOut(t, b, c, d)
-    d = d or 1
-    if (t < d / 2) then
-        return M.bounceIn(t * 2, 0, c, d) * .5 + b
-    else
-        return M.bounceOut(t * 2 - d, 0, c, d) * .5 + c * .5 + b
+
+function M.bounceInOut(t)
+    t = t * 2
+    if (t < 1) then
+        return M.bounceIn(t) / 2
     end
+    t = 2 - t
+    return 1 - M.bounceIn(t) / 2
 end
 
 return M
