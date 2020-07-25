@@ -74,6 +74,20 @@ function M._loadFromFile(path)
 
     M._setCurFile(path)
 
+    local fu = cc.FileUtils:getInstance()
+    local find
+    local folder = M.getDir()
+    folder = string.path_uniform(folder)
+    for i, v in ipairs(fu:getSearchPaths()) do
+        if v == folder or v == folder .. '/' then
+            find = true
+            break
+        end
+    end
+    if not find then
+        fu:addSearchPath(folder)
+    end
+
     local tree = get_tree()
     tree:reset()
     tree:deserialize(str)
