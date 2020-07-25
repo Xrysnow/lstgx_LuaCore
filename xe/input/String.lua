@@ -25,12 +25,11 @@ function M:ctor(node, idx, extra)
     self:addChild(input)
     input:setString(value):setWidth(-1)
     self:addChild(function()
-        if im.isItemEdited() then
-            self:_setNodeValue()
-            self:_checkValid()
-        end
         if im.isItemDeactivatedAfterEdit() then
             self:submit()
+        elseif im.isItemEdited() then
+            self:_setNodeValue()
+            self:_checkValid()
         end
     end)
 end

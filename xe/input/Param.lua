@@ -110,6 +110,10 @@ function M:_update()
                 self._val[i] = input:getString()
                 self:_updateValue()
                 self:submit()
+            elseif im.isItemEdited() then
+                self._val[i] = input:getString()
+                self:_updateValue()
+                self:_checkValid()
             end
         end)
         if i < #names then
