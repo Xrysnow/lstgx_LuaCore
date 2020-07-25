@@ -26,6 +26,7 @@ end
 ---@param magFilter ccb.SamplerFilter|string @'linear'/'nearest'
 ---@param wrapS ccb.SamplerAddressMode|string
 ---@param wrapT ccb.SamplerAddressMode|string @'repeat'/'mirrored_repeat'/'clamp_to_edge'
+---@return lstg.ResTexture
 function M:setTexParameters(minFilter, magFilter, wrapS, wrapT)
     minFilter = assert(_filter[minFilter])
     magFilter = assert(_filter[magFilter])
@@ -39,10 +40,12 @@ function M:setTexParameters(minFilter, magFilter, wrapS, wrapT)
                 self:getName(), sz.width, sz.height))
     end
     tex:setTexParameters(minFilter, magFilter, wrapS, wrapT)
+    return self
 end
 
 ---
 ---@param wrap ccb.SamplerAddressMode|number
+---@return lstg.ResTexture
 function M:setWrap(wrap)
     local tex = self:getTexture()
     local sz = tex:getContentSizeInPixels()
@@ -52,4 +55,5 @@ function M:setWrap(wrap)
                 self:getName(), sz.width, sz.height))
     end
     tex:setTexParameters(ccb.SamplerFilter.LINEAR, ccb.SamplerFilter.LINEAR, assert(_wrap[wrap]), assert(_wrap[wrap]))
+    return self
 end
