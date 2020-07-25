@@ -5,11 +5,16 @@ M.watch = watch
 ---@type table<xe.SceneNode,boolean>
 watch.image = {}
 
+function M.addWatch(key, node)
+    print('addWatch', node:getType(), key)
+    watch[key][node] = true
+end
+
 ---@param node xe.SceneNode
 function M.removeWatch(node)
-    local watch = node:getConfig().watch
-    if watch then
-        M.watch[watch][node] = nil
+    local w = node:getConfig().watch
+    if w then
+        M.watch[w][node] = nil
     end
 end
 

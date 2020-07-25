@@ -132,6 +132,7 @@ function M.insertNode(parent, child, idx)
     end
     parent:unfold()
     child:select()
+    child:addToWatch()
     return true
 end
 
@@ -440,10 +441,6 @@ function M:onSelChanged(next_node)
     toolbar:setEnabled('debugStage', next_node:isDebuggable('stage'))
 end
 
-function M:onDelete(node)
-    require('xe.TreeHelper').removeWatch(node)
-end
-
 function M:copyCurrent()
     local cur = self:getCurrent()
     if M.isValid(cur) and not cur:isRoot() then
@@ -512,14 +509,16 @@ function M:deserialize(str)
     local t = require('xe.TreeHelper').DeSerialize(str)
     local f = require('xe.SceneNode').deserialize
     for i, v in ipairs(t) do
-        local node = f(v)()
-        if not node then
+        local node_ctor = f(v)
+        if not node_ctor then
             -- error
             log('failed to deserialize node', 'error')
             self:reset()
             return false
         end
-        self:getRoot():insertChild(node)
+        --self:getRoot():insertChild(node)
+        self:setCurrent(self:getRoot())
+        self:insertToCurrent(node_ctor)
     end
     return true
 end

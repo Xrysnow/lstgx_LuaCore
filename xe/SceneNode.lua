@@ -32,6 +32,7 @@ function M:ctor(type)
     end)
     self:setOnDelete(function()
         self:getView():onSelChanged(nil)
+        self:removeFromWatch()
     end)
     --TODO: should no put here
     self._icon = _get_icon(type)
@@ -102,8 +103,6 @@ local function _construct_plain(type, default)
     end
 
     if nt.watch then
-        --TODO: remove TreeHelper
-        require('xe.TreeHelper').watch[nt.watch][ret] = true
         ret._watch = nt.watch
     end
     if def then
@@ -742,6 +741,23 @@ end
 
 function M:getWatch()
     return self._watch
+end
+
+function M:addToWatch()
+    local w = self:getWatch()
+    if w then
+        require('xe.TreeHelper').addWatch(w, self)
+    end
+    for _, child in self:children() do
+        child:addToWatch()
+    end
+end
+
+function M:removeFromWatch()
+    require('xe.TreeHelper').removeWatch(self)
+    for _, child in self:children() do
+        child:removeFromWatch()
+    end
 end
 
 --
