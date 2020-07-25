@@ -1,6 +1,6 @@
 local base = require('xe.input.Base')
 ---@class xe.input.TypeNameDefine:xe.input.Base
-local M = class('editor.input.TypeNameDefine', base)
+local M = class('xe.input.TypeNameDefine', base)
 local im = imgui
 local wi = require('imgui.Widget')
 local dif_list = { 'All', 'Easy', 'Normal', 'Hard', 'Lunatic' }
@@ -39,6 +39,12 @@ function M:ctor(node, idx, extra)
     input:setString(value):setWidth(-1)
     self:addChild(input)
     self:addChild(function()
+        if im.isItemEdited() then
+            self._name = input:getString()
+            self:_updateValue()
+            self:_setNodeValue()
+            self:_checkValid()
+        end
         if im.isItemDeactivatedAfterEdit() then
             self._name = input:getString()
             self:_updateValue()
