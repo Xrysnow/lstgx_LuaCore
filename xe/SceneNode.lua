@@ -651,6 +651,7 @@ end
 local tonumber = tonumber
 local assert = assert
 function M:format(s)
+    -- note: only replace once
     local function f1(ss)
         if ss:sub(1, 1) == 'q' then
             if ss:sub(2, 2) == 'p' then
@@ -659,24 +660,10 @@ function M:format(s)
                 return ('%q'):format(self:getAttrValue(tonumber(ss:sub(2))))
             end
         else
-            return assert(self:getAttrValue(tonumber(ss)))
+            return self:getAttrValue(tonumber(ss)) or ss
         end
     end
     s = s:gsub('$(q?p?%d+)', f1)
-
-    local function f2(ss)
-        if ss:sub(1, 1) == 'q' then
-            if ss:sub(2, 2) == 'p' then
-                return ('%q'):format(self:getParentNode():_getAttrValueFromName(ss:sub(4, -2)))
-            else
-                return ('%q'):format(self:_getAttrValueFromName(ss:sub(3, -2)))
-            end
-        else
-            return assert(self:_getAttrValueFromName(ss:sub(2, -2)))
-        end
-    end
-    s = s:gsub('$(q?p?%b{})', f2)
-
     return s
 end
 
