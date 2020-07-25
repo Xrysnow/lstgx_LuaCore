@@ -337,7 +337,10 @@ function M.addPackRes(path, from_type)
 end
 
 function M.launchGame(...)
-    require('xe.game').start(...)
+    local ok, msg = require('xe.game').start(...)
+    if not ok then
+        err(msg or 'error')
+    end
 end
 
 --
