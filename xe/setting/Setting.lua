@@ -105,10 +105,11 @@ end
 
 function M:_set()
     local setting = self._setting
-    local glv = cc.Director:getInstance():getOpenGLView()
+    --local glv = cc.Director:getInstance():getOpenGLView()
     local fsz = setting.frame_size
     if fsz and require('cocos.framework.device').isDesktop then
-        glv:setFrameSize(fsz[1], fsz[2])
+        --glv:setFrameSize(fsz[1], fsz[2])
+        lstg.WindowHelperDesktop:getInstance():setSize(cc.size(fsz[1], fsz[2])):moveToCenter()
     end
 end
 
