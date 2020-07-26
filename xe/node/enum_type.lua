@@ -31,7 +31,7 @@ local M = {
     event      = { 'frame', 'render', 'colli', 'kill', 'del' },
     leftright  = { 'left', 'right' },
     item       = { 'item_power', 'item_faith', 'item_point', 'item_power_large', 'item_power_full', 'item_faith_minor',
-                   'item_extend', 'item_chip', 'item_bomb', 'item_bomb_chip' },
+                   'item_extend', 'item_chip', 'item_bomb', 'item_bombchip' },
     layer      = {
         'LAYER_BG', 'LAYER_BG+1', 'LAYER_BG-1',
         'LAYER_ENEMY', 'LAYER_ENEMY+1', 'LAYER_ENEMY-1',
