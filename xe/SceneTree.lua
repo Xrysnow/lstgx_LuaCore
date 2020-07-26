@@ -99,9 +99,10 @@ function M.checkAncestor(node, parent)
     end
     anc = nodeType[ty].forbidancestor
     if anc then
-        for _, v in ipairs(ancStack) do
-            if anc[v] then
-                log(format('%q forbid ancestor: %s', ty, v), "error")
+        for i, v in ipairs(ancStack) do
+            -- skip self
+            if anc[v] and i > 1 then
+                log(format('%q forbid ancestor: %s (%d)', ty, v, i), "error")
                 return false
             end
         end
