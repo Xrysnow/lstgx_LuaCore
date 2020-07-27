@@ -1113,7 +1113,7 @@ end
 
 -- Add the data string (0's and 1's) to the matrix for the given mask.
 local function add_data_to_matrix(matrix,data,mask)
-    size = #matrix
+    local size = #matrix
     local x,y,positions
     local _x,_y,m
     local dir = "up"
