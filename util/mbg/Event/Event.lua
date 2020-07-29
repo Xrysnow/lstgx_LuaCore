@@ -16,7 +16,7 @@ local function _Event()
     local ret = {}
     ---@type mbg.Condition
     ret.Condition = nil
-    ---@type mbg.IAction
+    ---@type mbg.DataOperateAction|mbg.CommandAction|mbg.ReflexBoardAction
     ret.Action = nil
     return ret
 end
