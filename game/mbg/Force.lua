@@ -1,6 +1,6 @@
 ---@class lstg.mbg.Force
 local M = {}
---local M = class('lstg.mbg.ForceField')
+--local M = class('lstg.mbg.Batch')
 local Player = require('game.mbg.Player')
 local Time = require('game.mbg.Time')
 local Main = require('game.mbg.Main')

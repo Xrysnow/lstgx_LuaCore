@@ -1,5 +1,5 @@
 ---@class lstg.mbg.Batch
-local M = class('lstg.mbg.BulletEmitter')
+local M = class('lstg.mbg.Batch')
 local Center = require('game.mbg.Center')
 local Player = require('game.mbg.Player')
 local Time = require('game.mbg.Time')
@@ -260,7 +260,7 @@ function M:ctor(data)
         e.tag = v.Name
         e.t = v.Interval
         e.addtime = v.IntervalIncrement
-        e.events = table.clone(v.Events)
+        e.events = table.clone(v.Events or {})
         table.insert(self.Parentevents, e)
     end
     for i, v in ipairs(data['子弹事件组'] or {}) do
@@ -268,7 +268,7 @@ function M:ctor(data)
         e.tag = v.Name
         e.t = v.Interval
         e.addtime = v.IntervalIncrement
-        e.events = table.clone(v.Events)
+        e.events = table.clone(v.Events or {})
         table.insert(self.Sonevents, e)
     end
     --
