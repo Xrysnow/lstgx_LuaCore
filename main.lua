@@ -38,6 +38,7 @@ local function main()
     lstg.SystemLog('start main')
     lstg.FrameInit()
     if lstg.GetPlatform() == 'android' then
+        -- change src path to 'sdcard/lstg/src' if it exists
         local sd = require('platform.android.native').getSDCardPath()
         if sd and sd ~= '' then
             local src = sd .. '/lstg/src'
