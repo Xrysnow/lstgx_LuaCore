@@ -65,7 +65,7 @@ local mt_SecondCondition = {
     __call = function()
         ---@type mbg.Condition.SecondCondition
         local ret = {}
-        ret.LogincOp = 0
+        ret.LogicOp = 0
         ret.Expr = Expression()
         return ret
     end
@@ -101,7 +101,7 @@ function Condition.ParseFrom(c)
         local exprs = c:split('且', '或')
         condition.First = Expression.ParseFrom(String(exprs[1]))
         condition.Second = SecondCondition()
-        condition.Second.LogincOp = op
+        condition.Second.LogicOp = op
         condition.Second.Expr = Expression.ParseFrom(String(exprs[2]))
     end
     return condition
