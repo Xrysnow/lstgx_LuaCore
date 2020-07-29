@@ -231,6 +231,87 @@ function M.update()
     Player.update()
 end
 
+function M.draw()
+    local Layer = require('game.mbg.Layer')
+    local Time = require('game.mbg.Time')
+    --local Center = require('game.mbg.Center')
+    --local Player = require('game.mbg.Player')
+    --
+    for _, layer in ipairs(Layer.LayerArray) do
+        if layer.Visible and not Time.Playing then
+            local ForceArray = {}
+            for _, v in ipairs(layer.ForceArray) do
+                if not v.NeedDelete then
+                    table.insert(ForceArray, v)
+                    --v:draw()
+                end
+            end
+            layer.ForceArray = ForceArray
+            --
+            local ReboundArray = {}
+            for _, v in ipairs(layer.ReboundArray) do
+                if not v.NeedDelete then
+                    table.insert(ReboundArray, v)
+                    --v:draw()
+                end
+            end
+            layer.ReboundArray = ReboundArray
+            --
+            local CoverArray = {}
+            for _, v in ipairs(layer.CoverArray) do
+                if not v.NeedDelete then
+                    table.insert(CoverArray, v)
+                    --v:draw()
+                end
+            end
+            layer.CoverArray = CoverArray
+            --
+            local LaseArray = {}
+            for _, v in ipairs(layer.LaseArray) do
+                if not v.NeedDelete then
+                    table.insert(LaseArray, v)
+                    --v:draw()
+                end
+            end
+            layer.LaseArray = LaseArray
+            --
+            local BatchArray = {}
+            for _, v in ipairs(layer.BatchArray) do
+                if not v.NeedDelete then
+                    table.insert(BatchArray, v)
+                    --v:draw()
+                end
+            end
+            layer.BatchArray = BatchArray
+        end
+        local Barrages = {}
+        for _, v in ipairs(layer.Barrages) do
+            if not v.NeedDelete then
+                table.insert(Barrages, v)
+                --if v.Blend then
+                --    v:draw('Additive')
+                --    v:ldraw('Additive')
+                --else
+                --    v:draw()
+                --    v:ldraw()
+                --end
+            end
+        end
+        layer.Barrages = Barrages
+    end
+    --Player.draw()
+    --Center.draw()
+    --Layer.ldraw()
+    local LayerArray = {}
+    for _, layer in ipairs(Layer.LayerArray) do
+        if not layer.NeedDelete then
+            table.insert(LayerArray, layer)
+            --layer:draw()
+        end
+    end
+    --Time.draw()
+end
+
 function M.Twopointangle(x2, y2, x1, y1)
     local num
     if x2 ~= x1 then

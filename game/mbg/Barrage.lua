@@ -1,14 +1,16 @@
 ---@class lstg.mbg.Barrage
-local M = class('lstg.mbg.Barrage')
+local M = {}
+--local M = class('lstg.mbg.Barrage')
 local Center = require('game.mbg.Center')
 local Player = require('game.mbg.Player')
 local Time = require('game.mbg.Time')
 local Main = require('game.mbg.Main')
 local Math = require('game.mbg._math')
 local MathHelper = Math
-local float = { Parse = function(s)
-    return tonumber(s)
-end }
+local function Rand1()
+    return ran:Float(-1, 1)
+end
+local ipairs = ipairs
 
 function M:ctor()
     self.conditions = {}-- float[3];
@@ -91,8 +93,11 @@ function M:ctor()
     self.batch = nil-- Batch
     self.lase = nil-- Lase
     self.cover = nil-- Cover
+    ---@type lstg.mbg.Event[]
     self.Events = {}-- List<Event>
+    ---@type lstg.mbg.BExecution[]
     self.Eventsexe = {}-- List<BExecution>
+    ---@type lstg.mbg.BLExecution[]
     self.LEventsexe = {}--  List<BLExecution>
     --
     local Shadows = require('game.mbg.Shadows')
@@ -105,8 +110,17 @@ function M:ctor()
     end
 end
 
+local _BExecution
+local function BExecution()
+    _BExecution = _BExecution or require('game.mbg.BExecution')
+    local t = {}
+    _BExecution.ctor(t)
+    t.update = _BExecution.update
+    return t
+end
+
 function M:update()
-    local BExecution = require('game.mbg.BExecution')
+    --local BExecution = require('game.mbg.BExecution')
 
     if (not self.IsLase and self.type ~= -2) then
         local bx = self.x
@@ -188,10 +202,11 @@ function M:update()
                 end
             end
             if (self.Afterimage and self.time <= num + self.life) then
-                self.savesha[self.shatime].alpha = 0.4 * (self.alpha / 100)
-                self.savesha[self.shatime].x = self.x
-                self.savesha[self.shatime].y = self.y
-                self.savesha[self.shatime].d = self.head
+                local idx = self.shatime + 1
+                self.savesha[idx].alpha = 0.4 * (self.alpha / 100)
+                self.savesha[idx].x = self.x
+                self.savesha[idx].y = self.y
+                self.savesha[idx].d = self.head
                 self.shatime = self.shatime + 1
                 if (self.shatime >= 49) then
                     self.shatime = 0
@@ -230,24 +245,29 @@ function M:update()
                 if ((self.time - num) % event.t == 0) then
                     event.loop = event.loop + 1
                 end
+                local _loop_addtime = event.loop * event.addtime
                 for _, eventRead in ipairs(event.results) do
                     repeat
-                        if (eventRead.special2 == 1) then
+                        local _is_special2 = eventRead.special2 == 1
+                        if _is_special2 then
                             self.conditions[0] = Time.now
                         end
-                        if (eventRead.opreator == ">") then
-                            if (eventRead.opreator2 == ">") then
-                                if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event.loop * event.addtime) and self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event.loop * event.addtime)) then
+                        local _opreator = eventRead.opreator
+                        local _opreator2 = eventRead.opreator2
+                        local _collector = eventRead.collector
+                        local _changevalue = eventRead.changevalue
+                        local _condition = self.conditions[eventRead.contype]
+                        if (_opreator == ">") then
+                            if (_opreator2 == ">") then
+                                if (_collector == "且") then
+                                    if (_condition > eventRead.condition + (_loop_addtime) and self.conditions[eventRead.contype2] > eventRead.condition2 + (_loop_addtime)) then
                                         if (eventRead.special == 4) then
-                                            if (eventRead.changevalue == 10) then
+                                            if (_changevalue == 10) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                            end
-                                            if (eventRead.changevalue == 12) then
+                                            elseif (_changevalue == 12) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                             end
                                         end
-                                        local bexecution = BExecution()
                                         if (eventRead.noloop) then
                                             break
                                         end
@@ -257,25 +277,24 @@ function M:update()
                                                 eventRead.noloop = true
                                             end
                                         end
+                                        local bexecution = BExecution()
                                         bexecution.change = eventRead.change
                                         bexecution.changetype = eventRead.changetype
-                                        bexecution.changevalue = eventRead.changevalue
-                                        bexecution.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                        bexecution.region = tostring(self.results[eventRead.changename])
+                                        bexecution.changevalue = _changevalue
+                                        bexecution.value = eventRead.res + eventRead.rand * Rand1()
+                                        bexecution.region = self.results[eventRead.changename]
                                         bexecution.time = eventRead.times
                                         bexecution.ctime = bexecution.time
                                         table.insert(self.Eventsexe, bexecution)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event.loop * event.addtime) or self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event.loop * event.addtime))) then
+                                elseif (_collector == "或" and (_condition > eventRead.condition + (_loop_addtime) or self.conditions[eventRead.contype2] > eventRead.condition2 + (_loop_addtime))) then
                                     if (eventRead.special == 4) then
-                                        if (eventRead.changevalue == 10) then
+                                        if (_changevalue == 10) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                        end
-                                        if (eventRead.changevalue == 12) then
+                                        elseif (_changevalue == 12) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                         end
                                     end
-                                    local bexecution2 = BExecution()
                                     if (eventRead.noloop) then
                                         break
                                     end
@@ -285,27 +304,26 @@ function M:update()
                                             eventRead.noloop = true
                                         end
                                     end
+                                    local bexecution2 = BExecution()
                                     bexecution2.change = eventRead.change
                                     bexecution2.changetype = eventRead.changetype
-                                    bexecution2.changevalue = eventRead.changevalue
-                                    bexecution2.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                    bexecution2.region = tostring(self.results[eventRead.changename])
+                                    bexecution2.changevalue = _changevalue
+                                    bexecution2.value = eventRead.res + eventRead.rand * Rand1()
+                                    bexecution2.region = self.results[eventRead.changename]
                                     bexecution2.time = eventRead.times
                                     bexecution2.ctime = bexecution2.time
                                     table.insert(self.Eventsexe, bexecution2)
                                 end
-                            elseif (eventRead.opreator2 == "=") then
-                                if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event.loop * event.addtime) and self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event.loop * event.addtime)) then
+                            elseif (_opreator2 == "=") then
+                                if (_collector == "且") then
+                                    if (_condition > eventRead.condition + (_loop_addtime) and self.conditions[eventRead.contype2] == eventRead.condition2 + (_loop_addtime)) then
                                         if (eventRead.special == 4) then
-                                            if (eventRead.changevalue == 10) then
+                                            if (_changevalue == 10) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                            end
-                                            if (eventRead.changevalue == 12) then
+                                            elseif (_changevalue == 12) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                             end
                                         end
-                                        local bexecution3 = BExecution()
                                         if (eventRead.noloop) then
                                             break
                                         end
@@ -315,25 +333,24 @@ function M:update()
                                                 eventRead.noloop = true
                                             end
                                         end
+                                        local bexecution3 = BExecution()
                                         bexecution3.change = eventRead.change
                                         bexecution3.changetype = eventRead.changetype
-                                        bexecution3.changevalue = eventRead.changevalue
-                                        bexecution3.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                        bexecution3.region = tostring(self.results[eventRead.changename])
+                                        bexecution3.changevalue = _changevalue
+                                        bexecution3.value = eventRead.res + eventRead.rand * Rand1()
+                                        bexecution3.region = self.results[eventRead.changename]
                                         bexecution3.time = eventRead.times
                                         bexecution3.ctime = bexecution3.time
                                         table.insert(self.Eventsexe, bexecution3)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event.loop * event.addtime) or self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event.loop * event.addtime))) then
+                                elseif (_collector == "或" and (_condition > eventRead.condition + (_loop_addtime) or self.conditions[eventRead.contype2] == eventRead.condition2 + (_loop_addtime))) then
                                     if (eventRead.special == 4) then
-                                        if (eventRead.changevalue == 10) then
+                                        if (_changevalue == 10) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                        end
-                                        if (eventRead.changevalue == 12) then
+                                        elseif (_changevalue == 12) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                         end
                                     end
-                                    local bexecution4 = BExecution()
                                     if (eventRead.noloop) then
                                         break
                                     end
@@ -343,27 +360,26 @@ function M:update()
                                             eventRead.noloop = true
                                         end
                                     end
+                                    local bexecution4 = BExecution()
                                     bexecution4.change = eventRead.change
                                     bexecution4.changetype = eventRead.changetype
-                                    bexecution4.changevalue = eventRead.changevalue
-                                    bexecution4.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                    bexecution4.region = tostring(self.results[eventRead.changename])
+                                    bexecution4.changevalue = _changevalue
+                                    bexecution4.value = eventRead.res + eventRead.rand * Rand1()
+                                    bexecution4.region = self.results[eventRead.changename]
                                     bexecution4.time = eventRead.times
                                     bexecution4.ctime = bexecution4.time
                                     table.insert(self.Eventsexe, bexecution4)
                                 end
-                            elseif (eventRead.opreator2 == "<") then
-                                if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event.loop * event.addtime) and self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event.loop * event.addtime)) then
+                            elseif (_opreator2 == "<") then
+                                if (_collector == "且") then
+                                    if (_condition > eventRead.condition + (_loop_addtime) and self.conditions[eventRead.contype2] < eventRead.condition2 + (_loop_addtime)) then
                                         if (eventRead.special == 4) then
-                                            if (eventRead.changevalue == 10) then
+                                            if (_changevalue == 10) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                            end
-                                            if (eventRead.changevalue == 12) then
+                                            elseif (_changevalue == 12) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                             end
                                         end
-                                        local bexecution5 = BExecution()
                                         if (eventRead.noloop) then
                                             break
                                         end
@@ -373,25 +389,24 @@ function M:update()
                                                 eventRead.noloop = true
                                             end
                                         end
+                                        local bexecution5 = BExecution()
                                         bexecution5.change = eventRead.change
                                         bexecution5.changetype = eventRead.changetype
-                                        bexecution5.changevalue = eventRead.changevalue
-                                        bexecution5.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                        bexecution5.region = tostring(self.results[eventRead.changename])
+                                        bexecution5.changevalue = _changevalue
+                                        bexecution5.value = eventRead.res + eventRead.rand * Rand1()
+                                        bexecution5.region = self.results[eventRead.changename]
                                         bexecution5.time = eventRead.times
                                         bexecution5.ctime = bexecution5.time
                                         table.insert(self.Eventsexe, bexecution5)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event.loop * event.addtime) or self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event.loop * event.addtime))) then
+                                elseif (_collector == "或" and (_condition > eventRead.condition + (_loop_addtime) or self.conditions[eventRead.contype2] < eventRead.condition2 + (_loop_addtime))) then
                                     if (eventRead.special == 4) then
-                                        if (eventRead.changevalue == 10) then
+                                        if (_changevalue == 10) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                        end
-                                        if (eventRead.changevalue == 12) then
+                                        elseif (_changevalue == 12) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                         end
                                     end
-                                    local bexecution6 = BExecution()
                                     if (eventRead.noloop) then
                                         break
                                     end
@@ -401,57 +416,56 @@ function M:update()
                                             eventRead.noloop = true
                                         end
                                     end
+                                    local bexecution6 = BExecution()
                                     bexecution6.change = eventRead.change
                                     bexecution6.changetype = eventRead.changetype
-                                    bexecution6.changevalue = eventRead.changevalue
-                                    bexecution6.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                    bexecution6.region = tostring(self.results[eventRead.changename])
+                                    bexecution6.changevalue = _changevalue
+                                    bexecution6.value = eventRead.res + eventRead.rand * Rand1()
+                                    bexecution6.region = self.results[eventRead.changename]
                                     bexecution6.time = eventRead.times
                                     bexecution6.ctime = bexecution6.time
                                     table.insert(self.Eventsexe, bexecution6)
                                 end
-                            elseif (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event.loop * event.addtime)) then
+                            elseif (_condition > eventRead.condition + (_loop_addtime)) then
                                 if (eventRead.special == 4) then
-                                    if (eventRead.changevalue == 10) then
+                                    if (_changevalue == 10) then
                                         eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                    end
-                                    if (eventRead.changevalue == 12) then
+                                    elseif (_changevalue == 12) then
                                         eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                     end
                                 end
-                                local bexecution7 = BExecution()
                                 if (eventRead.noloop) then
                                     break
                                 end
-                                if (eventRead.time > 0) then
-                                    eventRead.time = eventRead.time - 1
-                                    if (eventRead.time == 0) then
+                                local _time = eventRead.time
+                                if (_time > 0) then
+                                    eventRead.time = _time - 1
+                                    if (_time == 1) then
                                         eventRead.noloop = true
                                     end
                                 end
+                                local bexecution7 = BExecution()
                                 bexecution7.change = eventRead.change
                                 bexecution7.changetype = eventRead.changetype
-                                bexecution7.changevalue = eventRead.changevalue
-                                bexecution7.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                bexecution7.region = tostring(self.results[eventRead.changename])
+                                bexecution7.changevalue = _changevalue
+                                bexecution7.value = eventRead.res + eventRead.rand * Rand1()
+                                bexecution7.region = self.results[eventRead.changename]
                                 bexecution7.time = eventRead.times
                                 bexecution7.ctime = bexecution7.time
                                 table.insert(self.Eventsexe, bexecution7)
                             end
                         end
-                        if (eventRead.opreator == "=") then
-                            if (eventRead.opreator2 == ">") then
-                                if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event.loop * event.addtime) and self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event.loop * event.addtime)) then
+                        if (_opreator == "=") then
+                            if (_opreator2 == ">") then
+                                if (_collector == "且") then
+                                    if (_condition == eventRead.condition + (_loop_addtime) and self.conditions[eventRead.contype2] > eventRead.condition2 + (_loop_addtime)) then
                                         if (eventRead.special == 4) then
-                                            if (eventRead.changevalue == 10) then
+                                            if (_changevalue == 10) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                            end
-                                            if (eventRead.changevalue == 12) then
+                                            elseif (_changevalue == 12) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                             end
                                         end
-                                        local bexecution8 = BExecution()
                                         if (eventRead.noloop) then
                                             break
                                         end
@@ -461,25 +475,24 @@ function M:update()
                                                 eventRead.noloop = true
                                             end
                                         end
+                                        local bexecution8 = BExecution()
                                         bexecution8.change = eventRead.change
                                         bexecution8.changetype = eventRead.changetype
-                                        bexecution8.changevalue = eventRead.changevalue
-                                        bexecution8.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                        bexecution8.region = tostring(self.results[eventRead.changename])
+                                        bexecution8.changevalue = _changevalue
+                                        bexecution8.value = eventRead.res + eventRead.rand * Rand1()
+                                        bexecution8.region = self.results[eventRead.changename]
                                         bexecution8.time = eventRead.times
                                         bexecution8.ctime = bexecution8.time
                                         table.insert(self.Eventsexe, bexecution8)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event.loop * event.addtime) or self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event.loop * event.addtime))) then
+                                elseif (_collector == "或" and (_condition == eventRead.condition + (_loop_addtime) or self.conditions[eventRead.contype2] > eventRead.condition2 + (_loop_addtime))) then
                                     if (eventRead.special == 4) then
-                                        if (eventRead.changevalue == 10) then
+                                        if (_changevalue == 10) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                        end
-                                        if (eventRead.changevalue == 12) then
+                                        elseif (_changevalue == 12) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                         end
                                     end
-                                    local bexecution9 = BExecution()
                                     if (eventRead.noloop) then
                                         break
                                     end
@@ -489,27 +502,26 @@ function M:update()
                                             eventRead.noloop = true
                                         end
                                     end
+                                    local bexecution9 = BExecution()
                                     bexecution9.change = eventRead.change
                                     bexecution9.changetype = eventRead.changetype
-                                    bexecution9.changevalue = eventRead.changevalue
-                                    bexecution9.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                    bexecution9.region = tostring(self.results[eventRead.changename])
+                                    bexecution9.changevalue = _changevalue
+                                    bexecution9.value = eventRead.res + eventRead.rand * Rand1()
+                                    bexecution9.region = self.results[eventRead.changename]
                                     bexecution9.time = eventRead.times
                                     bexecution9.ctime = bexecution9.time
                                     table.insert(self.Eventsexe, bexecution9)
                                 end
-                            elseif (eventRead.opreator2 == "=") then
-                                if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event.loop * event.addtime) and self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event.loop * event.addtime)) then
+                            elseif (_opreator2 == "=") then
+                                if (_collector == "且") then
+                                    if (_condition == eventRead.condition + (_loop_addtime) and self.conditions[eventRead.contype2] == eventRead.condition2 + (_loop_addtime)) then
                                         if (eventRead.special == 4) then
-                                            if (eventRead.changevalue == 10) then
+                                            if (_changevalue == 10) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                            end
-                                            if (eventRead.changevalue == 12) then
+                                            elseif (_changevalue == 12) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                             end
                                         end
-                                        local bexecution10 = BExecution()
                                         if (eventRead.noloop) then
                                             break
                                         end
@@ -519,25 +531,24 @@ function M:update()
                                                 eventRead.noloop = true
                                             end
                                         end
+                                        local bexecution10 = BExecution()
                                         bexecution10.change = eventRead.change
                                         bexecution10.changetype = eventRead.changetype
-                                        bexecution10.changevalue = eventRead.changevalue
-                                        bexecution10.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                        bexecution10.region = tostring(self.results[eventRead.changename])
+                                        bexecution10.changevalue = _changevalue
+                                        bexecution10.value = eventRead.res + eventRead.rand * Rand1()
+                                        bexecution10.region = self.results[eventRead.changename]
                                         bexecution10.time = eventRead.times
                                         bexecution10.ctime = bexecution10.time
                                         table.insert(self.Eventsexe, bexecution10)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event.loop * event.addtime) or self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event.loop * event.addtime))) then
+                                elseif (_collector == "或" and (_condition == eventRead.condition + (_loop_addtime) or self.conditions[eventRead.contype2] == eventRead.condition2 + (_loop_addtime))) then
                                     if (eventRead.special == 4) then
-                                        if (eventRead.changevalue == 10) then
+                                        if (_changevalue == 10) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                        end
-                                        if (eventRead.changevalue == 12) then
+                                        elseif (_changevalue == 12) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                         end
                                     end
-                                    local bexecution11 = BExecution()
                                     if (eventRead.noloop) then
                                         break
                                     end
@@ -547,27 +558,26 @@ function M:update()
                                             eventRead.noloop = true
                                         end
                                     end
+                                    local bexecution11 = BExecution()
                                     bexecution11.change = eventRead.change
                                     bexecution11.changetype = eventRead.changetype
-                                    bexecution11.changevalue = eventRead.changevalue
-                                    bexecution11.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                    bexecution11.region = tostring(self.results[eventRead.changename])
+                                    bexecution11.changevalue = _changevalue
+                                    bexecution11.value = eventRead.res + eventRead.rand * Rand1()
+                                    bexecution11.region = self.results[eventRead.changename]
                                     bexecution11.time = eventRead.times
                                     bexecution11.ctime = bexecution11.time
                                     table.insert(self.Eventsexe, bexecution11)
                                 end
-                            elseif (eventRead.opreator2 == "<") then
-                                if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event.loop * event.addtime) and self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event.loop * event.addtime)) then
+                            elseif (_opreator2 == "<") then
+                                if (_collector == "且") then
+                                    if (_condition == eventRead.condition + (_loop_addtime) and self.conditions[eventRead.contype2] < eventRead.condition2 + (_loop_addtime)) then
                                         if (eventRead.special == 4) then
-                                            if (eventRead.changevalue == 10) then
+                                            if (_changevalue == 10) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                            end
-                                            if (eventRead.changevalue == 12) then
+                                            elseif (_changevalue == 12) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                             end
                                         end
-                                        local bexecution12 = BExecution()
                                         if (eventRead.noloop) then
                                             break
                                         end
@@ -577,25 +587,24 @@ function M:update()
                                                 eventRead.noloop = true
                                             end
                                         end
+                                        local bexecution12 = BExecution()
                                         bexecution12.change = eventRead.change
                                         bexecution12.changetype = eventRead.changetype
-                                        bexecution12.changevalue = eventRead.changevalue
-                                        bexecution12.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                        bexecution12.region = tostring(self.results[eventRead.changename])
+                                        bexecution12.changevalue = _changevalue
+                                        bexecution12.value = eventRead.res + eventRead.rand * Rand1()
+                                        bexecution12.region = self.results[eventRead.changename]
                                         bexecution12.time = eventRead.times
                                         bexecution12.ctime = bexecution12.time
                                         table.insert(self.Eventsexe, bexecution12)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event.loop * event.addtime) or self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event.loop * event.addtime))) then
+                                elseif (_collector == "或" and (_condition == eventRead.condition + (_loop_addtime) or self.conditions[eventRead.contype2] < eventRead.condition2 + (_loop_addtime))) then
                                     if (eventRead.special == 4) then
-                                        if (eventRead.changevalue == 10) then
+                                        if (_changevalue == 10) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                        end
-                                        if (eventRead.changevalue == 12) then
+                                        elseif (_changevalue == 12) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                         end
                                     end
-                                    local bexecution13 = BExecution()
                                     if (eventRead.noloop) then
                                         break
                                     end
@@ -605,25 +614,24 @@ function M:update()
                                             eventRead.noloop = true
                                         end
                                     end
+                                    local bexecution13 = BExecution()
                                     bexecution13.change = eventRead.change
                                     bexecution13.changetype = eventRead.changetype
-                                    bexecution13.changevalue = eventRead.changevalue
-                                    bexecution13.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                    bexecution13.region = tostring(self.results[eventRead.changename])
+                                    bexecution13.changevalue = _changevalue
+                                    bexecution13.value = eventRead.res + eventRead.rand * Rand1()
+                                    bexecution13.region = self.results[eventRead.changename]
                                     bexecution13.time = eventRead.times
                                     bexecution13.ctime = bexecution13.time
                                     table.insert(self.Eventsexe, bexecution13)
                                 end
-                            elseif (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event.loop * event.addtime)) then
+                            elseif (_condition == eventRead.condition + (_loop_addtime)) then
                                 if (eventRead.special == 4) then
-                                    if (eventRead.changevalue == 10) then
+                                    if (_changevalue == 10) then
                                         eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                    end
-                                    if (eventRead.changevalue == 12) then
+                                    elseif (_changevalue == 12) then
                                         eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                     end
                                 end
-                                local bexecution14 = BExecution()
                                 if (eventRead.noloop) then
                                     break
                                 end
@@ -633,29 +641,28 @@ function M:update()
                                         eventRead.noloop = true
                                     end
                                 end
+                                local bexecution14 = BExecution()
                                 bexecution14.change = eventRead.change
                                 bexecution14.changetype = eventRead.changetype
-                                bexecution14.changevalue = eventRead.changevalue
-                                bexecution14.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                bexecution14.region = tostring(self.results[eventRead.changename])
+                                bexecution14.changevalue = _changevalue
+                                bexecution14.value = eventRead.res + eventRead.rand * Rand1()
+                                bexecution14.region = self.results[eventRead.changename]
                                 bexecution14.time = eventRead.times
                                 bexecution14.ctime = bexecution14.time
                                 table.insert(self.Eventsexe, bexecution14)
                             end
                         end
-                        if (eventRead.opreator == "<") then
-                            if (eventRead.opreator2 == ">") then
-                                if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event.loop * event.addtime) and self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event.loop * event.addtime)) then
+                        if (_opreator == "<") then
+                            if (_opreator2 == ">") then
+                                if (_collector == "且") then
+                                    if (_condition < eventRead.condition + (_loop_addtime) and self.conditions[eventRead.contype2] > eventRead.condition2 + (_loop_addtime)) then
                                         if (eventRead.special == 4) then
-                                            if (eventRead.changevalue == 10) then
+                                            if (_changevalue == 10) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                            end
-                                            if (eventRead.changevalue == 12) then
+                                            elseif (_changevalue == 12) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                             end
                                         end
-                                        local bexecution15 = BExecution()
                                         if (eventRead.noloop) then
                                             break
                                         end
@@ -665,25 +672,24 @@ function M:update()
                                                 eventRead.noloop = true
                                             end
                                         end
+                                        local bexecution15 = BExecution()
                                         bexecution15.change = eventRead.change
                                         bexecution15.changetype = eventRead.changetype
-                                        bexecution15.changevalue = eventRead.changevalue
-                                        bexecution15.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                        bexecution15.region = tostring(self.results[eventRead.changename])
+                                        bexecution15.changevalue = _changevalue
+                                        bexecution15.value = eventRead.res + eventRead.rand * Rand1()
+                                        bexecution15.region = self.results[eventRead.changename]
                                         bexecution15.time = eventRead.times
                                         bexecution15.ctime = bexecution15.time
                                         table.insert(self.Eventsexe, bexecution15)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event.loop * event.addtime) or self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event.loop * event.addtime))) then
+                                elseif (_collector == "或" and (_condition < eventRead.condition + (_loop_addtime) or self.conditions[eventRead.contype2] > eventRead.condition2 + (_loop_addtime))) then
                                     if (eventRead.special == 4) then
-                                        if (eventRead.changevalue == 10) then
+                                        if (_changevalue == 10) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                        end
-                                        if (eventRead.changevalue == 12) then
+                                        elseif (_changevalue == 12) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                         end
                                     end
-                                    local bexecution16 = BExecution()
                                     if (eventRead.noloop) then
                                         break
                                     end
@@ -693,27 +699,26 @@ function M:update()
                                             eventRead.noloop = true
                                         end
                                     end
+                                    local bexecution16 = BExecution()
                                     bexecution16.change = eventRead.change
                                     bexecution16.changetype = eventRead.changetype
-                                    bexecution16.changevalue = eventRead.changevalue
-                                    bexecution16.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                    bexecution16.region = tostring(self.results[eventRead.changename])
+                                    bexecution16.changevalue = _changevalue
+                                    bexecution16.value = eventRead.res + eventRead.rand * Rand1()
+                                    bexecution16.region = self.results[eventRead.changename]
                                     bexecution16.time = eventRead.times
                                     bexecution16.ctime = bexecution16.time
                                     table.insert(self.Eventsexe, bexecution16)
                                 end
-                            elseif (eventRead.opreator2 == "=") then
-                                if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event.loop * event.addtime) and self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event.loop * event.addtime)) then
+                            elseif (_opreator2 == "=") then
+                                if (_collector == "且") then
+                                    if (_condition < eventRead.condition + (_loop_addtime) and self.conditions[eventRead.contype2] == eventRead.condition2 + (_loop_addtime)) then
                                         if (eventRead.special == 4) then
-                                            if (eventRead.changevalue == 10) then
+                                            if (_changevalue == 10) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                            end
-                                            if (eventRead.changevalue == 12) then
+                                            elseif (_changevalue == 12) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                             end
                                         end
-                                        local bexecution17 = BExecution()
                                         if (eventRead.noloop) then
                                             break
                                         end
@@ -723,25 +728,24 @@ function M:update()
                                                 eventRead.noloop = true
                                             end
                                         end
+                                        local bexecution17 = BExecution()
                                         bexecution17.change = eventRead.change
                                         bexecution17.changetype = eventRead.changetype
-                                        bexecution17.changevalue = eventRead.changevalue
-                                        bexecution17.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                        bexecution17.region = tostring(self.results[eventRead.changename])
+                                        bexecution17.changevalue = _changevalue
+                                        bexecution17.value = eventRead.res + eventRead.rand * Rand1()
+                                        bexecution17.region = self.results[eventRead.changename]
                                         bexecution17.time = eventRead.times
                                         bexecution17.ctime = bexecution17.time
                                         table.insert(self.Eventsexe, bexecution17)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event.loop * event.addtime) or self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event.loop * event.addtime))) then
+                                elseif (_collector == "或" and (_condition < eventRead.condition + (_loop_addtime) or self.conditions[eventRead.contype2] == eventRead.condition2 + (_loop_addtime))) then
                                     if (eventRead.special == 4) then
-                                        if (eventRead.changevalue == 10) then
+                                        if (_changevalue == 10) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                        end
-                                        if (eventRead.changevalue == 12) then
+                                        elseif (_changevalue == 12) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                         end
                                     end
-                                    local bexecution18 = BExecution()
                                     if (eventRead.noloop) then
                                         break
                                     end
@@ -751,27 +755,26 @@ function M:update()
                                             eventRead.noloop = true
                                         end
                                     end
+                                    local bexecution18 = BExecution()
                                     bexecution18.change = eventRead.change
                                     bexecution18.changetype = eventRead.changetype
-                                    bexecution18.changevalue = eventRead.changevalue
-                                    bexecution18.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                    bexecution18.region = tostring(self.results[eventRead.changename])
+                                    bexecution18.changevalue = _changevalue
+                                    bexecution18.value = eventRead.res + eventRead.rand * Rand1()
+                                    bexecution18.region = self.results[eventRead.changename]
                                     bexecution18.time = eventRead.times
                                     bexecution18.ctime = bexecution18.time
                                     table.insert(self.Eventsexe, bexecution18)
                                 end
-                            elseif (eventRead.opreator2 == "<") then
-                                if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event.loop * event.addtime) and self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event.loop * event.addtime)) then
+                            elseif (_opreator2 == "<") then
+                                if (_collector == "且") then
+                                    if (_condition < eventRead.condition + (_loop_addtime) and self.conditions[eventRead.contype2] < eventRead.condition2 + (_loop_addtime)) then
                                         if (eventRead.special == 4) then
-                                            if (eventRead.changevalue == 10) then
+                                            if (_changevalue == 10) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                            end
-                                            if (eventRead.changevalue == 12) then
+                                            elseif (_changevalue == 12) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                             end
                                         end
-                                        local bexecution19 = BExecution()
                                         if (eventRead.noloop) then
                                             break
                                         end
@@ -781,25 +784,24 @@ function M:update()
                                                 eventRead.noloop = true
                                             end
                                         end
+                                        local bexecution19 = BExecution()
                                         bexecution19.change = eventRead.change
                                         bexecution19.changetype = eventRead.changetype
-                                        bexecution19.changevalue = eventRead.changevalue
-                                        bexecution19.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                        bexecution19.region = tostring(self.results[eventRead.changename])
+                                        bexecution19.changevalue = _changevalue
+                                        bexecution19.value = eventRead.res + eventRead.rand * Rand1()
+                                        bexecution19.region = self.results[eventRead.changename]
                                         bexecution19.time = eventRead.times
                                         bexecution19.ctime = bexecution19.time
                                         table.insert(self.Eventsexe, bexecution19)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event.loop * event.addtime) or self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event.loop * event.addtime))) then
+                                elseif (_collector == "或" and (_condition < eventRead.condition + (_loop_addtime) or self.conditions[eventRead.contype2] < eventRead.condition2 + (_loop_addtime))) then
                                     if (eventRead.special == 4) then
-                                        if (eventRead.changevalue == 10) then
+                                        if (_changevalue == 10) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                        end
-                                        if (eventRead.changevalue == 12) then
+                                        elseif (_changevalue == 12) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                         end
                                     end
-                                    local bexecution20 = BExecution()
                                     if (eventRead.noloop) then
                                         break
                                     end
@@ -809,25 +811,24 @@ function M:update()
                                             eventRead.noloop = true
                                         end
                                     end
+                                    local bexecution20 = BExecution()
                                     bexecution20.change = eventRead.change
                                     bexecution20.changetype = eventRead.changetype
-                                    bexecution20.changevalue = eventRead.changevalue
-                                    bexecution20.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                    bexecution20.region = tostring(self.results[eventRead.changename])
+                                    bexecution20.changevalue = _changevalue
+                                    bexecution20.value = eventRead.res + eventRead.rand * Rand1()
+                                    bexecution20.region = self.results[eventRead.changename]
                                     bexecution20.time = eventRead.times
                                     bexecution20.ctime = bexecution20.time
                                     table.insert(self.Eventsexe, bexecution20)
                                 end
-                            elseif (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event.loop * event.addtime)) then
+                            elseif (_condition < eventRead.condition + (_loop_addtime)) then
                                 if (eventRead.special == 4) then
-                                    if (eventRead.changevalue == 10) then
+                                    if (_changevalue == 10) then
                                         eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
-                                    end
-                                    if (eventRead.changevalue == 12) then
+                                    elseif (_changevalue == 12) then
                                         eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
                                     end
                                 end
-                                local bexecution21 = BExecution()
                                 if (eventRead.noloop) then
                                     break
                                 end
@@ -837,11 +838,12 @@ function M:update()
                                         eventRead.noloop = true
                                     end
                                 end
+                                local bexecution21 = BExecution()
                                 bexecution21.change = eventRead.change
                                 bexecution21.changetype = eventRead.changetype
-                                bexecution21.changevalue = eventRead.changevalue
-                                bexecution21.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
-                                bexecution21.region = tostring(self.results[eventRead.changename])
+                                bexecution21.changevalue = _changevalue
+                                bexecution21.value = eventRead.res + eventRead.rand * Rand1()
+                                bexecution21.region = self.results[eventRead.changename]
                                 bexecution21.time = eventRead.times
                                 bexecution21.ctime = bexecution21.time
                                 table.insert(self.Eventsexe, bexecution21)
@@ -851,7 +853,7 @@ function M:update()
                             self.x = Center.ox
                             self.y = Center.oy
                         end
-                        if (eventRead.special2 == 1) then
+                        if _is_special2 then
                             self.conditions[0] = Time.now
                         end
                     until true
@@ -919,7 +921,7 @@ function M:update()
             end
         end
         if (self.Outdispel) then
-            if (num2 == self.savesha.Length) then
+            if (num2 == #self.savesha) then
                 if (Main.WideScreen) then
                     if (self.x < -50 or self.x > 680 or self.y < -50 or self.y > 530) then
                         self.NeedDelete = true
@@ -928,7 +930,7 @@ function M:update()
                     self.NeedDelete = true
                 end
             end
-        elseif (num2 == self.savesha.Length) then
+        elseif (num2 == #self.savesha) then
             if (Main.WideScreen) then
                 if (self.x < -250 or self.x > 880 or self.y < -250 or self.y > 730) then
                     self.NeedDelete = true
@@ -980,7 +982,7 @@ function M:lupdate()
                         if (eventRead.opreator == ">") then
                             if (eventRead.opreator2 == ">") then
                                 if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event1.loop * event1.addtime)) then
+                                    if (self.conditions[eventRead.contype] > eventRead.condition + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] > eventRead.condition2 + (event1.loop * event1.addtime)) then
                                         if (eventRead.special == 4) then
                                             if (eventRead.changevalue == 6) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1002,13 +1004,13 @@ function M:lupdate()
                                         blexecution.change = eventRead.change
                                         blexecution.changetype = eventRead.changetype
                                         blexecution.changevalue = eventRead.changevalue
-                                        blexecution.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                        blexecution.value = eventRead.res + eventRead.rand * Rand1()
                                         blexecution.region = tostring(self.results[eventRead.changename])
                                         blexecution.time = eventRead.times
                                         blexecution.ctime = blexecution.time
                                         table.insert(self.LEventsexe, blexecution)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event1.loop * event1.addtime))) then
+                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] > eventRead.condition + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] > eventRead.condition2 + (event1.loop * event1.addtime))) then
                                     if (eventRead.special == 4) then
                                         if (eventRead.changevalue == 6) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1030,7 +1032,7 @@ function M:lupdate()
                                     blexecution2.change = eventRead.change
                                     blexecution2.changetype = eventRead.changetype
                                     blexecution2.changevalue = eventRead.changevalue
-                                    blexecution2.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                    blexecution2.value = eventRead.res + eventRead.rand * Rand1()
                                     blexecution2.region = tostring(self.results[eventRead.changename])
                                     blexecution2.time = eventRead.times
                                     blexecution2.ctime = blexecution2.time
@@ -1038,7 +1040,7 @@ function M:lupdate()
                                 end
                             elseif (eventRead.opreator2 == "=") then
                                 if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event1.loop * event1.addtime)) then
+                                    if (self.conditions[eventRead.contype] > eventRead.condition + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] == eventRead.condition2 + (event1.loop * event1.addtime)) then
                                         if (eventRead.special == 4) then
                                             if (eventRead.changevalue == 6) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1060,13 +1062,13 @@ function M:lupdate()
                                         blexecution3.change = eventRead.change
                                         blexecution3.changetype = eventRead.changetype
                                         blexecution3.changevalue = eventRead.changevalue
-                                        blexecution3.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                        blexecution3.value = eventRead.res + eventRead.rand * Rand1()
                                         blexecution3.region = tostring(self.results[eventRead.changename])
                                         blexecution3.time = eventRead.times
                                         blexecution3.ctime = blexecution3.time
                                         table.insert(self.LEventsexe, blexecution3)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event1.loop * event1.addtime))) then
+                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] > eventRead.condition + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] == eventRead.condition2 + (event1.loop * event1.addtime))) then
                                     if (eventRead.special == 4) then
                                         if (eventRead.changevalue == 6) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1088,7 +1090,7 @@ function M:lupdate()
                                     blexecution4.change = eventRead.change
                                     blexecution4.changetype = eventRead.changetype
                                     blexecution4.changevalue = eventRead.changevalue
-                                    blexecution4.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                    blexecution4.value = eventRead.res + eventRead.rand * Rand1()
                                     blexecution4.region = tostring(self.results[eventRead.changename])
                                     blexecution4.time = eventRead.times
                                     blexecution4.ctime = blexecution4.time
@@ -1096,7 +1098,7 @@ function M:lupdate()
                                 end
                             elseif (eventRead.opreator2 == "<") then
                                 if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event1.loop * event1.addtime)) then
+                                    if (self.conditions[eventRead.contype] > eventRead.condition + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] < eventRead.condition2 + (event1.loop * event1.addtime)) then
                                         if (eventRead.special == 4) then
                                             if (eventRead.changevalue == 6) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1118,13 +1120,13 @@ function M:lupdate()
                                         blexecution5.change = eventRead.change
                                         blexecution5.changetype = eventRead.changetype
                                         blexecution5.changevalue = eventRead.changevalue
-                                        blexecution5.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                        blexecution5.value = eventRead.res + eventRead.rand * Rand1()
                                         blexecution5.region = tostring(self.results[eventRead.changename])
                                         blexecution5.time = eventRead.times
                                         blexecution5.ctime = blexecution5.time
                                         table.insert(self.LEventsexe, blexecution5)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event1.loop * event1.addtime))) then
+                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] > eventRead.condition + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] < eventRead.condition2 + (event1.loop * event1.addtime))) then
                                     if (eventRead.special == 4) then
                                         if (eventRead.changevalue == 6) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1146,13 +1148,13 @@ function M:lupdate()
                                     blexecution6.change = eventRead.change
                                     blexecution6.changetype = eventRead.changetype
                                     blexecution6.changevalue = eventRead.changevalue
-                                    blexecution6.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                    blexecution6.value = eventRead.res + eventRead.rand * Rand1()
                                     blexecution6.region = tostring(self.results[eventRead.changename])
                                     blexecution6.time = eventRead.times
                                     blexecution6.ctime = blexecution6.time
                                     table.insert(self.LEventsexe, blexecution6)
                                 end
-                            elseif (self.conditions[eventRead.contype] > float.Parse(eventRead.condition) + (event1.loop * event1.addtime)) then
+                            elseif (self.conditions[eventRead.contype] > eventRead.condition + (event1.loop * event1.addtime)) then
                                 if (eventRead.special == 4) then
                                     if (eventRead.changevalue == 6) then
                                         eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1174,7 +1176,7 @@ function M:lupdate()
                                 blexecution7.change = eventRead.change
                                 blexecution7.changetype = eventRead.changetype
                                 blexecution7.changevalue = eventRead.changevalue
-                                blexecution7.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                blexecution7.value = eventRead.res + eventRead.rand * Rand1()
                                 blexecution7.region = tostring(self.results[eventRead.changename])
                                 blexecution7.time = eventRead.times
                                 blexecution7.ctime = blexecution7.time
@@ -1184,7 +1186,7 @@ function M:lupdate()
                         if (eventRead.opreator == "=") then
                             if (eventRead.opreator2 == ">") then
                                 if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event1.loop * event1.addtime)) then
+                                    if (self.conditions[eventRead.contype] == eventRead.condition + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] > eventRead.condition2 + (event1.loop * event1.addtime)) then
                                         if (eventRead.special == 4) then
                                             if (eventRead.changevalue == 6) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1206,13 +1208,13 @@ function M:lupdate()
                                         blexecution8.change = eventRead.change
                                         blexecution8.changetype = eventRead.changetype
                                         blexecution8.changevalue = eventRead.changevalue
-                                        blexecution8.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                        blexecution8.value = eventRead.res + eventRead.rand * Rand1()
                                         blexecution8.region = tostring(self.results[eventRead.changename])
                                         blexecution8.time = eventRead.times
                                         blexecution8.ctime = blexecution8.time
                                         table.insert(self.LEventsexe, blexecution8)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event1.loop * event1.addtime))) then
+                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] == eventRead.condition + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] > eventRead.condition2 + (event1.loop * event1.addtime))) then
                                     if (eventRead.special == 4) then
                                         if (eventRead.changevalue == 6) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1234,7 +1236,7 @@ function M:lupdate()
                                     blexecution9.change = eventRead.change
                                     blexecution9.changetype = eventRead.changetype
                                     blexecution9.changevalue = eventRead.changevalue
-                                    blexecution9.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                    blexecution9.value = eventRead.res + eventRead.rand * Rand1()
                                     blexecution9.region = tostring(self.results[eventRead.changename])
                                     blexecution9.time = eventRead.times
                                     blexecution9.ctime = blexecution9.time
@@ -1242,7 +1244,7 @@ function M:lupdate()
                                 end
                             elseif (eventRead.opreator2 == "=") then
                                 if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event1.loop * event1.addtime)) then
+                                    if (self.conditions[eventRead.contype] == eventRead.condition + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] == eventRead.condition2 + (event1.loop * event1.addtime)) then
                                         if (eventRead.special == 4) then
                                             if (eventRead.changevalue == 6) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1264,13 +1266,13 @@ function M:lupdate()
                                         blexecution10.change = eventRead.change
                                         blexecution10.changetype = eventRead.changetype
                                         blexecution10.changevalue = eventRead.changevalue
-                                        blexecution10.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                        blexecution10.value = eventRead.res + eventRead.rand * Rand1()
                                         blexecution10.region = tostring(self.results[eventRead.changename])
                                         blexecution10.time = eventRead.times
                                         blexecution10.ctime = blexecution10.time
                                         table.insert(self.LEventsexe, blexecution10)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event1.loop * event1.addtime))) then
+                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] == eventRead.condition + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] == eventRead.condition2 + (event1.loop * event1.addtime))) then
                                     if (eventRead.special == 4) then
                                         if (eventRead.changevalue == 6) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1292,7 +1294,7 @@ function M:lupdate()
                                     blexecution11.change = eventRead.change
                                     blexecution11.changetype = eventRead.changetype
                                     blexecution11.changevalue = eventRead.changevalue
-                                    blexecution11.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                    blexecution11.value = eventRead.res + eventRead.rand * Rand1()
                                     blexecution11.region = tostring(self.results[eventRead.changename])
                                     blexecution11.time = eventRead.times
                                     blexecution11.ctime = blexecution11.time
@@ -1300,7 +1302,7 @@ function M:lupdate()
                                 end
                             elseif (eventRead.opreator2 == "<") then
                                 if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event1.loop * event1.addtime)) then
+                                    if (self.conditions[eventRead.contype] == eventRead.condition + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] < eventRead.condition2 + (event1.loop * event1.addtime)) then
                                         if (eventRead.special == 4) then
                                             if (eventRead.changevalue == 6) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1322,13 +1324,13 @@ function M:lupdate()
                                         blexecution12.change = eventRead.change
                                         blexecution12.changetype = eventRead.changetype
                                         blexecution12.changevalue = eventRead.changevalue
-                                        blexecution12.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                        blexecution12.value = eventRead.res + eventRead.rand * Rand1()
                                         blexecution12.region = tostring(self.results[eventRead.changename])
                                         blexecution12.time = eventRead.times
                                         blexecution12.ctime = blexecution12.time
                                         table.insert(self.LEventsexe, blexecution12)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event1.loop * event1.addtime))) then
+                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] == eventRead.condition + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] < eventRead.condition2 + (event1.loop * event1.addtime))) then
                                     if (eventRead.special == 4) then
                                         if (eventRead.changevalue == 6) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1350,13 +1352,13 @@ function M:lupdate()
                                     blexecution13.change = eventRead.change
                                     blexecution13.changetype = eventRead.changetype
                                     blexecution13.changevalue = eventRead.changevalue
-                                    blexecution13.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                    blexecution13.value = eventRead.res + eventRead.rand * Rand1()
                                     blexecution13.region = tostring(self.results[eventRead.changename])
                                     blexecution13.time = eventRead.times
                                     blexecution13.ctime = blexecution13.time
                                     table.insert(self.LEventsexe, blexecution13)
                                 end
-                            elseif (self.conditions[eventRead.contype] == float.Parse(eventRead.condition) + (event1.loop * event1.addtime)) then
+                            elseif (self.conditions[eventRead.contype] == eventRead.condition + (event1.loop * event1.addtime)) then
                                 if (eventRead.special == 4) then
                                     if (eventRead.changevalue == 6) then
                                         eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1378,7 +1380,7 @@ function M:lupdate()
                                 blexecution14.change = eventRead.change
                                 blexecution14.changetype = eventRead.changetype
                                 blexecution14.changevalue = eventRead.changevalue
-                                blexecution14.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                blexecution14.value = eventRead.res + eventRead.rand * Rand1()
                                 blexecution14.region = tostring(self.results[eventRead.changename])
                                 blexecution14.time = eventRead.times
                                 blexecution14.ctime = blexecution14.time
@@ -1388,7 +1390,7 @@ function M:lupdate()
                         if (eventRead.opreator == "<") then
                             if (eventRead.opreator2 == ">") then
                                 if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event1.loop * event1.addtime)) then
+                                    if (self.conditions[eventRead.contype] < eventRead.condition + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] > eventRead.condition2 + (event1.loop * event1.addtime)) then
                                         if (eventRead.special == 4) then
                                             if (eventRead.changevalue == 6) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1410,13 +1412,13 @@ function M:lupdate()
                                         blexecution15.change = eventRead.change
                                         blexecution15.changetype = eventRead.changetype
                                         blexecution15.changevalue = eventRead.changevalue
-                                        blexecution15.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                        blexecution15.value = eventRead.res + eventRead.rand * Rand1()
                                         blexecution15.region = tostring(self.results[eventRead.changename])
                                         blexecution15.time = eventRead.times
                                         blexecution15.ctime = blexecution15.time
                                         table.insert(self.LEventsexe, blexecution15)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] > float.Parse(eventRead.condition2) + (event1.loop * event1.addtime))) then
+                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] < eventRead.condition + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] > eventRead.condition2 + (event1.loop * event1.addtime))) then
                                     if (eventRead.special == 4) then
                                         if (eventRead.changevalue == 6) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1438,7 +1440,7 @@ function M:lupdate()
                                     blexecution16.change = eventRead.change
                                     blexecution16.changetype = eventRead.changetype
                                     blexecution16.changevalue = eventRead.changevalue
-                                    blexecution16.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                    blexecution16.value = eventRead.res + eventRead.rand * Rand1()
                                     blexecution16.region = tostring(self.results[eventRead.changename])
                                     blexecution16.time = eventRead.times
                                     blexecution16.ctime = blexecution16.time
@@ -1446,7 +1448,7 @@ function M:lupdate()
                                 end
                             elseif (eventRead.opreator2 == "=") then
                                 if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event1.loop * event1.addtime)) then
+                                    if (self.conditions[eventRead.contype] < eventRead.condition + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] == eventRead.condition2 + (event1.loop * event1.addtime)) then
                                         if (eventRead.special == 4) then
                                             if (eventRead.changevalue == 6) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1468,13 +1470,13 @@ function M:lupdate()
                                         blexecution17.change = eventRead.change
                                         blexecution17.changetype = eventRead.changetype
                                         blexecution17.changevalue = eventRead.changevalue
-                                        blexecution17.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                        blexecution17.value = eventRead.res + eventRead.rand * Rand1()
                                         blexecution17.region = tostring(self.results[eventRead.changename])
                                         blexecution17.time = eventRead.times
                                         blexecution17.ctime = blexecution17.time
                                         table.insert(self.LEventsexe, blexecution17)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] == float.Parse(eventRead.condition2) + (event1.loop * event1.addtime))) then
+                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] < eventRead.condition + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] == eventRead.condition2 + (event1.loop * event1.addtime))) then
                                     if (eventRead.special == 4) then
                                         if (eventRead.changevalue == 6) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1496,7 +1498,7 @@ function M:lupdate()
                                     blexecution18.change = eventRead.change
                                     blexecution18.changetype = eventRead.changetype
                                     blexecution18.changevalue = eventRead.changevalue
-                                    blexecution18.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                    blexecution18.value = eventRead.res + eventRead.rand * Rand1()
                                     blexecution18.region = tostring(self.results[eventRead.changename])
                                     blexecution18.time = eventRead.times
                                     blexecution18.ctime = blexecution18.time
@@ -1504,7 +1506,7 @@ function M:lupdate()
                                 end
                             elseif (eventRead.opreator2 == "<") then
                                 if (eventRead.collector == "且") then
-                                    if (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event1.loop * event1.addtime)) then
+                                    if (self.conditions[eventRead.contype] < eventRead.condition + (event1.loop * event1.addtime) and self.conditions[eventRead.contype2] < eventRead.condition2 + (event1.loop * event1.addtime)) then
                                         if (eventRead.special == 4) then
                                             if (eventRead.changevalue == 6) then
                                                 eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1526,13 +1528,13 @@ function M:lupdate()
                                         blexecution19.change = eventRead.change
                                         blexecution19.changetype = eventRead.changetype
                                         blexecution19.changevalue = eventRead.changevalue
-                                        blexecution19.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                        blexecution19.value = eventRead.res + eventRead.rand * Rand1()
                                         blexecution19.region = tostring(self.results[eventRead.changename])
                                         blexecution19.time = eventRead.times
                                         blexecution19.ctime = blexecution19.time
                                         table.insert(self.LEventsexe, blexecution19)
                                     end
-                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] < float.Parse(eventRead.condition2) + (event1.loop * event1.addtime))) then
+                                elseif (eventRead.collector == "或" and (self.conditions[eventRead.contype] < eventRead.condition + (event1.loop * event1.addtime) or self.conditions[eventRead.contype2] < eventRead.condition2 + (event1.loop * event1.addtime))) then
                                     if (eventRead.special == 4) then
                                         if (eventRead.changevalue == 6) then
                                             eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1554,13 +1556,13 @@ function M:lupdate()
                                     blexecution20.change = eventRead.change
                                     blexecution20.changetype = eventRead.changetype
                                     blexecution20.changevalue = eventRead.changevalue
-                                    blexecution20.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                    blexecution20.value = eventRead.res + eventRead.rand * Rand1()
                                     blexecution20.region = tostring(self.results[eventRead.changename])
                                     blexecution20.time = eventRead.times
                                     blexecution20.ctime = blexecution20.time
                                     table.insert(self.LEventsexe, blexecution20)
                                 end
-                            elseif (self.conditions[eventRead.contype] < float.Parse(eventRead.condition) + (event1.loop * event1.addtime)) then
+                            elseif (self.conditions[eventRead.contype] < eventRead.condition + (event1.loop * event1.addtime)) then
                                 if (eventRead.special == 4) then
                                     if (eventRead.changevalue == 6) then
                                         eventRead.res = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, self.x, self.y))
@@ -1582,7 +1584,7 @@ function M:lupdate()
                                 blexecution21.change = eventRead.change
                                 blexecution21.changetype = eventRead.changetype
                                 blexecution21.changevalue = eventRead.changevalue
-                                blexecution21.value = eventRead.res + MathHelper.Lerp(-eventRead.rand, eventRead.rand, Main.rand.NextDouble())
+                                blexecution21.value = eventRead.res + eventRead.rand * Rand1()
                                 blexecution21.region = tostring(self.results[eventRead.changename])
                                 blexecution21.time = eventRead.times
                                 blexecution21.ctime = blexecution21.time
@@ -1798,6 +1800,7 @@ function M:draw()
     end
     local set = self:getSet()
     local xx, yy = self:getCoord(self.x, self.y)
+    local blend = self.Blend and 'mul+add' or ''
     if self.time <= 15 and self.Mist then
         local color = Color(
                 self.time / 15 * (self.alpha / 100) * 255,
@@ -1806,14 +1809,14 @@ function M:draw()
             if set.color ~= -1 then
                 local name = 'mbg.mist' .. (set.color + 1)
                 local scale = set.rect.Width / 30 + 1.5 * (15 - self.time) / 15
-                SetImageState(name, '', color)
+                SetImageState(name, blend, color)
                 Render(name, xx, yy, 0, scale)
                 return
             end
             if self.type < 228 then
                 local name = 'mbg.barrage' .. (self.type + 1)
-                local rot = math.rad(self.head) + math.pi / 2
-                SetImageState(name, '', color)
+                local rot = -(self.head + 90)
+                SetImageState(name, blend, color)
                 Render(name, xx, yy, rot, self.wscale, self.hscale)
                 return
             end
@@ -1822,8 +1825,8 @@ function M:draw()
         else
             if self.type < 228 then
                 local name = 'mbg.barrage' .. (self.type + 1)
-                local rot = math.rad(self.head) + math.pi / 2
-                SetImageState(name, '', color)
+                local rot = -(self.head + 90)
+                SetImageState(name, blend, color)
                 local hsc = self.wscale + (15 - self.time) / 15
                 local vsc = self.hscale + (15 - self.time) / 15
                 Render(name, xx, yy, rot, hsc, vsc)
@@ -1838,9 +1841,11 @@ function M:draw()
                 self.R, self.G, self.B)
         if self.type < 228 then
             local name = 'mbg.barrage' .. (self.type + 1)
-            local rot = math.rad(self.head) + math.pi / 2
-            SetImageState(name, '', color)
+            local rot = -(self.head + 90)
+            SetImageState(name, blend, color)
             Render(name, xx, yy, rot, self.wscale, self.hscale)
+            --local str = ('%.1f,%.1f'):format(self.wscale, self.hscale)
+            --RenderText('menu', str, xx, yy, 0.3)
             return
         else
             -- custom texture
@@ -1853,10 +1858,10 @@ function M:draw()
                     local col = Color(
                             (shadows.alpha) * 255,
                             self.R, self.G, self.B)
-                    local rot = math.rad(shadows.d) + math.pi / 2
+                    local rot = -(shadows.d + 90)
                     if self.type < 228 then
                         local name = 'mbg.barrage' .. (self.type + 1)
-                        SetImageState(name, '', col)
+                        SetImageState(name, blend, col)
                         Render(name, x, y, rot, self.wscale, self.hscale)
                     else
                         -- custom texture
@@ -1866,18 +1871,33 @@ function M:draw()
         end
         if self.Dis and set.rect.Width <= 48 then
             local name = 'mbg.dis' .. (set.color + 1)
-            SetImageState(name, '', color)
-            Render(name, xx, yy, self.randf, self.dscale)
+            SetImageState(name, blend, color)
+            Render(name, xx, yy, math.deg(-self.randf), self.dscale)
         end
     end
 end
 
 function M:getCoord(x, y)
-    return Time.quake.X + x - 315, Time.quake.Y + y - 240
+    return (Time.quake.X + x - 315), - (Time.quake.Y + y - 240)
 end
 
 function M:getSet()
     return Main.bgset[self.type + 1]
 end
+
+local mt = {
+    __call = function()
+        local ret = {}
+        M.ctor(ret)
+        ret.update = M.update
+        ret.lupdate = M.lupdate
+        ret.judge = M.judge
+        ret.draw = M.draw
+        ret.getCoord = M.getCoord
+        ret.getSet = M.getSet
+        return ret
+    end
+}
+setmetatable(M, mt)
 
 return M

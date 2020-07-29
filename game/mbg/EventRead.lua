@@ -1,5 +1,6 @@
 ---@class lstg.mbg.EventRead
-local M = class('lstg.mbg.EventRead')
+local M = {}
+--local M = class('lstg.mbg.EventRead')
 
 function M:ctor()
     self.rand = 0
@@ -30,5 +31,15 @@ function M:copy()
     end
     return ret
 end
+
+local mt = {
+    __call = function()
+        local ret = {}
+        M.ctor(ret)
+        ret.copy = M.copy
+        return ret
+    end
+}
+setmetatable(M, mt)
 
 return M

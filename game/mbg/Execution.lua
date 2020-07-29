@@ -1,5 +1,6 @@
 ---@class lstg.mbg.Execution
-local M = class('lstg.mbg.Execution')
+local M = {}
+--local M = class('lstg.mbg.Execution')
 local Math = require('game.mbg._math')
 local MathHelper = Math
 local float = { Parse = function(s)
@@ -845,5 +846,16 @@ function M:update(objects)
         self.NeedDelete = true
     end
 end
+
+local mt = {
+    __call = function()
+        local ret = {}
+        M.ctor(ret)
+        ret.clone = M.clone
+        ret.update = M.update
+        return ret
+    end
+}
+setmetatable(M, mt)
 
 return M

@@ -1,5 +1,6 @@
 ---@class lstg.mbg.Force
-local M = class('lstg.mbg.ForceField')
+local M = {}
+--local M = class('lstg.mbg.ForceField')
 local Player = require('game.mbg.Player')
 local Time = require('game.mbg.Time')
 local Main = require('game.mbg.Main')
@@ -8,15 +9,25 @@ local Math = require('game.mbg._math')
 
 M.record = 0
 
+local function _ctor(data)
+    local ret = {}
+    M.ctor(ret, data)
+    ret.update = M.update
+    ret.clone = M.clone
+    ret.copy = M.copy
+    ret.getLayer = M.getLayer
+    return ret
+end
+
 ---@param data mbg.ForceField
 function M:ctor(data)
     -- private
     self.clcount = 0
     self.clwait = 0
     -- public
-    --self.Selecting = false
-    --self.NeedDelete = false
-    --self.Searched = 0
+    self.Selecting = false
+    self.NeedDelete = false
+    self.Searched = 0
     self.id = 0
     self.parentid = 0
     self.parentcolor = 0
@@ -56,6 +67,8 @@ function M:ctor(data)
     --- 力场加速度
     self.addspeed = 0
     self.Parentevents = {}
+    ---@type lstg.mbg.Force
+    self.copys = nil
     if not data then
         return
     end
@@ -63,7 +76,7 @@ function M:ctor(data)
         return v.RandValue
     end
     self._data = data
-    self.rand = M()
+    self.rand = _ctor()
     --
     self.id = data["ID"]
     self.parentid = data["层ID"]
@@ -71,8 +84,10 @@ function M:ctor(data)
     self.y = data["位置坐标"].Y
     self.begin = data["生命"].Begin
     self.life = data["生命"].LifeTime
-    self.halfw = data["生命"]
+    self.halfw = data["半高"]
+    --assert(type(self.halfw) == 'number')
     self.halfh = data["半宽"]
+    --assert(type(self.halfh) == 'number')
     self.Circle = data["启用圆形"]
     self.type = data["类型"]
     self.controlid = data["控制ID"]
@@ -241,5 +256,12 @@ function M:getLayer()
     local Layer = require('game.mbg.Layer')
     return Layer.LayerArray[self.parentid + 1]
 end
+
+local mt = {
+    __call = function(_, data)
+        return _ctor(data)
+    end
+}
+setmetatable(M, mt)
 
 return M

@@ -52,6 +52,8 @@ end
 function M:update()
     local Time = require('game.mbg.Time')
     local Main = require('game.mbg.Main')
+    local sw = lstg.StopWatch()
+    local tt = 0
 
     if not Main.Available then
         return
@@ -103,11 +105,13 @@ function M:update()
             end
         end
         if Time.Playing then
+            sw:reset()
             for i, v in ipairs(self.Barrages) do
                 v.id = i - 1
                 v:update()
                 v:lupdate()
             end
+            self._Tb = sw:get() * 1000
         end
     end
 end

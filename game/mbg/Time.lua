@@ -67,6 +67,7 @@ function M.update()
             M.now = 1
             M.left = 1
             Center.Eventsexe = {}
+
             for _, layer8 in ipairs(Layer.LayerArray) do
                 for _, batch4 in ipairs(layer8.BatchArray) do
                     batch4.Eventsexe = {}
@@ -262,11 +263,9 @@ function M.update()
     end
 end
 
-function M.play()
-    local Center = require('game.mbg.Center')
+function M._play()
     local Player = require('game.mbg.Player')
     local Main = require('game.mbg.Main')
-    local GlobalEvent = require('game.mbg.GlobalEvent')
     local Layer = require('game.mbg.Layer')
 
     M.Playing = true
@@ -278,9 +277,227 @@ function M.play()
                 for _, e in ipairs(batch.copys.Parentevents) do
                     e.loop = 0
                 end
-                --TODO
+                local num = MathHelper.Lerp(-batch.copys.rand.speed, batch.copys.rand.speed, Main.rand.NextDouble())
+                local num2 = math.floor(MathHelper.Lerp(-batch.copys.rand.speedd, batch.copys.rand.speedd, Main.rand.NextDouble()))
+                local num3 = MathHelper.Lerp(-batch.copys.rand.aspeed, batch.copys.rand.aspeed, Main.rand.NextDouble())
+                local num4 = math.floor(MathHelper.Lerp(-batch.copys.rand.aspeedd, batch.copys.rand.aspeedd, Main.rand.NextDouble()))
+                if (batch.fx == -99998) then
+                    batch.copys.fx = batch.x - 4
+                end
+                if (batch.fx == -99999) then
+                    batch.copys.fx = Player.position.X
+                end
+                if (batch.fy == -99998) then
+                    batch.copys.fy = batch.y + 16
+                end
+                if (batch.fy == -99999) then
+                    batch.copys.fy = Player.position.Y
+                end
+                if (batch.speedd == -99999) then
+                    batch.copys.speedd = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, batch.copys.fx, batch.copys.fy))
+                end
+                if (batch.aspeedd == -99999) then
+                    batch.copys.aspeedd = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, batch.copys.fx, batch.copys.fy))
+                end
+                batch.copys.aspeed = batch.copys.aspeed + num3
+                batch.copys.aspeedd = batch.copys.aspeedd + num4
+                batch.copys.speed = batch.copys.speed + num
+                batch.copys.speedd = batch.copys.speedd + num2
+                batch.copys.aspeedx = batch.copys.aspeed * Math.Cos(MathHelper.ToRadians(batch.copys.aspeedd))
+                batch.copys.aspeedy = batch.copys.aspeed * Math.Sin(MathHelper.ToRadians(batch.copys.aspeedd))
+                batch.copys.speedx = batch.copys.speed * Math.Cos(MathHelper.ToRadians(batch.copys.speedd))
+                batch.copys.speedy = batch.copys.speed * Math.Sin(MathHelper.ToRadians(batch.copys.speedd))
+                batch.copys.bfdirection = batch.fdirection
+                batch.copys.bsonaspeedd = batch.sonaspeedd
+                if (batch.fdirection == -99998) then
+                    batch.copys.fdirection = MathHelper.ToDegrees(Main.Twopointangle(batch.x - 4, batch.y + 16, batch.copys.fx, batch.copys.fy))
+                elseif (batch.fdirection == -99999) then
+                    batch.copys.fdirection = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, batch.copys.fx, batch.copys.fy))
+                elseif (batch.fdirection == -100000) then
+                    batch.copys.fdirection = MathHelper.ToDegrees(Main.Twopointangle(batch.fdirections.X, batch.fdirections.Y, batch.copys.fx, batch.copys.fy))
+                end
+                if (batch.sonaspeedd == -99998) then
+                    batch.copys.sonaspeedd = MathHelper.ToDegrees(Main.Twopointangle(batch.x - 4, batch.y + 16, batch.copys.fx, batch.copys.fy))
+                elseif (batch.sonaspeedd == -99999) then
+                    batch.copys.sonaspeedd = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, batch.copys.fx, batch.copys.fy))
+                elseif (batch.sonaspeedd == -100000) then
+                    batch.copys.sonaspeedd = MathHelper.ToDegrees(Main.Twopointangle(batch.sonaspeedds.X, batch.sonaspeedds.Y, batch.copys.fx, batch.copys.fy))
+                end
+                if (batch.head == -100000) then
+                    batch.copys.head = MathHelper.ToDegrees(Main.Twopointangle(batch.heads.X, batch.heads.Y, batch.copys.fx, batch.copys.fx))
+                end
+                for _, event2 in ipairs(batch.Parentevents) do
+                    for _, e in ipairs(event2.events) do
+                        event2:addBatchParentEvent(e)
+                    end
+                end
+                for _, event3 in ipairs(batch.Sonevents) do
+                    for _, e in ipairs(event3.events) do
+                        event3:addBatchChildEvent(e)
+                    end
+                end
+            end
+            for _, lase in ipairs(layer.LaseArray) do
+                lase.Selecting = false
+                lase.copys = lase:copy()
+                for _, e in ipairs(lase.copys.Parentevents) do
+                    e.loop = 0
+                end
+                local num5 = MathHelper.Lerp(-lase.copys.rand.speed, lase.copys.rand.speed, Main.rand.NextDouble())
+                local num6 = math.floor(MathHelper.Lerp(-lase.copys.rand.speedd, lase.copys.rand.speedd, Main.rand.NextDouble()))
+                local num7 = MathHelper.Lerp(-lase.copys.rand.aspeed, lase.copys.rand.aspeed, Main.rand.NextDouble())
+                local num8 = math.floor(MathHelper.Lerp(-lase.copys.rand.aspeedd, lase.copys.rand.aspeedd, Main.rand.NextDouble()))
+                lase.copys.aspeed = lase.copys.aspeed + num7
+                lase.copys.aspeedd = lase.copys.aspeedd + num8
+                lase.copys.speed = lase.copys.speed + num5
+                lase.copys.speedd = lase.copys.speedd + num6
+                lase.copys.aspeedx = lase.copys.aspeed * Math.Cos(MathHelper.ToRadians(lase.copys.aspeedd))
+                lase.copys.aspeedy = lase.copys.aspeed * Math.Sin(MathHelper.ToRadians(lase.copys.aspeedd))
+                lase.copys.speedx = lase.copys.speed * Math.Cos(MathHelper.ToRadians(lase.copys.speedd))
+                lase.copys.speedy = lase.copys.speed * Math.Sin(MathHelper.ToRadians(lase.copys.speedd))
+                if (lase.fdirection == -99999) then
+                    lase.copys.fdirection = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, lase.copys.x - 4, lase.copys.y + 16))
+                elseif (lase.fdirection == -100000) then
+                    lase.copys.fdirection = MathHelper.ToDegrees(Main.Twopointangle(lase.fdirections.X, lase.fdirections.Y, lase.copys.x - 4, lase.copys.y + 16))
+                end
+                if (lase.sonaspeedd == -99998) then
+                    lase.copys.sonaspeedd = MathHelper.ToDegrees(Main.Twopointangle(lase.x - 4, lase.y + 16, lase.copys.x - 4, lase.copys.y + 16))
+                elseif (lase.sonaspeedd == -99999) then
+                    lase.copys.sonaspeedd = MathHelper.ToDegrees(Main.Twopointangle(Player.position.X, Player.position.Y, lase.copys.x - 4, lase.copys.y + 16))
+                elseif (lase.sonaspeedd == -100000) then
+                    lase.copys.sonaspeedd = MathHelper.ToDegrees(Main.Twopointangle(lase.sonaspeedds.X, lase.sonaspeedds.Y, lase.copys.x - 4, lase.copys.y + 16))
+                end
+                for _, event5 in ipairs(lase.Parentevents) do
+                    for _, e in ipairs(event5.events) do
+                        event5:addLaserParentEvent(e)
+                    end
+                end
+                for _, event6 in ipairs(lase.Sonevents) do
+                    for _, e in ipairs(event6.events) do
+                        event6:addLaserChildEvent(e)
+                    end
+                end
+            end
+            for _, cover in ipairs(layer.CoverArray) do
+                cover.Selecting = false
+                cover.copys = cover:copy()
+                for _, e in ipairs(cover.copys.Parentevents) do
+                    e.loop = 0
+                end
+                local num9 = MathHelper.Lerp(-cover.copys.rand.speed, cover.copys.rand.speed, Main.rand.NextDouble())
+                local num10 = math.floor(MathHelper.Lerp(-cover.copys.rand.speedd, cover.copys.rand.speedd, Main.rand.NextDouble()))
+                local num11 = MathHelper.Lerp(-cover.copys.rand.aspeed, cover.copys.rand.aspeed, Main.rand.NextDouble())
+                local num12 = math.floor(MathHelper.Lerp(-cover.copys.rand.aspeedd, cover.copys.rand.aspeedd, Main.rand.NextDouble()))
+                cover.copys.aspeed = cover.copys.aspeed + num11
+                cover.copys.aspeedd = cover.copys.aspeedd + num12
+                cover.copys.speed = cover.copys.speed + num9
+                cover.copys.speedd = cover.copys.speedd + num10
+                cover.copys.aspeedx = cover.copys.aspeed * Math.Cos(MathHelper.ToRadians(cover.copys.aspeedd))
+                cover.copys.aspeedy = cover.copys.aspeed * Math.Sin(MathHelper.ToRadians(cover.copys.aspeedd))
+                cover.copys.speedx = cover.copys.speed * Math.Cos(MathHelper.ToRadians(cover.copys.speedd))
+                cover.copys.speedy = cover.copys.speed * Math.Sin(MathHelper.ToRadians(cover.copys.speedd))
+                for _, event8 in ipairs(cover.Parentevents) do
+                    for _, e in ipairs(event8.events) do
+                        event8:addCoverParentEvent(e)
+                    end
+                end
+                for _, event9 in ipairs(cover.Sonevents) do
+                    for _, e in ipairs(event9.events) do
+                        event9:addCoverChildEvent(e)
+                    end
+                end
+            end
+            for _, rebound in ipairs(layer.ReboundArray) do
+                rebound.Selecting = false
+                rebound.copys = rebound:copy()
+                local num13 = MathHelper.Lerp(-rebound.copys.rand.speed, rebound.copys.rand.speed, Main.rand.NextDouble())
+                local num14 = math.floor(MathHelper.Lerp(-rebound.copys.rand.speedd, rebound.copys.rand.speedd, Main.rand.NextDouble()))
+                local num15 = MathHelper.Lerp(-rebound.copys.rand.aspeed, rebound.copys.rand.aspeed, Main.rand.NextDouble())
+                local num16 = math.floor(MathHelper.Lerp(-rebound.copys.rand.aspeedd, rebound.copys.rand.aspeedd, Main.rand.NextDouble()))
+                rebound.copys.aspeed = rebound.copys.aspeed + num15
+                rebound.copys.aspeedd = rebound.copys.aspeedd + num16
+                rebound.copys.speed = rebound.copys.speed + num13
+                rebound.copys.speedd = rebound.copys.speedd + num14
+                rebound.copys.aspeedx = rebound.copys.aspeed * Math.Cos(MathHelper.ToRadians(rebound.copys.aspeedd))
+                rebound.copys.aspeedy = rebound.copys.aspeed * Math.Sin(MathHelper.ToRadians(rebound.copys.aspeedd))
+                rebound.copys.speedx = rebound.copys.speed * Math.Cos(MathHelper.ToRadians(rebound.copys.speedd))
+                rebound.copys.speedy = rebound.copys.speed * Math.Sin(MathHelper.ToRadians(rebound.copys.speedd))
+            end
+            for _, force in ipairs(layer.ForceArray) do
+                force.Selecting = false
+                force.copys = force:copy()
+                local num17 = MathHelper.Lerp(-force.copys.rand.speed, force.copys.rand.speed, Main.rand.NextDouble())
+                local num18 = math.floor(MathHelper.Lerp(-force.copys.rand.speedd, force.copys.rand.speedd, Main.rand.NextDouble()))
+                local num19 = MathHelper.Lerp(-force.copys.rand.aspeed, force.copys.rand.aspeed, Main.rand.NextDouble())
+                local num20 = math.floor(MathHelper.Lerp(-force.copys.rand.aspeedd, force.copys.rand.aspeedd, Main.rand.NextDouble()))
+                force.copys.aspeed = force.copys.aspeed + num19
+                force.copys.aspeedd = force.copys.aspeedd + num20
+                force.copys.speed = force.copys.speed + num17
+                force.copys.speedd = force.copys.speedd + num18
+                force.copys.aspeedx = force.copys.aspeed * Math.Cos(MathHelper.ToRadians(force.copys.aspeedd))
+                force.copys.aspeedy = force.copys.aspeed * Math.Sin(MathHelper.ToRadians(force.copys.aspeedd))
+                force.copys.speedx = force.copys.speed * Math.Cos(MathHelper.ToRadians(force.copys.speedd))
+                force.copys.speedy = force.copys.speed * Math.Sin(MathHelper.ToRadians(force.copys.speedd))
             end
         end
+        M.now = M.now - 1
+    end
+end
+
+function M._pause()
+    if M.Playing then
+        M.Pause = true
+    end
+    M.Playing = false
+end
+
+function M._stop()
+    local Center = require('game.mbg.Center')
+    local Player = require('game.mbg.Player')
+    local Layer = require('game.mbg.Layer')
+
+    M.Playing = false
+    M.Pause = false
+    Player.clear()
+    M.now = 1
+    M.left = 1
+    for _, globalEvent2 in ipairs(M.GE) do
+        globalEvent2.gtcount = 0
+        globalEvent2.qtcount = 0
+        globalEvent2.stcount = 0
+    end
+    M.stop = 1
+    M.quake = Vector2(0, 0)
+    for _, layer7 in ipairs(Layer.LayerArray) do
+        for _, batch3 in ipairs(layer7.BatchArray) do
+            batch3.Eventsexe = {}
+            for _, e in ipairs(batch3.Parentevents) do
+                e.results = {}
+            end
+            for _, e in ipairs(batch3.Sonevents) do
+                e.results = {}
+            end
+        end
+        for _, lase3 in ipairs(layer7.LaseArray) do
+            lase3.Eventsexe = {}
+            for _, e in ipairs(lase3.Parentevents) do
+                e.results = {}
+            end
+            for _, e in ipairs(lase3.Sonevents) do
+                e.results = {}
+            end
+        end
+        for _, cover3 in ipairs(layer7.CoverArray) do
+            cover3.Eventsexe = {}
+            for _, e in ipairs(cover3.Parentevents) do
+                e.results = {}
+            end
+            for _, e in ipairs(cover3.Sonevents) do
+                e.results = {}
+            end
+        end
+        Center.Eventsexe = {}
+        layer7.Barrages = {}
     end
 end
 

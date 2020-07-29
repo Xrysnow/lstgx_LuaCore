@@ -29,69 +29,135 @@ function M:ctor(data)
     self.Searched = 0
     self.NeedDelete = false
 
-    self.id = 0
-    self.parentid = 0
-    self.parentcolor = 0
-    self.Binding = false
-    self.bindid = -1;
-    self.Bindwithspeedd = false
-    self.Deepbind = false
-    self.Deepbinded = false
-    self.x = 0
-    self.y = 0
-    self.time = 0
-    self.begin = 0
-    self.life = 0
-    self.fx = -99998
-    self.fy = -99998
-    self.r = 0
-    self.rdirection = 0
-    self.rdirections = { X = 0, Y = 0 }
-    self.tiao = 1
-    self.t = 5
-    self.fdirection = 0
-    self.bfdirection = 0
-    self.fdirections = { X = 0, Y = 0 }
-    self.range = 360
-    self.speed = 0
-    self.speedd = 0
-    self.speedx = 0
-    self.speedy = 0
-    self.speedds = { X = 0, Y = 0 }
-    self.aspeed = 0
-    self.aspeedx = 0
-    self.aspeedy = 0
-    self.aspeedd = 0
-    self.aspeedds = { X = 0, Y = 0 }
-    self.sonlife = 200
-    self.type = 1
-    self.wscale = 1
-    self.hscale = 1
-    self.colorR = 255
-    self.colorG = 255
-    self.colorB = 255
-    self.alpha = 100
-    self.head = 0
-    self.heads = { X = 0, Y = 0 }
-    self.Withspeedd = true
-    self.sonspeed = 5
-    self.sonspeedd = 0
-    self.sonspeedds = { X = 0, Y = 0 }
-    self.sonaspeed = 0
-    self.sonaspeedd = 0
-    self.bsonaspeedd = 0
-    self.sonaspeedds = { X = 0, Y = 0 }
-    self.xscale = 1
-    self.yscale = 1
-    self.Mist = true
-    self.Dispel = true
-    self.Blend = false
-    self.Afterimage = false
-    self.Outdispel = true
-    self.Invincible = false
-    self.Cover = true
-    self.Rebound = true
-    self.Force = true
+    if data then
+        self.id = 0
+        self.parentid = 0
+        self.parentcolor = 0
+        self.Binding = false
+        self.bindid = -1
+        self.Bindwithspeedd = false
+        self.Deepbind = false
+        self.Deepbinded = false
+        self.x = 0
+        self.y = 0
+        self.time = 0
+        self.begin = 0
+        self.life = 0
+        self.fx = -99998
+        self.fy = -99998
+        self.r = 0
+        self.rdirection = 0
+        self.rdirections = { X = 0, Y = 0 }
+        self.tiao = 1
+        self.t = 5
+        self.fdirection = 0
+        self.bfdirection = 0
+        self.fdirections = { X = 0, Y = 0 }
+        self.range = 360
+        self.speed = 0
+        self.speedd = 0
+        self.speedx = 0
+        self.speedy = 0
+        self.speedds = { X = 0, Y = 0 }
+        self.aspeed = 0
+        self.aspeedx = 0
+        self.aspeedy = 0
+        self.aspeedd = 0
+        self.aspeedds = { X = 0, Y = 0 }
+        self.sonlife = 200
+        self.type = 1
+        self.wscale = 1
+        self.hscale = 1
+        self.colorR = 255
+        self.colorG = 255
+        self.colorB = 255
+        self.alpha = 100
+        self.head = 0
+        self.heads = { X = 0, Y = 0 }
+        self.Withspeedd = true
+        self.sonspeed = 5
+        self.sonspeedd = 0
+        self.sonspeedds = { X = 0, Y = 0 }
+        self.sonaspeed = 0
+        self.sonaspeedd = 0
+        self.bsonaspeedd = 0
+        self.sonaspeedds = { X = 0, Y = 0 }
+        self.xscale = 1
+        self.yscale = 1
+        self.Mist = true
+        self.Dispel = true
+        self.Blend = false
+        self.Afterimage = false
+        self.Outdispel = true
+        self.Invincible = false
+        self.Cover = true
+        self.Rebound = true
+        self.Force = true
+    else
+        self.id = 0
+        self.parentid = 0
+        self.parentcolor = 0
+        self.Binding = false
+        self.bindid = -1
+        self.Bindwithspeedd = false
+        self.Deepbind = false
+        self.Deepbinded = false
+        self.x = 0
+        self.y = 0
+        self.time = 0
+        self.begin = 0
+        self.life = 0
+        self.fx = 0
+        self.fy = 0
+        self.r = 0
+        self.rdirection = 0
+        self.rdirections = { X = 0, Y = 0 }
+        self.tiao = 0
+        self.t = 0
+        self.fdirection = 0
+        self.bfdirection = 0
+        self.fdirections = { X = 0, Y = 0 }
+        self.range = 0
+        self.speed = 0
+        self.speedd = 0
+        self.speedx = 0
+        self.speedy = 0
+        self.speedds = { X = 0, Y = 0 }
+        self.aspeed = 0
+        self.aspeedx = 0
+        self.aspeedy = 0
+        self.aspeedd = 0
+        self.aspeedds = { X = 0, Y = 0 }
+        self.sonlife = 0
+        self.type = 0
+        self.wscale = 0
+        self.hscale = 0
+        self.colorR = 0
+        self.colorG = 0
+        self.colorB = 0
+        self.alpha = 0
+        self.head = 0
+        self.heads = { X = 0, Y = 0 }
+        self.Withspeedd = true
+        self.sonspeed = 0
+        self.sonspeedd = 0
+        self.sonspeedds = { X = 0, Y = 0 }
+        self.sonaspeed = 0
+        self.sonaspeedd = 0
+        self.bsonaspeedd = 0
+        self.sonaspeedds = { X = 0, Y = 0 }
+        self.xscale = 0
+        self.yscale = 0
+        self.Mist = false
+        self.Dispel = false
+        self.Blend = false
+        self.Afterimage = false
+        self.Outdispel = false
+        self.Invincible = false
+        self.Cover = false
+        self.Rebound = false
+        self.Force = false
+    end
     ---@type lstg.mbg.Event[]
     self.Parentevents = {}
     ---@type lstg.mbg.Execution[]
@@ -113,9 +179,17 @@ function M:ctor(data)
     --
     self.id = data['ID']
     self.parentid = data['层ID']
-    self.Binding = data['绑定状态']
-    self.bindid = data['绑定ID']
-    self.Bindwithspeedd = data['相对方向']
+    if data['绑定状态'].Parent then
+        self.Binding = true
+        self.bindid = data['绑定状态'].Parent['ID']
+        self.Bindwithspeedd = data['绑定状态'].Relative
+        self.Deepbind = data['绑定状态'].Depth
+    else
+        self.Binding = false
+        self.bindid = -1
+        self.Bindwithspeedd = false
+        self.Deepbind = false
+    end
     self.x = base(data['位置坐标'].X)
     self.y = base(data['位置坐标'].Y)
     self.begin = data['生命'].Begin
@@ -221,11 +295,9 @@ function M:ctor(data)
     self.Cover = data['遮罩']
     self.Rebound = data['反弹板']
     self.Force = data['力场']
-    self.Deepbind = data['深度绑定']
 end
 
 function M:update()
-    print('Batch:update')
     local Execution = require('game.mbg.Execution')
 
     if self.clcount == 1 then

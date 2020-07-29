@@ -31,6 +31,14 @@ local sqrt = math.sqrt
 local tan = math.tan
 local tanh = math.tanh
 
+function M.Min(...)
+    return min(...)
+end
+
+function M.Max(...)
+    return max(...)
+end
+
 function M.Sin(x)
     return sin(x)
 end

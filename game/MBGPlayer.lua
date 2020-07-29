@@ -27,7 +27,7 @@ function M:init(path)
     end
     Main.loadContent()
     require('game.mbg.Opening').Open(data)
-    require('game.mbg.Time').play()
+    require('game.mbg.Time')._play()
 end
 
 function M:frame()
@@ -35,6 +35,7 @@ function M:frame()
         return
     end
     Main.update()
+    Main.draw()
 end
 
 function M:render()
@@ -51,9 +52,16 @@ function M:render()
             b:draw()
         end
     end
-    local Time = require('game.mbg.Time')
-    RenderText('menu', table.concat(num, ','), 0, 0, 0.5)
-    RenderText('menu', ('Play:%s'):format(Time.Playing), 0, -20, 0.5)
+    --local Time = require('game.mbg.Time')
+    --RenderText('menu', table.concat(num, ','), 0, 0, 0.5)
+    --RenderText('menu', ('Play:%s'):format(Time.Playing), 0, -20, 0.5)
+
+    local la1 = Layer.LayerArray[1]
+    local str = ('%d'):format(#(la1.Barrages))
+    if la1._Tb then
+        str = str .. (' %.1f'):format(la1._Tb)
+    end
+    RenderText('menu', str, 0, -200, 0.5)
 end
 
 return M
