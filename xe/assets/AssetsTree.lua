@@ -253,7 +253,9 @@ function M:_update()
         local root_dir = self._dir
         local root_attr, msg = lfs.attributes(fu:getSuitableFOpen(root_dir))
         if not root_attr then
-            error(tostring(msg))
+            --error(tostring(msg))
+            self:close()
+            return
         end
         proc_attr(root_attr)
         local name = root_dir
