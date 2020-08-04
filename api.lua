@@ -1,14 +1,18 @@
 --
 
----该函数未指定窗口化分辨率，请使用ChangeVideoMode
----设置窗口化(true)/非窗口化(false)
+---@~chinese 设置窗口化(true)/非窗口化(false)，请使用 `ChangeVideoMode`
+---
+---@~english Set the engine windowed or full-screen. `true` for windowed and `false` for full-screen. Default is `true`. Please use `ChangeVideoMode` instead.
+---
 ---@param b boolean
 ---@deprecated
 function SetWindowed(b)
 end
 
----设置窗口大小
----可以在运行时动态设置
+---@~chinese 设置窗口大小。可以在运行时动态设置。
+---
+---@~english Set window resolution (size) if game is windowed.
+---
 ---@param width number
 ---@param height number
 function SetResolution(width, height)
@@ -18,7 +22,10 @@ function SetResolution(width, height)
     end
 end
 
----改变视频选项。若成功返回true，否则返回false
+---@~chinese 改变视频选项。若成功返回true，否则返回false
+---
+---@~english Change video parameters. Returns `true` if success, otherwise returns `false` and restore last parameters.
+---
 ---@param width number
 ---@param height number
 ---@param windowed boolean
@@ -44,7 +51,10 @@ function ChangeVideoMode(width, height, windowed, vsync)
     end
 end
 
----设置是否显示光标，默认显示
+---@~chinese 设置是否显示光标，默认显示
+---
+---@~english Set if the mouse cursor is displayed in game window. Default is `true`.
+---
 ---@param b boolean
 function SetSplash(b)
     local w = lstg.WindowHelperDesktop:getInstance()
@@ -53,8 +63,10 @@ function SetSplash(b)
     end
 end
 
----设置窗口标题
----默认为"LuaSTG-x"
+---@~chinese 设置窗口标题。默认为"LuaSTG-x"。
+---
+---@~english Set the caption of window. Default is `"LuaSTG-x"`.
+---
 ---@param title string
 function SetTitle(title)
     local w = lstg.WindowHelperDesktop:getInstance()

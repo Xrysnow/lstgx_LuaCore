@@ -3,12 +3,26 @@
 local FU = cc.FileUtils:getInstance()
 local LRES = lstg.ResourceMgr:getInstance()
 
---- 加载指定位置的ZIP资源包，可选填密码
---- 失败将导致错误
----> 细节
---->   后加载的资源包有较高的查找优先级。这意味着可以通过该机制加载资源包来覆盖基础资源包中的文件。
---->   一旦zip文件被打开，将不能被访问。
---->   加载文件时将按照优先级依次搜索资源包，若资源包中不含文件则从当前目录加载。
+---@~chinese 加载指定位置的ZIP资源包，可选填密码。失败将导致错误。
+---
+---@~chinese 细节
+---
+---@~chinese >   后加载的资源包有较高的查找优先级。这意味着可以通过该机制加载资源包来覆盖基础资源包中的文件。
+---
+---@~chinese >   一旦zip文件被打开，将不能被访问。
+---
+---@~chinese >   加载文件时将按照优先级依次搜索资源包，若资源包中不含文件则从当前目录加载。
+---
+---@~english Load zip pack at `path` with an optional password. Will throw an error if failed.
+---
+---@~english Detail
+---
+---@~english >   Zip pack loaded later will have higher priority. So you can override files in previous packs.
+---
+---@~english >   Zip file will be occupied after loaded.
+---
+---@~english >   Files required by engine will be searched in packs at first, then local path.
+---
 ---@param path string
 ---@param password string @optional
 ---@return lstg.ResourcePack
@@ -26,8 +40,10 @@ function LoadPack(path, password)
     return pack
 end
 
---- 卸载指定位置的资源包，要求路径名必须一致
---- 若资源包不存在不发生错误
+---@~chinese 卸载指定位置的资源包，要求路径名必须一致。若资源包不存在不发生错误。
+---
+---@~english Unload zip pack loaded at `path`. Will NOT throw an error if failed.
+---
 function UnloadPack(path)
     path = FU:fullPathForFilename(path)
     if not LRES:unloadResourcePack(path) then
@@ -35,8 +51,10 @@ function UnloadPack(path)
     end
 end
 
---- 将资源包中的数据解压到本地
---- 若失败将抛出错误
+---@~chinese 将资源包中的数据解压到本地。若失败将抛出错误。
+---
+---@~english Extract files in pack to local path. Will throw an error if failed.
+---
 function ExtractRes(path, target)
     path = FU:fullPathForFilename(path)
     if not LRES:extractFile(path, target) then
