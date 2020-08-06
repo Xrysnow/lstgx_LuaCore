@@ -226,6 +226,10 @@ function DoFrame()
     end
 end
 
+---@~chinese 将被每帧调用以执行渲染指令。
+---
+---@~english Will be invoked every frame to process all render instructions.
+---
 function RenderFunc()
     e:dispatchEvent('onRenderFunc')
 end
@@ -261,6 +265,10 @@ end, 0)
 
 ----------------------------------------------------------------------
 
+---@~chinese 将被每帧调用以执行帧逻辑。返回`true`时会使游戏退出。
+---
+---@~english Will be invoked every frame to process all frame logic. Game will exit if it returns `true`.
+---
 function FrameFunc()
     e:dispatchEvent('onFrameFunc')
     return lstg.quit_flag
@@ -300,15 +308,26 @@ end, 10, 'FrameReset')
 
 ----------------------------------------------------------------------
 
+---@~chinese 将在窗口失去焦点时调用。
+---
+---@~english Will be invoked when the window lose focus.
+---
 function FocusLoseFunc()
     e:dispatchEvent('onFocusLose')
 end
 
+---@~chinese 将在窗口重新获得焦点时调用。
+---
+---@~english Will be invoked when the window get focus.
+---
 function FocusGainFunc()
     e:dispatchEvent('onFocusGain')
 end
 
----游戏初始化
+---@~chinese 将在引擎初始化结束后调用。
+---
+---@~english Will be invoked after the initialization of engine finished.
+---
 function GameInit()
     SetViewMode 'ui'
     if stage.next_stage == nil then
@@ -355,6 +374,7 @@ end, 9)
 
 --
 
+---
 function Screenshot()
     local time = os.date("%Y-%m-%d-%H-%M-%S")
     local path = 'snapshot/' .. time .. '.png'
@@ -454,11 +474,19 @@ if p_light then
     assert(rm, i18n 'failed to create RenderMode')
 end
 
----设置雾值
----若参数为空，将关闭雾效果。否则设置一个从near到far的雾
+---@~chinese 设置雾效果。若无参数，将关闭雾效果。否则开启雾效果。
+---@~chinese - `near`为`-1`时，使用EXP1算法，`far`作为强度参数。
+---@~chinese - `near`为`-2`时，使用EXP2算法，`far`作为强度参数。
+---@~chinese - 否则，使用线性算法，`near, far`作为范围参数。
+---
+---@~english Set fog effect. Will clear fog effect if no parameter if passed, otherwise enable fog effect.
+---@~english - If `near` is `-1`, EXP1 algorism will be used and `far` will be density parameter.
+---@~english - If `near` is `-2`, EXP2 algorism will be used and `far` will be density parameter.
+---@~english - Otherwise, linear algorism will be used and `near, far` will be range parameter.
+---
 ---@param near number
 ---@param far number
----@param color lstg.Color 默认为0xFF000000
+---@param color lstg.Color 可选，默认为`0x00FFFFFF` | optional, default is `0x00FFFFFF`.
 function SetFog(near, far, color)
     local t = {}
     local fog_type

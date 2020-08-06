@@ -7,13 +7,20 @@ local _GetKeyState = lstg.GetKeyState
 local _GetLastKey = lstg.GetLastKey
 local ch = require('platform.ControllerHelper')
 
---- 给出虚拟键代码检测是否按下
----> code的具体含义请查阅keycode.lua
+---@~chinese 给出按键代码检测是否按下。
+---@~chinese > 请查阅`keycode.lua`。
+---
+---@~english Check if key corresponding to `code` is pressed.
+---@~english > See `keycode.lua`.
+---
 function GetKeyState(code)
     return _GetKeyState(code) or ch.getStatus(code)
 end
 
----返回最后一次输入的按键的虚拟键代码
+---@~chinese 返回最后一次输入的按键的按键代码。
+---
+---@~english Returns code of last pressed key.
+---
 ---@return number
 function GetLastKey()
     local ret = _GetLastKey()
@@ -95,7 +102,10 @@ end
 local _GetMousePosition = lstg.GetMousePosition
 local glv = cc.Director:getInstance():getOpenGLView()
 
----获取鼠标的位置，以窗口左下角为原点，使用screen坐标系
+---@~chinese 获取鼠标的screen坐标系位置，以窗口左下角为原点。
+---
+---@~english Get mouse position in screen coordinates starts from the bottom left of the window.
+---
 ---@return number,number
 function GetMousePosition()
     local res = glv:getDesignResolutionSize()
