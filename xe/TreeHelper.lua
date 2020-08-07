@@ -6,7 +6,6 @@ M.watch = watch
 watch.image = {}
 
 function M.addWatch(key, node)
-    print('addWatch', node:getType(), key)
     watch[key][node] = true
 end
 
