@@ -424,7 +424,8 @@ function M:_handler()
     assert(str)
     if str == '' then
         --str = ('[%s] select: %s'):format(self:getType(), self._select)
-        str = ('[%s] fold: %s'):format(self:getType(), self._fold)
+        --str = ('[%s] icon: %s'):format(self:getType(), self._icon)
+        --str = ('[%s] idx: %s'):format(self:getType(), self._index)
     end
     if self._icon then
         str = '     ' .. str
