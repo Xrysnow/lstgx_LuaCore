@@ -86,6 +86,13 @@ if not view then
         view = cc.GLViewImpl:createWithRect(title, rect(0, 0, width, height))
     end
     director:setOpenGLView(view)
+    if cc.Configuration then
+        local cfg = cc.Configuration:getInstance()
+        local backend_device = cfg:getValue('renderer', 'N/A')
+        local backend_version = cfg:getValue('version', 'N/A')
+        lstg.SystemLog(('Backend device: %s'):format(backend_device))
+        lstg.SystemLog(('Backend version: %s'):format(backend_version))
+    end
 end
 
 return M
