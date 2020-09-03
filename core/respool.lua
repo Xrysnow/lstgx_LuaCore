@@ -1239,7 +1239,7 @@ function ParticleStop(object)
 end
 lstg.ParticleStop = ParticleStop
 
----@~chinese 返回绑定在对象上的粒子发射器的存活粒子数。
+---@~chinese 返回绑定在对象上的粒子发射器的当前粒子数。
 ---
 ---@~english Returns current particle count on `object`.
 ---
@@ -1253,7 +1253,7 @@ function ParticleGetn(object)
 end
 lstg.ParticleGetn = ParticleGetn
 
----@~chinese 获取绑定在对象上粒子发射器的发射密度（个/秒）。
+---@~chinese 返回绑定在对象上粒子发射器的发射密度（个/秒）。
 ---
 ---@~chinese 细节
 ---@~chinese > 粒子发射器始终以1/60秒的步进更新。
