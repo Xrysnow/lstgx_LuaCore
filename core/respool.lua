@@ -203,6 +203,7 @@ lstg.GetTextureSize = GetTextureSize
 ---@param path string
 ---@return lstg.ResTexture
 function LoadTexture(name, path)
+    path = string.path_uniform(path)
     local map = _getMap(ENUM_RES_TYPE.tex)
     local old = map:at(name)
     if old then
