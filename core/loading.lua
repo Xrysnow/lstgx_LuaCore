@@ -65,7 +65,7 @@ function lstg.loadMod()
     lstg.eventDispatcher:dispatchEvent('load.THlib.after')
     DoFile('core/score.lua')
 
-    RegistClasses()
+    RegisterClasses()
     SetTitle(setting.mod)
     SetResourceStatus('stage')
 end

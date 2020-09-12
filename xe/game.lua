@@ -165,7 +165,7 @@ function M.start(rank, player, stage_, debugStage, debugSC)
     --M.loadStage()
     lstg.eventDispatcher:dispatchEvent('load.THlib.after')
     DoFile('core/score.lua')
-    RegistClasses()
+    RegisterClasses()
     --SetTitle(setting.mod)
     SetResourceStatus('stage')
     --

@@ -56,7 +56,7 @@ local _class_num = 0
 local _class_id = {}
 --local sym = require('core_x.symbol')
 
-function RegistClasses()
+function RegisterClasses()
     for _, v in pairs(all_class) do
         v[1] = v.init
         v[2] = v.del
