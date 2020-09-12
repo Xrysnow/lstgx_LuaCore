@@ -769,6 +769,7 @@ lstg.PushRenderTarget = PushRenderTarget
 function PopRenderTarget(name)
     assert(FindResRenderTarget(name):pop())
 end
+lstg.PopRenderTarget = PopRenderTarget
 
 ---@~chinese 应用后处理并将结果渲染到屏幕。`param`中的值将传递给着色器。
 ---

@@ -532,6 +532,7 @@ function SetFog(near, far, color)
         end
     end
 end
+lstg.SetFog = SetFog
 
 --
 
