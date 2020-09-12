@@ -24,6 +24,9 @@ end
 local profiler = profiler
 function Scene:onEnter()
     --ex.Test('test2.mp4')
+    if stage.next_stage then
+        return
+    end
     stage.next_stage = stage_menu
 
     --local e = cc.EventListenerCustom:create('director_after_visit', function()
@@ -76,64 +79,66 @@ function Scene:update(dt)
     profiler.toc('RenderFunc')
 end
 
-stage_init = stage.New('init', true, true)
-function stage_init:init()
-end
-function stage_init:frame()
-    stage.Set('none', 'menu')
-end
-function stage_init:render()
-    SetViewMode('ui')
-    RenderText('menu', 'stage_init', 320, 240, 1)
-end
+if not stage.next_stage then
+    stage_init = stage.New('init', true, true)
+    function stage_init:init()
+    end
+    function stage_init:frame()
+        stage.Set('none', 'menu')
+    end
+    function stage_init:render()
+        SetViewMode('ui')
+        --RenderText('menu', 'stage_init', 320, 240, 1)
+    end
 
-local inited = false
-stage_menu = stage.New('menu', false, true)
-function stage_menu:init()
-    --SetResourceStatus('global')
-    --SystemLog('stage_menu:init')
-    local returnToLauncher = function()
-        -- return to launcher2
-        --SystemLog('pop scene')
-        inited = false
-        stage.current_stage = nil
-        lstg.practice = nil
-        game_util.stopAudios()
-        glv:setDesignResolutionSize(
-                1706, 960, cc.ResolutionPolicy.SHOW_ALL)
-        cc.Director:getInstance():popScene()
-    end
-    if inited then
-        if self.save_replay then
-            --SystemLog('stage_menu =\n'..stringify(self))
-            local menu_replay_saver
-            menu_replay_saver = New(replay_saver, self.save_replay, self.finish, function()
-                menu.FlyOut(menu_replay_saver, 'right')
-                task.New(stage_menu, function()
-                    task.Wait(30)
-                    task.New(stage_menu, returnToLauncher)
-                end)
-            end)
-            menu.FlyIn(menu_replay_saver, 'left')
-        else
-            --returnToLauncher()
-            task.New(stage_menu, returnToLauncher)
+    local inited = false
+    stage_menu = stage.New('menu', false, true)
+    function stage_menu:init()
+        --SetResourceStatus('global')
+        --SystemLog('stage_menu:init')
+        local returnToLauncher = function()
+            -- return to launcher2
+            --SystemLog('pop scene')
+            inited = false
+            stage.current_stage = nil
+            lstg.practice = nil
+            game_util.stopAudios()
+            glv:setDesignResolutionSize(
+                    1706, 960, cc.ResolutionPolicy.SHOW_ALL)
+            cc.Director:getInstance():popScene()
         end
-    else
-        inited = true
-        --SystemLog('before enterStage')
-        game_util.enterStage(stage_menu, false)
+        if inited then
+            if self.save_replay then
+                --SystemLog('stage_menu =\n'..stringify(self))
+                local menu_replay_saver
+                menu_replay_saver = New(replay_saver, self.save_replay, self.finish, function()
+                    menu.FlyOut(menu_replay_saver, 'right')
+                    task.New(stage_menu, function()
+                        task.Wait(30)
+                        task.New(stage_menu, returnToLauncher)
+                    end)
+                end)
+                menu.FlyIn(menu_replay_saver, 'left')
+            else
+                --returnToLauncher()
+                task.New(stage_menu, returnToLauncher)
+            end
+        else
+            inited = true
+            --SystemLog('before enterStage')
+            game_util.enterStage(stage_menu, false)
+        end
     end
-end
-function stage_menu:frame()
-end
-function stage_menu:render()
-    --SetViewMode('ui')
-    --RenderText('menu', 'stage_menu', 320, 240, 1)
-    --local size = glv:getDesignResolutionSize()
-    --local str=string.format('D res: (%d, %d)', size.width, size.height)
-    --RenderText('menu', str, 320, 200, 1)
-    --ui.DrawMenuBG()
+    function stage_menu:frame()
+    end
+    function stage_menu:render()
+        --SetViewMode('ui')
+        --RenderText('menu', 'stage_menu', 320, 240, 1)
+        --local size = glv:getDesignResolutionSize()
+        --local str=string.format('D res: (%d, %d)', size.width, size.height)
+        --RenderText('menu', str, 320, 200, 1)
+        --ui.DrawMenuBG()
+    end
 end
 
 return Scene
