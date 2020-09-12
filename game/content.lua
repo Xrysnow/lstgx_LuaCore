@@ -14,6 +14,9 @@ function M.enumRanks()
 end
 
 function M.setRank(rank)
+    if not stage.groups then
+        return false
+    end
     local _ranks, _rank_names = M.enumRanks()
     local group_name = _rank_names[rank]
     if not group_name then
@@ -34,6 +37,9 @@ function M.enumPlayers()
 end
 
 function M.setPlayer(index)
+    if not player_list then
+        return false
+    end
     local player_name = player_list[index][2]
     local rep_player = player_list[index][3]
     if not (player_name and rep_player) then
