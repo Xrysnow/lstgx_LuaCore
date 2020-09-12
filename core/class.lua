@@ -55,59 +55,63 @@ object3d['.3d'] = true
 local _class_num = 0
 local _class_id = {}
 --local sym = require('core_x.symbol')
+local callbacks = { 'init', 'del', 'frame', 'render', 'colli', 'kill', }
 
-function RegisterClasses()
-    for _, v in pairs(all_class) do
-        v[1] = v.init
-        v[2] = v.del
-        v[3] = v.frame
-        v[4] = v.render
-        v[5] = v.colli
-        v[6] = v.kill
-
-        if v[3] == object.frame then
-            v[3] = nil
+function RegisterGameClass(v)
+    for i = 1, 6 do
+        if type(v[i]) ~= 'function' then
+            v[i] = v[callbacks[i]]
         end
-        if v[4] == DefaultRenderFunc then
-            v[4] = nil
+    end
+
+    if v[3] == object.frame then
+        v[3] = nil
+    end
+    if v[4] == DefaultRenderFunc then
+        v[4] = nil
+    end
+
+    if _class_id[v] == nil then
+        _class_num = _class_num + 1
+        _class_id[v] = _class_num
+        v[7] = _class_num
+    else
+        v[7] = _class_id[v]
+    end
+
+    --if v['.compile'] then
+    --    RegisterClass(v, sym.compile(v.frame))
+    --else
+    RegisterClass(v)
+    --end
+
+    local _class_name
+    for k, vv in pairs(_G) do
+        if vv == v then
+            _class_name = k
+            break
         end
-
-        if _class_id[v] == nil then
-            _class_num = _class_num + 1
-            _class_id[v] = _class_num
-            v[7] = _class_num
-        else
-            v[7] = _class_id[v]
-        end
-
-        --if v['.compile'] then
-        --    RegisterClass(v, sym.compile(v.frame))
-        --else
-            RegisterClass(v)
-        --end
-
-        local _class_name
-        for k, vv in pairs(_G) do
+    end
+    if not _class_name or _class_name == 'last' then
+        for k, vv in pairs(_editor_class or {}) do
             if vv == v then
-                _class_name = k
+                _class_name = 'editor.' .. k
                 break
             end
         end
-        if not _class_name or _class_name == 'last' then
-            for k, vv in pairs(_editor_class) do
-                if vv == v then
-                    _class_name = 'editor.' .. k
-                    break
-                end
-            end
-        end
-        v['.classname'] = _class_name
+    end
+    v['.classname'] = _class_name
 
-        --if _class_name then
-        --    Print(string.format('regist class %d (%s)', _class_id[v], _class_name))
-        --else
-        --    Print(string.format('regist class %d', _class_id[v]))
-        --end
+    --if _class_name then
+    --    Print(string.format('regist class %d (%s)', _class_id[v], _class_name))
+    --else
+    --    Print(string.format('regist class %d', _class_id[v]))
+    --end
+end
+
+function RegisterClasses()
+    for _, v in pairs(all_class) do
+        RegisterGameClass(v)
     end
 end
 
