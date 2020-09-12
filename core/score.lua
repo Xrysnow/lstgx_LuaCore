@@ -47,7 +47,8 @@ plus.CreateDirectory(score_dir:sub(1, -2))
 
 --- save scoredata to file
 function SaveScoreData()
-    local dst = score_dir .. setting.username .. '.dat'
+    local username = setting.username or 'User'
+    local dst = score_dir .. username .. '.dat'
     local fu = cc.FileUtils:getInstance()
     fu:writeStringToFile(Serialize(scoredata), dst)
 end
@@ -55,7 +56,8 @@ end
 ---init score data
 ---score/mod_name
 
-local fpath = score_dir .. setting.username .. '.dat'
+local username = setting.username or 'User'
+local fpath = score_dir .. username .. '.dat'
 if not plus.FileExists(fpath) then
     if scoredata == nil then
         scoredata = {}
