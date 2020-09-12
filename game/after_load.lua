@@ -1,6 +1,5 @@
 --
 LoadTexture('logo', 'game/blank.png')
-SetImageCenter('logo', -160, 240)
 
 local function loadModules()
     require('game.misc.batch_helper')
