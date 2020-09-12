@@ -7,6 +7,9 @@ local status_button = {}
 local status_axis = {}
 local status_axis_pos = {}
 local status_axis_neg = {}
+function M.getInnerStatus()
+    return status_button, status_axis
+end
 
 local mapping = { button = {}, axis = { pos = {}, neg = {} } }
 local mapping_inv = {}
