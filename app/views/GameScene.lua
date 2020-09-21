@@ -69,13 +69,28 @@ function Scene:addTouchKey()
     end
 end
 
+if not GameFrame then
+    function GameFrame()
+        if FrameFunc then
+            FrameFunc()
+        end
+    end
+end
+if not GameRender then
+    function GameRender()
+        if RenderFunc then
+            RenderFunc()
+        end
+    end
+end
+
 function Scene:update(dt)
     profiler.tic('FrameFunc')
-    FrameFunc()
+    GameFrame()
     profiler.toc('FrameFunc')
 
     profiler.tic('RenderFunc')
-    RenderFunc()
+    GameRender()
     profiler.toc('RenderFunc')
 end
 
