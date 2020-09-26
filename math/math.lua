@@ -213,3 +213,32 @@ if not math.isnan then
         return v ~= v
     end
 end
+
+--------------------------------------------------
+-- fibonacci
+--------------------------------------------------
+
+local _fib_cache
+
+---@param n number
+---@return number
+function math.fibonacci(n)
+    if n < 1 then
+        return 0
+    end
+    if n > 1476 then
+        error('n is too big')
+    end
+    if not _fib_cache then
+        _fib_cache = { 1, 1 }
+        local f1, f2 = 1, 1
+        local fn = 0
+        for i = 3, 1476 do
+            fn = f1 + f2
+            f1 = f2
+            f2 = fn
+            _fib_cache[i] = fn
+        end
+    end
+    return _fib_cache[n]
+end
