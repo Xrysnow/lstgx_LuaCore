@@ -136,7 +136,7 @@ function RemoveResource(poolType, resType, name)
         end
     else
         resType = _toResType(resType)
-        assert(resType and poolType[resType],
+        assert(resType,
                "invalid argument #2 for 'RemoveResource'")
         assert(name, "invalid argument #3 for 'RemoveResource'")
         pool[resType]:insert(name, nil)
