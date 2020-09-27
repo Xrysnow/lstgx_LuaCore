@@ -97,6 +97,39 @@ if not math.round then
     end
 end
 
+if not math.gcd then
+    ---@param m number
+    ---@param n number
+    ---@return number
+    function math.gcd(m, n)
+        local M = abs(floor(m))
+        local N = abs(floor(n))
+        if M == 0 then
+            return N
+        end
+        if N == 0 then
+            return M
+        end
+        while N > 0 do
+            local tmp = M % N
+            M = N
+            N = tmp
+        end
+        return M
+    end
+end
+
+if not math.lcm then
+    ---@param m number
+    ---@param n number
+    ---@return number
+    function math.lcm(m, n)
+        local M = abs(floor(m))
+        local N = abs(floor(n))
+        return M / math.gcd(M, N) * N
+    end
+end
+
 --- solve:
 --- a1 x + b1 y = c1
 --- a2 x + b2 y = c2
