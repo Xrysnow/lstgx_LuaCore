@@ -130,6 +130,16 @@ if not math.lcm then
     end
 end
 
+if math.tgamma and not math.beta then
+    local gamma = math.tgamma
+    ---@param x number
+    ---@param y number
+    ---@return number
+    function math.beta(x, y)
+        return gamma(x) * gamma(y) / gamma(x + y)
+    end
+end
+
 --- solve:
 --- a1 x + b1 y = c1
 --- a2 x + b2 y = c2
