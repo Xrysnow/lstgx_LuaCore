@@ -150,6 +150,15 @@ function math.solveLiner(a1, b1, c1, a2, b2, c2)
 end
 
 --------------------------------------------------
+-- from Python
+--------------------------------------------------
+
+function math.divmod(x, y)
+    local mod = x % y
+    return (x - mod) / y, mod
+end
+
+--------------------------------------------------
 -- from Microsoft.Xna.Framework.MathHelper
 --------------------------------------------------
 
