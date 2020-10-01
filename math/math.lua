@@ -158,6 +158,16 @@ function math.divmod(x, y)
     return (x - mod) / y, mod
 end
 
+local _rad_to_deg = 180 / pi
+
+function math.degrees(x)
+    return x * _rad_to_deg
+end
+
+function math.radians(x)
+    return x / _rad_to_deg
+end
+
 --------------------------------------------------
 -- from Microsoft.Xna.Framework.MathHelper
 --------------------------------------------------
