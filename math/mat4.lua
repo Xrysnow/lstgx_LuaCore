@@ -509,7 +509,7 @@ function M:decompose(out_scale, out_rotation, out_translation)
 
     -- Determine if we have a negative scale (true if determinant is less than zero).
     -- In this case, we simply negate a single axis of the scale.
-    local det = self:det()
+    local det = self:determinant()
     if (det < 0) then
         scaleZ = -scaleZ
     end
@@ -570,6 +570,7 @@ function M:decompose(out_scale, out_rotation, out_translation)
     return true
 end
 
+---@return number
 function M:determinant()
     local a0 = self[1] * self[6] - self[2] * self[5]
     local a1 = self[1] * self[7] - self[3] * self[5]
