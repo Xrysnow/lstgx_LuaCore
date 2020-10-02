@@ -168,6 +168,12 @@ function math.radians(x)
     return x / _rad_to_deg
 end
 
+function math.isclose(a, b, rel_tol, abs_tol)
+    rel_tol = rel_tol and abs(rel_tol) or 1e-9
+    abs_tol = abs_tol and abs(abs_tol) or 0
+    return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+end
+
 --------------------------------------------------
 -- from Microsoft.Xna.Framework.MathHelper
 --------------------------------------------------
