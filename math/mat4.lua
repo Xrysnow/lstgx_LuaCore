@@ -767,4 +767,10 @@ function M:transformVector(x, y, z, w)
     return vec4(xx, yy, zz, ww)
 end
 
+
+---@return number
+function M:trace()
+    return self[1] + self[6] + self[11] + self[16]
+end
+
 return M
