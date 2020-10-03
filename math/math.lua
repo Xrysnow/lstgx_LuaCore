@@ -174,6 +174,10 @@ function math.isclose(a, b, rel_tol, abs_tol)
     return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 end
 
+function math.isqrt(n)
+    return floor(sqrt(n))
+end
+
 --------------------------------------------------
 -- from Microsoft.Xna.Framework.MathHelper
 --------------------------------------------------
