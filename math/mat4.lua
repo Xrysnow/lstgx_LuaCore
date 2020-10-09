@@ -767,6 +767,58 @@ function M:transformVector(x, y, z, w)
     return vec4(xx, yy, zz, ww)
 end
 
+--------------------------------------------------
+-- linalg
+--------------------------------------------------
+
+function M:det()
+    return self:determinant()
+end
+
+--- Raise a square matrix to the (integer) power `n`.
+---
+--- For positive integers `n`, the power is computed by repeated matrix
+--- squarings and matrix multiplications. If ``n == 0``, the identity matrix
+--- of the same shape as M is returned. If ``n < 0``, the inverse
+--- is computed and then raised to the ``abs(n)``.
+---
+---@param n number
+---@return math.mat4
+function M:matrix_power(n)
+    n = math.floor(n)
+    if n == 0 then
+        return M.identity()
+    end
+    local a = self
+    if n < 0 then
+        n = math.abs(n)
+        a = self:getInversed()
+    end
+    if n == 1 then
+        return a
+    elseif n == 2 then
+        return a * a
+    elseif n == 3 then
+        return a * a * a
+    end
+    local z, bit, ret
+    while n > 0 do
+        if not z then
+            z = a
+        else
+            z = z * z
+        end
+        n, bit = math.divmod(n, 2)
+        if bit > 0 then
+            if not ret then
+                ret = z
+            else
+                ret = ret * z
+            end
+        end
+    end
+    return ret
+end
 
 ---@return number
 function M:trace()
