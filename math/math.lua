@@ -178,6 +178,17 @@ function math.isqrt(n)
     return floor(sqrt(n))
 end
 
+--
+
+--- Round to nearest integer towards zero.
+function math.fix(x)
+    if x > 0 then
+        return floor(x)
+    else
+        return ceil(x)
+    end
+end
+
 --------------------------------------------------
 -- from Microsoft.Xna.Framework.MathHelper
 --------------------------------------------------
