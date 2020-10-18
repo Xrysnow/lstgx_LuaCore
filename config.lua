@@ -24,6 +24,8 @@ CC_DESIGN_RESOLUTION = {
 local M = {}
 
 require('cocos.cocos2d.json')
+local json = cjson or json
+
 local f = cc.FileUtils:getInstance():getStringFromFile('setting')
 local ok, ret
 if #f > 0 then
