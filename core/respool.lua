@@ -844,15 +844,16 @@ end
 --- 设置全局图像渲染缩放
 ---@param scale number
 function SetImageScale(scale)
-    LRES:setGlobalImageScaleFactor(scale)
+    SetGlobalImageScale(scale)
 end
 lstg.SetImageScale = SetImageScale
 
 --- 获取全局图像渲染缩放
 ---@return number
 function GetImageScale()
-    return LRES:getGlobalImageScaleFactor()
+    return GetGlobalImageScale()
 end
+lstg.GetImageScale = GetImageScale
 
 ------------------------------------------------------------
 -- text api
@@ -1117,7 +1118,7 @@ lstg.GetMusicState = GetMusicState
 function Render(name, x, y, rot, hscale, vscale, z)
     hscale = hscale or 1
     vscale = vscale or hscale
-    local factor = LRES:getGlobalImageScaleFactor()
+    local factor = GetImageScale()
     FindResSprite(name):render(x, y, rot or 0, hscale * factor, vscale * factor, z or 0.5)
 end
 lstg.Render = Render
