@@ -27,6 +27,9 @@ function imgui.create()
     local ini = fu:getStringFromFile(_iniFile)
     if #ini > 0 then
         imgui.loadIniSettingsFromMemory(ini, #ini)
+        print(('read %q from %q'):format(_iniFile, fu:fullPathForFilename(_iniFile)))
+    else
+        print(('read %q failed'):format(_iniFile))
     end
     if not _globalSchedule then
         _globalSchedule = dir:getScheduler():scheduleScriptFunc(function()
