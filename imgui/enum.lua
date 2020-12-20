@@ -68,6 +68,7 @@ ImGuiInputTextFlags.Password = 2 ^ 15  --- Password mode display all characters 
 ImGuiInputTextFlags.NoUndoRedo = 2 ^ 16  --- Disable undo/redo. Note that input text owns the text data while active if you want to provide your own undo/redo stack you need e.g. to call ClearActiveID().
 ImGuiInputTextFlags.CharsScientific = 2 ^ 17  --- Allow 0123456789.+-*/eE (Scientific notation input)
 ImGuiInputTextFlags.CallbackResize = 2 ^ 18  --- Callback on buffer capacity changes request (beyond 'buf_size' parameter value) allowing the string to grow. Notify when the string wants to be resized (for string types which hold a cache of their Size). You will be provided a new BufSize in the callback and NEED to honor it. (see misc/cpp/imgui_stdlib.h for an example of using this)
+ImGuiInputTextFlags.CallbackEdit = 2 ^ 19  --- Callback on any edit (note that InputText() already returns true on edit, the callback is useful mainly to manipulate the underlying buffer while focus is active)
 
 --------------------------------------------------
 
@@ -79,7 +80,7 @@ im.TreeNodeFlags = ImGuiTreeNodeFlags
 
 ImGuiTreeNodeFlags.None = 0
 ImGuiTreeNodeFlags.Selected = 2 ^ 0   --- Draw as selected
-ImGuiTreeNodeFlags.Framed = 2 ^ 1   --- Full colored frame (e.g. for CollapsingHeader)
+ImGuiTreeNodeFlags.Framed = 2 ^ 1   --- Draw frame with background (e.g. for CollapsingHeader)
 ImGuiTreeNodeFlags.AllowItemOverlap = 2 ^ 2   --- Hit testing to allow subsequent widgets to overlap this one
 ImGuiTreeNodeFlags.NoTreePushOnOpen = 2 ^ 3   --- Don't do a TreePush() when open (e.g. for CollapsingHeader) = no extra indent nor pushing on ID stack
 ImGuiTreeNodeFlags.NoAutoOpenOnLog = 2 ^ 4   --- Don't automatically and temporarily open node when Logging is active (by default logging will automatically open tree nodes)
@@ -101,15 +102,18 @@ ImGuiTreeNodeFlags.CollapsingHeader = ImGuiTreeNodeFlags.Framed + ImGuiTreeNodeF
 ---   small flags values as a mouse button index, so we encode the mouse button in the first few bits of the flags.
 ---   It is therefore guaranteed to be legal to pass a mouse button index in ImGuiPopupFlags.
 --- - For the same reason, we exceptionally default the ImGuiPopupFlags argument of BeginPopupContextXXX functions to 1 instead of 0.
+---   IMPORTANT: because the default parameter is 1 (==ImGuiPopupFlags_MouseButtonRight), if you rely on the default parameter
+---   and want to another another flag, you need to pass in the ImGuiPopupFlags_MouseButtonRight flag.
+--- - Multiple buttons currently cannot be combined/or-ed in those functions (we could allow it later).
 
 local ImGuiPopupFlags={}
 im.ImGuiPopupFlags = ImGuiPopupFlags
 im.PopupFlags = ImGuiPopupFlags
 
 ImGuiPopupFlags.None                    = 0
-ImGuiPopupFlags.MouseButtonLeft         = 0        --- For BeginPopupContext*(): open on Left Mouse release. Guaranted to always be == 0 (same as ImGuiMouseButton_Left)
-ImGuiPopupFlags.MouseButtonRight        = 1        --- For BeginPopupContext*(): open on Right Mouse release. Guaranted to always be == 1 (same as ImGuiMouseButton_Right)
-ImGuiPopupFlags.MouseButtonMiddle       = 2        --- For BeginPopupContext*(): open on Middle Mouse release. Guaranted to always be == 2 (same as ImGuiMouseButton_Middle)
+ImGuiPopupFlags.MouseButtonLeft         = 0        --- For BeginPopupContext*(): open on Left Mouse release. Guaranteed to always be == 0 (same as ImGuiMouseButton_Left)
+ImGuiPopupFlags.MouseButtonRight        = 1        --- For BeginPopupContext*(): open on Right Mouse release. Guaranteed to always be == 1 (same as ImGuiMouseButton_Right)
+ImGuiPopupFlags.MouseButtonMiddle       = 2        --- For BeginPopupContext*(): open on Middle Mouse release. Guaranteed to always be == 2 (same as ImGuiMouseButton_Middle)
 ImGuiPopupFlags.MouseButtonMask_        = 0x1F
 ImGuiPopupFlags.MouseButtonDefault_     = 1
 ImGuiPopupFlags.NoOpenOverExistingPopup = 2 ^  5   --- For OpenPopup*(), BeginPopupContext*(): don't open if there's already a popup at the same level of the popup stack
@@ -184,6 +188,9 @@ ImGuiTabItemFlags.SetSelected = 2 ^ 1   --- Trigger flag to programmatically mak
 ImGuiTabItemFlags.NoCloseWithMiddleMouseButton = 2 ^ 2   --- Disable behavior of closing tabs (that are submitted with p_open != NULL) with middle mouse button. You can still repro this behavior on user's side with if (IsItemHovered() && IsMouseClicked(2)) *p_open = false.
 ImGuiTabItemFlags.NoPushId = 2 ^ 3    --- Don't call PushID(tab->ID)/PopID() on BeginTabItem()/EndTabItem()
 ImGuiTabItemFlags.NoTooltip = 2 ^ 4    --- Disable tooltip for the given tab
+ImGuiTabItemFlags.NoReorder = 2 ^ 5   --- Disable reordering this tab or having another tab cross over this tab
+ImGuiTabItemFlags.Leading = 2 ^ 6   --- Enforce the tab position to the left of the tab bar (after the tab list popup button)
+ImGuiTabItemFlags.Trailing = 2 ^ 7    --- Enforce the tab position to the right of the tab bar (before the scrolling buttons)
 
 --------------------------------------------------
 
@@ -335,9 +342,9 @@ ImGuiKey.COUNT = 21
 --------------------------------------------------
 
 local ImGuiKeyModFlags={}
---- To test io.KeyMods (which is a combination of individual fields io.KeyCtrl, io.KeyShift, io.KeyAlt set by user/back-end)
+--- To test io.KeyMods (which is a combination of individual fields io.KeyCtrl, io.KeyShift, io.KeyAlt set by user/backend)
 im.ImGuiKeyModFlags = ImGuiKeyModFlags
---- To test io.KeyMods (which is a combination of individual fields io.KeyCtrl, io.KeyShift, io.KeyAlt set by user/back-end)
+--- To test io.KeyMods (which is a combination of individual fields io.KeyCtrl, io.KeyShift, io.KeyAlt set by user/backend)
 im.KeyModFlags = ImGuiKeyModFlags
 
 ImGuiKeyModFlags.None       = 0
@@ -351,12 +358,12 @@ ImGuiKeyModFlags.Super      = 2 ^  3
 local ImGuiNavInput = {}
 --- Gamepad/Keyboard navigation
 --- Keyboard: Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard to enable. NewFrame() will automatically fill io.NavInputs[] based on your io.KeysDown[] + io.KeyMap[] arrays.
---- Gamepad:  Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad to enable. Back-end: set ImGuiBackendFlags.HasGamepad and fill the io.NavInputs[] fields before calling NewFrame(). Note that io.NavInputs[] is cleared by EndFrame().
+--- Gamepad:  Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad to enable. Backend: set ImGuiBackendFlags.HasGamepad and fill the io.NavInputs[] fields before calling NewFrame(). Note that io.NavInputs[] is cleared by EndFrame().
 --- Read instructions in imgui.cpp for more details. Download PNG/PSD at http:--goo.gl/9LgVZW.
 im.ImGuiNavInput = ImGuiNavInput
 --- Gamepad/Keyboard navigation
 --- Keyboard: Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard to enable. NewFrame() will automatically fill io.NavInputs[] based on your io.KeysDown[] + io.KeyMap[] arrays.
---- Gamepad:  Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad to enable. Back-end: set ImGuiBackendFlags.HasGamepad and fill the io.NavInputs[] fields before calling NewFrame(). Note that io.NavInputs[] is cleared by EndFrame().
+--- Gamepad:  Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad to enable. Backend: set ImGuiBackendFlags.HasGamepad and fill the io.NavInputs[] fields before calling NewFrame(). Note that io.NavInputs[] is cleared by EndFrame().
 --- Read instructions in imgui.cpp for more details. Download PNG/PSD at http:--goo.gl/9LgVZW.
 im.NavInput = ImGuiNavInput
 
@@ -388,37 +395,40 @@ im.ConfigFlags = ImGuiConfigFlags
 
 ImGuiConfigFlags.None = 0
 ImGuiConfigFlags.NavEnableKeyboard = 2 ^ 0   --- Master keyboard navigation enable flag. NewFrame() will automatically fill io.NavInputs[] based on io.KeysDown[].
-ImGuiConfigFlags.NavEnableGamepad = 2 ^ 1   --- Master gamepad navigation enable flag. This is mostly to instruct your imgui back-end to fill io.NavInputs[]. Back-end also needs to set ImGuiBackendFlags.HasGamepad.
-ImGuiConfigFlags.NavEnableSetMousePos = 2 ^ 2   --- Instruct navigation to move the mouse cursor. May be useful on TV/console systems where moving a virtual mouse is awkward. Will update io.MousePos and set io.WantSetMousePos=true. If enabled you MUST honor io.WantSetMousePos requests in your binding otherwise ImGui will react as if the mouse is jumping around back and forth.
+ImGuiConfigFlags.NavEnableGamepad = 2 ^ 1   --- Master gamepad navigation enable flag. This is mostly to instruct your imgui backend to fill io.NavInputs[]. Back-end also needs to set ImGuiBackendFlags.HasGamepad.
+ImGuiConfigFlags.NavEnableSetMousePos = 2 ^ 2   --- Instruct navigation to move the mouse cursor. May be useful on TV/console systems where moving a virtual mouse is awkward. Will update io.MousePos and set io.WantSetMousePos=true. If enabled you MUST honor io.WantSetMousePos requests in your backend, otherwise ImGui will react as if the mouse is jumping around back and forth.
 ImGuiConfigFlags.NavNoCaptureKeyboard = 2 ^ 3   --- Instruct navigation to not set the io.WantCaptureKeyboard flag when io.NavActive is set.
-ImGuiConfigFlags.NoMouse = 2 ^ 4   --- Instruct imgui to clear mouse position/buttons in NewFrame(). This allows ignoring the mouse information set by the back-end.
-ImGuiConfigFlags.NoMouseCursorChange = 2 ^ 5   --- Instruct back-end to not alter mouse cursor shape and visibility. Use if the back-end cursor changes are interfering with yours and you don't want to use SetMouseCursor() to change mouse cursor. You may want to honor requests from imgui by reading GetMouseCursor() yourself instead.
+ImGuiConfigFlags.NoMouse = 2 ^ 4   --- Instruct imgui to clear mouse position/buttons in NewFrame(). This allows ignoring the mouse information set by the backend.
+ImGuiConfigFlags.NoMouseCursorChange = 2 ^ 5   --- Instruct backend to not alter mouse cursor shape and visibility. Use if the backend cursor changes are interfering with yours and you don't want to use SetMouseCursor() to change mouse cursor. You may want to honor requests from imgui by reading GetMouseCursor() yourself instead.
+
+-- [BETA] Docking
 ImGuiConfigFlags.DockingEnable = 2 ^ 6   --- Docking enable flags. Use SHIFT to dock window into another (or without SHIFT if io.ConfigDockingWithShift = false).
 
+-- [BETA] Viewports
 ImGuiConfigFlags.ViewportsEnable = 2 ^ 10  --- Viewport enable flags (require both ImGuiConfigFlags_PlatformHasViewports + ImGuiConfigFlags_RendererHasViewports set by the respective back-ends)
 
---- User storage (to allow your back-end/engine to communicate to code that may be shared between multiple projects. Those flags are not used by core ImGui)
+-- User storage (to allow your back-end/engine to communicate to code that may be shared between multiple projects. Those flags are not used by core ImGui)
 ImGuiConfigFlags.IsSRGB = 2 ^ 20  --- Application is SRGB-aware.
 ImGuiConfigFlags.IsTouchScreen = 2 ^ 21   --- Application is using a touch screen instead of a mouse.
 
 --------------------------------------------------
 
 local ImGuiBackendFlags = {}
---- Back-end capabilities flags stored in io.BackendFlags. Set by imgui_impl_xxx or custom back-end.
+--- Backend capabilities flags stored in io.BackendFlags. Set by imgui_impl_xxx or custom backend.
 im.ImGuiBackendFlags = ImGuiBackendFlags
---- Back-end capabilities flags stored in io.BackendFlags. Set by imgui_impl_xxx or custom back-end.
+--- Backend capabilities flags stored in io.BackendFlags. Set by imgui_impl_xxx or custom backend.
 im.BackendFlags = ImGuiBackendFlags
 
 ImGuiBackendFlags.None = 0
-ImGuiBackendFlags.HasGamepad = 2 ^ 0   --- Back-end supports gamepad and currently has one connected.
-ImGuiBackendFlags.HasMouseCursors = 2 ^ 1   --- Back-end supports honoring GetMouseCursor() value to change the OS cursor shape.
-ImGuiBackendFlags.HasSetMousePos = 2 ^ 2   --- Back-end Platform supports io.WantSetMousePos requests to reposition the OS mouse position (only used if ImGuiConfigFlags_NavEnableSetMousePos is set).
-ImGuiBackendFlags.RendererHasVtxOffset = 2 ^ 3   --- Back-end Renderer supports ImDrawCmd::VtxOffset. This enables output of large meshes (64K+ vertices) while still using 16-bits indices.
+ImGuiBackendFlags.HasGamepad = 2 ^ 0   --- Backend Platform supports gamepad and currently has one connected.
+ImGuiBackendFlags.HasMouseCursors = 2 ^ 1   --- Backend Platform supports honoring GetMouseCursor() value to change the OS cursor shape.
+ImGuiBackendFlags.HasSetMousePos = 2 ^ 2   --- Backend Platform supports io.WantSetMousePos requests to reposition the OS mouse position (only used if ImGuiConfigFlags_NavEnableSetMousePos is set).
+ImGuiBackendFlags.RendererHasVtxOffset = 2 ^ 3   --- Backend Renderer supports ImDrawCmd::VtxOffset. This enables output of large meshes (64K+ vertices) while still using 16-bit indices.
 
 -- [BETA] Viewports
-ImGuiBackendFlags.PlatformHasViewports = 2 ^ 10  --- Back-end Platform supports multiple viewports.
-ImGuiBackendFlags.HasMouseHoveredViewport = 2 ^ 11  --- Back-end Platform supports setting io.MouseHoveredViewport to the viewport directly under the mouse _IGNORING_ viewports with the ImGuiViewportFlags_NoInputs flag and _REGARDLESS_ of whether another viewport is focused and may be capturing the mouse. This information is _NOT EASY_ to provide correctly with most high-level engines! Don't set this without studying how the examples/ back-end handle it!
-ImGuiBackendFlags.RendererHasViewports = 2 ^ 12   --- Back-end Renderer supports multiple viewports.
+ImGuiBackendFlags.PlatformHasViewports = 2 ^ 10  --- Backend Platform supports multiple viewports.
+ImGuiBackendFlags.HasMouseHoveredViewport = 2 ^ 11  --- Backend Platform supports setting io.MouseHoveredViewport to the viewport directly under the mouse _IGNORING_ viewports with the ImGuiViewportFlags_NoInputs flag and _REGARDLESS_ of whether another viewport is focused and may be capturing the mouse. This information is _NOT EASY_ to provide correctly with most high-level engines! Don't set this without studying _carefully_ how the backends handle ImGuiViewportFlags_NoInputs!
+ImGuiBackendFlags.RendererHasViewports = 2 ^ 12   --- Backend Renderer supports multiple viewports.
 
 --------------------------------------------------
 
@@ -528,6 +538,19 @@ ImGuiStyleVar.COUNT = 23
 
 --------------------------------------------------
 
+local ImGuiButtonFlags = {}
+--- Flags for InvisibleButton() [extended in imgui_internal.h]
+im.ImGuiButtonFlags = ImGuiButtonFlags
+--- Flags for InvisibleButton() [extended in imgui_internal.h]
+im.ButtonFlags = ImGuiButtonFlags
+
+ImGuiButtonFlags.None                   = 0
+ImGuiButtonFlags.MouseButtonLeft        = 2 ^ 0   --- React on left mouse button (default)
+ImGuiButtonFlags.MouseButtonRight       = 2 ^ 1   --- React on right mouse button
+ImGuiButtonFlags.MouseButtonMiddle      = 2 ^ 2   --- React on center mouse button
+
+--------------------------------------------------
+
 local ImGuiColorEditFlags = {}
 --- Flags for ColorEdit3() / ColorEdit4() / ColorPicker3() / ColorPicker4() / ColorButton()
 im.ImGuiColorEditFlags = ImGuiColorEditFlags
@@ -536,13 +559,13 @@ im.ColorEditFlags = ImGuiColorEditFlags
 
 ImGuiColorEditFlags.None = 0
 ImGuiColorEditFlags.NoAlpha = 2 ^ 1   ---              --- ColorEdit ColorPicker ColorButton: ignore Alpha component (will only read 3 components from the input pointer).
-ImGuiColorEditFlags.NoPicker = 2 ^ 2   ---              --- ColorEdit: disable picker when clicking on colored square.
+ImGuiColorEditFlags.NoPicker = 2 ^ 2   ---              --- ColorEdit: disable picker when clicking on color square.
 ImGuiColorEditFlags.NoOptions = 2 ^ 3   ---              --- ColorEdit: disable toggling options menu when right-clicking on inputs/small preview.
-ImGuiColorEditFlags.NoSmallPreview = 2 ^ 4   ---              --- ColorEdit ColorPicker: disable colored square preview next to the inputs. (e.g. to show only the inputs)
-ImGuiColorEditFlags.NoInputs = 2 ^ 5   ---              --- ColorEdit ColorPicker: disable inputs sliders/text widgets (e.g. to show only the small preview colored square).
+ImGuiColorEditFlags.NoSmallPreview = 2 ^ 4   ---              --- ColorEdit, ColorPicker: disable color square preview next to the inputs. (e.g. to show only the inputs)
+ImGuiColorEditFlags.NoInputs = 2 ^ 5   ---              --- ColorEdit, ColorPicker: disable inputs sliders/text widgets (e.g. to show only the small preview color square).
 ImGuiColorEditFlags.NoTooltip = 2 ^ 6   ---              --- ColorEdit ColorPicker ColorButton: disable tooltip when hovering the preview.
 ImGuiColorEditFlags.NoLabel = 2 ^ 7   ---              --- ColorEdit ColorPicker: disable display of inline text label (the label is still forwarded to the tooltip and picker).
-ImGuiColorEditFlags.NoSidePreview = 2 ^ 8   ---              --- ColorPicker: disable bigger color preview on right side of the picker use small colored square preview instead.
+ImGuiColorEditFlags.NoSidePreview = 2 ^ 8   ---              --- ColorPicker: disable bigger color preview on right side of the picker, use small color square preview instead.
 ImGuiColorEditFlags.NoDragDrop = 2 ^ 9   ---              --- ColorEdit: disable drag and drop target. ColorButton: disable drag and drop source.
 ImGuiColorEditFlags.NoBorder = 2 ^ 10   ---              --- ColorButton: disable border (which is enforced by default)
 
@@ -567,12 +590,28 @@ ImGuiColorEditFlags._OptionsDefault = ImGuiColorEditFlags.Uint8 + ImGuiColorEdit
 
 --------------------------------------------------
 
+local ImGuiSliderFlags = {}
+--- Flags for DragFloat(), DragInt(), SliderFloat(), SliderInt() etc.
+--- We use the same sets of flags for DragXXX() and SliderXXX() functions as the features are the same and it makes it easier to swap them.
+im.ImGuiSliderFlags = ImGuiSliderFlags
+--- Flags for DragFloat(), DragInt(), SliderFloat(), SliderInt() etc.
+--- We use the same sets of flags for DragXXX() and SliderXXX() functions as the features are the same and it makes it easier to swap them.
+im.SliderFlags = ImGuiSliderFlags
+
+ImGuiSliderFlags.None                   = 0
+ImGuiSliderFlags.AlwaysClamp            = 2 ^ 4       --- Clamp value to min/max bounds when input manually with CTRL+Click. By default CTRL+Click allows going out of bounds.
+ImGuiSliderFlags.Logarithmic            = 2 ^ 5       --- Make the widget logarithmic (linear otherwise). Consider using ImGuiSliderFlags_NoRoundToFormat with this if using a format-string with small amount of digits.
+ImGuiSliderFlags.NoRoundToFormat        = 2 ^ 6       --- Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
+ImGuiSliderFlags.NoInput                = 2 ^ 7       --- Disable CTRL+Click or Enter key allowing to input text directly into the widget
+
+--------------------------------------------------
+
 local ImGuiMouseCursor = {}
 --- Enumeration for GetMouseCursor()
---- User code may request binding to display given cursor by calling SetMouseCursor() which is why we have some cursors that are marked unused here
+--- User code may request backend to display given cursor by calling SetMouseCursor(), which is why we have some cursors that are marked unused here
 im.ImGuiMouseCursor = ImGuiMouseCursor
 --- Enumeration for GetMouseCursor()
---- User code may request binding to display given cursor by calling SetMouseCursor() which is why we have some cursors that are marked unused here
+--- User code may request backend to display given cursor by calling SetMouseCursor(), which is why we have some cursors that are marked unused here
 im.MouseCursor = ImGuiMouseCursor
 
 ImGuiMouseCursor.None = -1
@@ -607,9 +646,9 @@ ImGuiCond.Appearing = 2 ^ 3    --- Set the variable if the object/window is appe
 --------------------------------------------------
 
 local ImGuiViewportFlags = {}
---- Flags stored in ImGuiViewport::Flags, giving indications to the platform back-ends.
+--- Flags stored in ImGuiViewport::Flags, giving indications to the platform backends.
 im.ImGuiViewportFlags = ImGuiViewportFlags
---- Flags stored in ImGuiViewport::Flags, giving indications to the platform back-ends.
+--- Flags stored in ImGuiViewport::Flags, giving indications to the platform backends.
 im.ViewportFlags = ImGuiViewportFlags
 
 ImGuiViewportFlags.None = 0
