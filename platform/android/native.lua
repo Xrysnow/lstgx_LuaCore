@@ -121,7 +121,7 @@ function M.getOrientation()
 end
 
 ---@return table
-function M.GetNativeInfo()
+function M.getNativeInfo()
     local ret = {}
     if osname == 'android' then
         ret['AssetsPath'] = M.getAssetsPath()

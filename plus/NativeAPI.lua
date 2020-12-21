@@ -143,7 +143,7 @@ if osname == 'android' then
     plus.getSDCardPath = native.getSDCardPath
     plus.GetNativeInfo = native.GetNativeInfo
 
-    local info = native.GetNativeInfo()
+    local info = native.getNativeInfo()
     plus.native_info = info
     local p = info['SDCardPath']
     if p and p ~= '' then
