@@ -113,7 +113,7 @@ function plus.enumFilesByType(path, suffix)
     end
 end
 
----getWriteablePath
+---
 ---@return string
 function plus.getWritablePath()
     if plus.writablePath then
@@ -131,45 +131,19 @@ end
 local osname = lstg.GetPlatform()
 plus.os = osname
 plus.is_mobile = osname == 'android' or osname == 'ios'
---Android-----------------------------------------
 if osname == 'android' then
     local native = require('platform.android.native')
-    plus.getAssetsPath = native.getAssetsPath
-    plus.getCocos2dxPackageName = native.getCocos2dxPackageName
-    plus.vibrate = native.vibrate
-    plus.getVersion = native.getVersion
-    plus.openURL = native.openURL
-    plus.getDPI = native.getDPI
-    plus.getSDCardPath = native.getSDCardPath
-    plus.GetNativeInfo = native.GetNativeInfo
-
     local info = native.getNativeInfo()
     plus.native_info = info
-    local p = info['SDCardPath']
-    if p and p ~= '' then
-        local path = p .. '/lstg/'
-        if plus.DirectoryExists(path) then
-            FU:setWritablePath(path)
-            FU:addSearchPath(path)
-            plus.writablePath = path
-            SystemLog(string.format('set local writable path to %q', path))
-        end
-        local lp = lstg.LogSystem:getInstance():getPath()
-        local expected = p .. '/lstg/lstg_log.txt'
-        if lp ~= expected then
-            if lstg.LogSystem:getInstance():changePath(expected) then
-                SystemLog('change log path successfully')
-            else
-                SystemLog('failed to change log path')
-            end
-        end
-    end
-
     local inf = '\n=== Native Info ===\n'
     for k, v in pairs(info) do
         inf = inf .. string.format('%s = %s\n', k, tostring(v))
     end
     SystemLog(inf)
+end
+local newWritablePath = require('platform.util').changeWritablePath()
+if newWritablePath then
+    plus.writablePath = newWritablePath
 end
 
 local _languages = {
@@ -225,10 +199,6 @@ local function _log_app_info()
     plus.platform = info.platform
 end
 _log_app_info()
-
-if not plus.is_mobile then
-    FU:setWritablePath('./')
-end
 
 --
 
