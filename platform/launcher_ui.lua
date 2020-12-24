@@ -471,6 +471,9 @@ local function CreateLauncherUI()
     inf_label:setString(inf)
 
     require('imgui.lstg.util').load(launcher_scene)
+    if imgui and plus.is_mobile then
+        imgui.hide()
+    end
 
     --local ui_layer = cc.Layer:create()
     --ui_layer:setAnchorPoint(0, 0)
