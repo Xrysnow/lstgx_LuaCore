@@ -189,6 +189,24 @@ function math.fix(x)
     end
 end
 
+--
+
+--- Calculates log(exp(v1) + exp(v2)).
+---@param v1 number
+---@param v2 number
+---@return number
+function math.logaddexp(v1, v2)
+    return log(exp(v1) + exp(v2))
+end
+
+--- Calculates log2(2^v1 + 2^v2).
+---@param x number
+---@param y number
+---@return number
+function math.logaddexp2(v1, v2)
+    return math.log2(math.exp2(v1) + math.exp2(v2))
+end
+
 --------------------------------------------------
 -- from Microsoft.Xna.Framework.MathHelper
 --------------------------------------------------
