@@ -207,6 +207,14 @@ function math.logaddexp2(v1, v2)
     return math.log2(math.exp2(v1) + math.exp2(v2))
 end
 
+--- Return floor(x/y).
+---@param v1 number
+---@param v2 number
+---@return number
+function math.floor_divide(x, y)
+    return floor(x / y)
+end
+
 --------------------------------------------------
 -- from Microsoft.Xna.Framework.MathHelper
 --------------------------------------------------
