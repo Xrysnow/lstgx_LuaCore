@@ -73,4 +73,30 @@ function M.changeWritablePath()
     return ret
 end
 
+function M.enumMods(path, root_name)
+    local ret = {}
+    root_name = root_name or 'root.lua'
+    local files = plus.EnumFiles(path)
+    for i, v in ipairs(files) do
+        if v.isDirectory then
+            if plus.FileExists(path .. v.name .. '/' .. root_name) then
+                table.insert(ret, v)
+            end
+        else
+            if string.lower(v.name:match(".+%.(%w+)$") or '') == 'zip' then
+                v.name = v.name:sub(1, -5)
+                assert(v.name ~= '')
+                table.insert(ret, v)
+            end
+        end
+    end
+    table.sort(ret, function(a, b)
+        if a.isDirectory ~= b.isDirectory then
+            return a.isDirectory
+        end
+        return a.name < b.name
+    end)
+    return ret
+end
+
 return M
