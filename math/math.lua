@@ -215,6 +215,44 @@ function math.floor_divide(x, y)
     return floor(x / y)
 end
 
+--- Returns -1 if x < 0, 0 if x==0, 1 if x > 0. nan is returned for nan inputs.
+---@param x number
+---@return number @-1, 0, 1
+function math.sign(x)
+    if x > 0 then
+        return 1
+    elseif x < 0 then
+        return -1
+    elseif x == 0 then
+        return 0
+    else
+        return 0 / 0
+    end
+end
+
+--- Compute the Heaviside step function.
+---@param x1 number
+---@param x2 number
+---@return number
+function math.heaviside(x1, x2)
+    if x1 < 0 then
+        return 0
+    elseif x1 > 1 then
+        return 1
+    else
+        return x2
+    end
+end
+
+--- Return the normalized sinc function.
+function math.sinc(x)
+    if -2e-4 < x and x < 2e-4 then
+        return 1 - x ^ 2 / 6
+    end
+    local p = pi * x
+    return sin(p) / p
+end
+
 --------------------------------------------------
 -- from Microsoft.Xna.Framework.MathHelper
 --------------------------------------------------
