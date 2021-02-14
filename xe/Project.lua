@@ -254,11 +254,12 @@ function M.pack()
     local entries = {}
     for i, v in ipairs(tree._arr) do
         if v.mode == 'file' then
-            local entry, num = v.path:gsub(root_path, '')
-            if num == 0 then
+            -- not sure if necessary
+            if not v.path:starts_with(root_path) then
                 logger.log(('invalid file path: %q'):format(v.path), 'error')
                 return false
             end
+            local entry = v.path:sub(#root_path + 1)
             if not _no_pack[string.fileext(entry):lower()] then
                 table.insert(entries, { entry, v.path })
             end
