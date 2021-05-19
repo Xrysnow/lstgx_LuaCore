@@ -45,6 +45,7 @@ util.swizzleVec(math.Vec3, 'x', 'y', 'z')
 util.swizzleVec(math.Vec4, 'x', 'y', 'z', 'w')
 
 math.collision = require('math.collision')
+math.complex = require('math.complex')
 math.intersection = require('math.intersection')
 math.spline = require('math.spline')
 math.tween = require('math.tween')
