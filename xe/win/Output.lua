@@ -28,7 +28,7 @@ function M:ctor()
     end, im.vec2(fsize, fsize))
     self:addChild(btn_clear)
     self:addChild(function()
-        if im.listBoxHeader('##', im.vec2(-1, -1)) then
+        if im.beginListBox('##', im.vec2(-1, -1)) then
             local lines = self._lines
             local n = #lines
             for i = 1, n do
@@ -44,7 +44,7 @@ function M:ctor()
                 end
                 im.text(str)
             end
-            im.listBoxFooter()
+            im.endListBox()
         end
     end)
     --TODO: trace

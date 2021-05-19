@@ -62,7 +62,7 @@ ImGuiInputTextFlags.CallbackCharFilter = 2 ^ 9   --- Callback on character input
 ImGuiInputTextFlags.AllowTabInput = 2 ^ 10  --- Pressing TAB input a '\t' character into the text field
 ImGuiInputTextFlags.CtrlEnterForNewLine = 2 ^ 11  --- In multi-line mode unfocus with Enter add new line with Ctrl+Enter (default is opposite: unfocus with Ctrl+Enter add line with Enter).
 ImGuiInputTextFlags.NoHorizontalScroll = 2 ^ 12  --- Disable following the cursor horizontally
-ImGuiInputTextFlags.AlwaysInsertMode = 2 ^ 13  --- Insert mode
+ImGuiInputTextFlags.AlwaysOverwrite = 2 ^ 13  --- Overwrite mode
 ImGuiInputTextFlags.ReadOnly = 2 ^ 14  --- Read-only mode
 ImGuiInputTextFlags.Password = 2 ^ 15  --- Password mode display all characters as '*'
 ImGuiInputTextFlags.NoUndoRedo = 2 ^ 16  --- Disable undo/redo. Note that input text owns the text data while active if you want to provide your own undo/redo stack you need e.g. to call ClearActiveID().
@@ -90,8 +90,8 @@ ImGuiTreeNodeFlags.OpenOnArrow = 2 ^ 7   --- Only open when clicking on the arro
 ImGuiTreeNodeFlags.Leaf = 2 ^ 8   --- No collapsing no arrow (use as a convenience for leaf nodes).
 ImGuiTreeNodeFlags.Bullet = 2 ^ 9   --- Display a bullet instead of arrow
 ImGuiTreeNodeFlags.FramePadding = 2 ^ 10  --- Use FramePadding (even for an unframed text node) to vertically align text baseline to regular widget height. Equivalent to calling AlignTextToFramePadding().
-ImGuiTreeNodeFlags.SpanAllAvailWidth  = 2 ^ 11  --- Extend hit box to the right-most edge, even if not framed. This is not the default in order to allow adding other items on the same line. In the future we may refactor the hit system to be front-to-back, allowing natural overlaps and then this can become the default.
-ImGuiTreeNodeFlags.NoScrollOnOpen     = 2 ^ 12  --- Extend hit box to the left-most and right-most edges (bypass the indented area).
+ImGuiTreeNodeFlags.SpanAllAvailWidth = 2 ^ 11  --- Extend hit box to the right-most edge, even if not framed. This is not the default in order to allow adding other items on the same line. In the future we may refactor the hit system to be front-to-back, allowing natural overlaps and then this can become the default.
+ImGuiTreeNodeFlags.NoScrollOnOpen = 2 ^ 12  --- Extend hit box to the left-most and right-most edges (bypass the indented area).
 ImGuiTreeNodeFlags.NavLeftJumpsBackHere = 2 ^ 13  --- (WIP) Nav: left direction may move to this TreeNode() from any of its child (items submitted between TreeNode and TreePop)
 ImGuiTreeNodeFlags.CollapsingHeader = ImGuiTreeNodeFlags.Framed + ImGuiTreeNodeFlags.NoTreePushOnOpen + ImGuiTreeNodeFlags.NoAutoOpenOnLog
 
@@ -106,21 +106,21 @@ ImGuiTreeNodeFlags.CollapsingHeader = ImGuiTreeNodeFlags.Framed + ImGuiTreeNodeF
 ---   and want to another another flag, you need to pass in the ImGuiPopupFlags_MouseButtonRight flag.
 --- - Multiple buttons currently cannot be combined/or-ed in those functions (we could allow it later).
 
-local ImGuiPopupFlags={}
+local ImGuiPopupFlags = {}
 im.ImGuiPopupFlags = ImGuiPopupFlags
 im.PopupFlags = ImGuiPopupFlags
 
-ImGuiPopupFlags.None                    = 0
-ImGuiPopupFlags.MouseButtonLeft         = 0        --- For BeginPopupContext*(): open on Left Mouse release. Guaranteed to always be == 0 (same as ImGuiMouseButton_Left)
-ImGuiPopupFlags.MouseButtonRight        = 1        --- For BeginPopupContext*(): open on Right Mouse release. Guaranteed to always be == 1 (same as ImGuiMouseButton_Right)
-ImGuiPopupFlags.MouseButtonMiddle       = 2        --- For BeginPopupContext*(): open on Middle Mouse release. Guaranteed to always be == 2 (same as ImGuiMouseButton_Middle)
-ImGuiPopupFlags.MouseButtonMask_        = 0x1F
-ImGuiPopupFlags.MouseButtonDefault_     = 1
-ImGuiPopupFlags.NoOpenOverExistingPopup = 2 ^  5   --- For OpenPopup*(), BeginPopupContext*(): don't open if there's already a popup at the same level of the popup stack
-ImGuiPopupFlags.NoOpenOverItems         = 2 ^  6   --- For BeginPopupContextWindow(): don't return true when hovering items, only when hovering empty space
-ImGuiPopupFlags.AnyPopupId              = 2 ^  7   --- For IsPopupOpen(): ignore the ImGuiID parameter and test for any popup.
-ImGuiPopupFlags.AnyPopupLevel           = 2 ^  8   --- For IsPopupOpen(): search/test at any level of the popup stack (default test in the current level)
-ImGuiPopupFlags.AnyPopup                = ImGuiPopupFlags.AnyPopupId + ImGuiPopupFlags.AnyPopupLevel
+ImGuiPopupFlags.None = 0
+ImGuiPopupFlags.MouseButtonLeft = 0        --- For BeginPopupContext*(): open on Left Mouse release. Guaranteed to always be == 0 (same as ImGuiMouseButton_Left)
+ImGuiPopupFlags.MouseButtonRight = 1        --- For BeginPopupContext*(): open on Right Mouse release. Guaranteed to always be == 1 (same as ImGuiMouseButton_Right)
+ImGuiPopupFlags.MouseButtonMiddle = 2        --- For BeginPopupContext*(): open on Middle Mouse release. Guaranteed to always be == 2 (same as ImGuiMouseButton_Middle)
+ImGuiPopupFlags.MouseButtonMask_ = 0x1F
+ImGuiPopupFlags.MouseButtonDefault_ = 1
+ImGuiPopupFlags.NoOpenOverExistingPopup = 2 ^ 5   --- For OpenPopup*(), BeginPopupContext*(): don't open if there's already a popup at the same level of the popup stack
+ImGuiPopupFlags.NoOpenOverItems = 2 ^ 6   --- For BeginPopupContextWindow(): don't return true when hovering items, only when hovering empty space
+ImGuiPopupFlags.AnyPopupId = 2 ^ 7   --- For IsPopupOpen(): ignore the ImGuiID parameter and test for any popup.
+ImGuiPopupFlags.AnyPopupLevel = 2 ^ 8   --- For IsPopupOpen(): search/test at any level of the popup stack (default test in the current level)
+ImGuiPopupFlags.AnyPopup = ImGuiPopupFlags.AnyPopupId + ImGuiPopupFlags.AnyPopupLevel
 
 --------------------------------------------------
 
@@ -194,24 +194,139 @@ ImGuiTabItemFlags.Trailing = 2 ^ 7    --- Enforce the tab position to the right 
 
 --------------------------------------------------
 
-local ImGuiDockNodeFlags = {}
---- Flags for ImGui::DockSpace(), shared/inherited by child nodes.
---- (Some flags can be applied to individual nodes directly)
---- FIXME-DOCK: Also see ImGuiDockNodeFlagsPrivate_ which may involve using the WIP and internal DockBuilder api.
-im.ImGuiDockNodeFlags = ImGuiDockNodeFlags
---- Flags for ImGui::DockSpace(), shared/inherited by child nodes.
---- (Some flags can be applied to individual nodes directly)
---- FIXME-DOCK: Also see ImGuiDockNodeFlagsPrivate_ which may involve using the WIP and internal DockBuilder api.
-im.DockNodeFlags = ImGuiDockNodeFlags
+local ImGuiTableFlags = {}
+im.ImGuiTableFlags = ImGuiTableFlags
+--- Flags for ImGui::BeginTable()
+--- [BETA API] API may evolve slightly! If you use this, please update to the next version when it comes out!
+--- - Important! Sizing policies have complex and subtle side effects, more so than you would expect.
+---   Read comments/demos carefully + experiment with live demos to get acquainted with them.
+--- - The DEFAULT sizing policies are:
+---    - Default to ImGuiTableFlags_SizingFixedFit    if ScrollX is on, or if host window has ImGuiWindowFlags_AlwaysAutoResize.
+---    - Default to ImGuiTableFlags_SizingStretchSame if ScrollX is off.
+--- - When ScrollX is off:
+---    - Table defaults to ImGuiTableFlags_SizingStretchSame -> all Columns defaults to ImGuiTableColumnFlags_WidthStretch with same weight.
+---    - Columns sizing policy allowed: Stretch (default), Fixed/Auto.
+---    - Fixed Columns will generally obtain their requested width (unless the table cannot fit them all).
+---    - Stretch Columns will share the remaining width.
+---    - Mixed Fixed/Stretch columns is possible but has various side-effects on resizing behaviors.
+---      The typical use of mixing sizing policies is: any number of LEADING Fixed columns, followed by one or two TRAILING Stretch columns.
+---      (this is because the visible order of columns have subtle but necessary effects on how they react to manual resizing).
+--- - When ScrollX is on:
+---    - Table defaults to ImGuiTableFlags_SizingFixedFit -> all Columns defaults to ImGuiTableColumnFlags_WidthFixed
+---    - Columns sizing policy allowed: Fixed/Auto mostly.
+---    - Fixed Columns can be enlarged as needed. Table will show an horizontal scrollbar if needed.
+---    - When using auto-resizing (non-resizable) fixed columns, querying the content width to use item right-alignment e.g. SetNextItemWidth(-FLT_MIN) doesn't make sense, would create a feedback loop.
+---    - Using Stretch columns OFTEN DOES NOT MAKE SENSE if ScrollX is on, UNLESS you have specified a value for 'inner_width' in BeginTable().
+---      If you specify a value for 'inner_width' then effectively the scrolling space is known and Stretch or mixed Fixed/Stretch columns become meaningful again.
+--- - Read on documentation at the top of imgui_tables.cpp for details.
+im.TableFlags = ImGuiTableFlags
 
-ImGuiDockNodeFlags.None = 0
-ImGuiDockNodeFlags.KeepAliveOnly = 2 ^ 0   --- Shared       --- Don't display the dockspace node but keep it alive. Windows docked into this dockspace node won't be undocked.
----ImGuiDockNodeFlags.NoCentralNode              = 2 ^ 1   --- Shared       --- Disable Central Node (the node which can stay empty)
-ImGuiDockNodeFlags.NoDockingInCentralNode = 2 ^ 2   --- Shared       --- Disable docking inside the Central Node, which will be always kept empty.
-ImGuiDockNodeFlags.PassthruCentralNode = 2 ^ 3   --- Shared       --- Enable passthru dockspace: 1) DockSpace() will render a ImGuiCol_WindowBg background covering everything excepted the Central Node when empty. Meaning the host window should probably use SetNextWindowBgAlpha(0.0f) prior to Begin() when using this. 2) When Central Node is empty: let inputs pass-through + won't display a DockingEmptyBg background. See demo for details.
-ImGuiDockNodeFlags.NoSplit = 2 ^ 4   --- Shared/Local --- Disable splitting the node into smaller nodes. Useful e.g. when embedding dockspaces into a main root one (the root one may have splitting disabled to reduce confusion). Note: when turned off, existing splits will be preserved.
-ImGuiDockNodeFlags.NoResize = 2 ^ 5   --- Shared/Local --- Disable resizing node using the splitter/separators. Useful with programatically setup dockspaces.
-ImGuiDockNodeFlags.AutoHideTabBar = 2 ^ 6    --- Shared/Local --- Tab bar will automatically hide when there is a single window in the dock node.
+-- Features
+ImGuiTableFlags.None = 0
+ImGuiTableFlags.Resizable = 2 ^ 0 --- Enable resizing columns.
+ImGuiTableFlags.Reorderable = 2 ^ 1 --- Enable reordering columns in header row (need calling TableSetupColumn() + TableHeadersRow() to display headers)
+ImGuiTableFlags.Hideable = 2 ^ 2 --- Enable hiding/disabling columns in context menu.
+ImGuiTableFlags.Sortable = 2 ^ 3 --- Enable sorting. Call TableGetSortSpecs() to obtain sort specs. Also see ImGuiTableFlags_SortMulti and ImGuiTableFlags_SortTristate.
+ImGuiTableFlags.NoSavedSettings = 2 ^ 4 --- Disable persisting columns order, width and sort settings in the .ini file.
+ImGuiTableFlags.ContextMenuInBody = 2 ^ 5 --- Right-click on columns body/contents will display table context menu. By default it is available in TableHeadersRow().
+-- Decorations
+ImGuiTableFlags.RowBg = 2 ^ 6 --- Set each RowBg color with ImGuiCol_TableRowBg or ImGuiCol_TableRowBgAlt (equivalent of calling TableSetBgColor with ImGuiTableBgFlags_RowBg0 on each row manually)
+ImGuiTableFlags.BordersInnerH = 2 ^ 7 --- Draw horizontal borders between rows.
+ImGuiTableFlags.BordersOuterH = 2 ^ 8 --- Draw horizontal borders at the top and bottom.
+ImGuiTableFlags.BordersInnerV = 2 ^ 9 --- Draw vertical borders between columns.
+ImGuiTableFlags.BordersOuterV = 2 ^ 10 --- Draw vertical borders on the left and right sides.
+ImGuiTableFlags.BordersH = bit.bor(ImGuiTableFlags.BordersInnerH, ImGuiTableFlags.BordersOuterH) --- Draw horizontal borders.
+ImGuiTableFlags.BordersV = bit.bor(ImGuiTableFlags.BordersInnerV, ImGuiTableFlags.BordersOuterV) --- Draw vertical borders.
+ImGuiTableFlags.BordersInner = bit.bor(ImGuiTableFlags.BordersInnerV, ImGuiTableFlags.BordersInnerH) --- Draw inner borders.
+ImGuiTableFlags.BordersOuter = bit.bor(ImGuiTableFlags.BordersOuterV, ImGuiTableFlags.BordersOuterH) --- Draw outer borders.
+ImGuiTableFlags.Borders = bit.bor(ImGuiTableFlags.BordersInner, ImGuiTableFlags.BordersOuter) --- Draw all borders.
+ImGuiTableFlags.NoBordersInBody = 2 ^ 11 --- [ALPHA] Disable vertical borders in columns Body (borders will always appears in Headers). -> May move to style
+ImGuiTableFlags.NoBordersInBodyUntilResize = 2 ^ 12 --- [ALPHA] Disable vertical borders in columns Body until hovered for resize (borders will always appears in Headers). -> May move to style
+-- Sizing Policy (read above for defaults)
+ImGuiTableFlags.SizingFixedFit = 2 ^ 13 --- Columns default to _WidthFixed or _WidthAuto (if resizable or not resizable), matching contents width.
+ImGuiTableFlags.SizingFixedSame = 2 * 2 ^ 13 --- Columns default to _WidthFixed or _WidthAuto (if resizable or not resizable), matching the maximum contents width of all columns. Implicitly enable ImGuiTableFlags_NoKeepColumnsVisible.
+ImGuiTableFlags.SizingStretchProp = 3 * 2 ^ 13 --- Columns default to _WidthStretch with default weights proportional to each columns contents widths.
+ImGuiTableFlags.SizingStretchSame = 4 * 2 ^ 13 --- Columns default to _WidthStretch with default weights all equal, unless overridden by TableSetupColumn().
+-- Sizing Extra Options
+ImGuiTableFlags.NoHostExtendX = 2 ^ 16 --- Make outer width auto-fit to columns, overriding outer_size.x value. Only available when ScrollX/ScrollY are disabled and Stretch columns are not used.
+ImGuiTableFlags.NoHostExtendY = 2 ^ 17 --- Make outer height stop exactly at outer_size.y (prevent auto-extending table past the limit). Only available when ScrollX/ScrollY are disabled. Data below the limit will be clipped and not visible.
+ImGuiTableFlags.NoKeepColumnsVisible = 2 ^ 18 --- Disable keeping column always minimally visible when ScrollX is off and table gets too small. Not recommended if columns are resizable.
+ImGuiTableFlags.PreciseWidths = 2 ^ 19 --- Disable distributing remainder width to stretched columns (width allocation on a 100-wide table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33). With larger number of columns, resizing will appear to be less smooth.
+-- Clipping
+ImGuiTableFlags.NoClip = 2 ^ 20 --- Disable clipping rectangle for every individual columns (reduce draw command count, items will be able to overflow into other columns). Generally incompatible with TableSetupScrollFreeze().
+-- Padding
+ImGuiTableFlags.PadOuterX = 2 ^ 21 --- Default if BordersOuterV is on. Enable outer-most padding. Generally desirable if you have headers.
+ImGuiTableFlags.NoPadOuterX = 2 ^ 22 --- Default if BordersOuterV is off. Disable outer-most padding.
+ImGuiTableFlags.NoPadInnerX = 2 ^ 23 --- Disable inner padding between columns (double inner padding if BordersOuterV is on, single inner padding if BordersOuterV is off).
+-- Scrolling
+ImGuiTableFlags.ScrollX = 2 ^ 24 --- Enable horizontal scrolling. Require 'outer_size' parameter of BeginTable() to specify the container size. Changes default sizing policy. Because this create a child window, ScrollY is currently generally recommended when using ScrollX.
+ImGuiTableFlags.ScrollY = 2 ^ 25 --- Enable vertical scrolling. Require 'outer_size' parameter of BeginTable() to specify the container size.
+-- Sorting
+ImGuiTableFlags.SortMulti = 2 ^ 26 --- Hold shift when clicking headers to sort on multiple column. TableGetSortSpecs() may return specs where (SpecsCount > 1).
+ImGuiTableFlags.SortTristate = 2 ^ 27 --- Allow no sorting, disable default sorting. TableGetSortSpecs() may return specs where (SpecsCount == 0).
+
+--------------------------------------------------
+
+local ImGuiTableColumnFlags = {}
+--- Flags for ImGui::TableSetupColumn()
+im.ImGuiTableColumnFlags = ImGuiTableColumnFlags
+--- Flags for ImGui::TableSetupColumn()
+im.TableColumnFlags = ImGuiTableColumnFlags
+
+-- Input configuration flags
+ImGuiTableColumnFlags.None = 0
+ImGuiTableColumnFlags.DefaultHide = 2 ^ 0 --- Default as a hidden/disabled column.
+ImGuiTableColumnFlags.DefaultSort = 2 ^ 1 --- Default as a sorting column.
+ImGuiTableColumnFlags.WidthStretch = 2 ^ 2 --- Column will stretch. Preferable with horizontal scrolling disabled (default if table sizing policy is _SizingStretchSame or _SizingStretchProp).
+ImGuiTableColumnFlags.WidthFixed = 2 ^ 3 --- Column will not stretch. Preferable with horizontal scrolling enabled (default if table sizing policy is _SizingFixedFit and table is resizable).
+ImGuiTableColumnFlags.NoResize = 2 ^ 4 --- Disable manual resizing.
+ImGuiTableColumnFlags.NoReorder = 2 ^ 5 --- Disable manual reordering this column, this will also prevent other columns from crossing over this column.
+ImGuiTableColumnFlags.NoHide = 2 ^ 6 --- Disable ability to hide/disable this column.
+ImGuiTableColumnFlags.NoClip = 2 ^ 7 --- Disable clipping for this column (all NoClip columns will render in a same draw command).
+ImGuiTableColumnFlags.NoSort = 2 ^ 8 --- Disable ability to sort on this field (even if ImGuiTableFlags_Sortable is set on the table).
+ImGuiTableColumnFlags.NoSortAscending = 2 ^ 9 --- Disable ability to sort in the ascending direction.
+ImGuiTableColumnFlags.NoSortDescending = 2 ^ 10 --- Disable ability to sort in the descending direction.
+ImGuiTableColumnFlags.NoHeaderWidth = 2 ^ 11 --- Disable header text width contribution to automatic column width.
+ImGuiTableColumnFlags.PreferSortAscending = 2 ^ 12 --- Make the initial sort direction Ascending when first sorting on this column (default).
+ImGuiTableColumnFlags.PreferSortDescending = 2 ^ 13 --- Make the initial sort direction Descending when first sorting on this column.
+ImGuiTableColumnFlags.IndentEnable = 2 ^ 14 --- Use current Indent value when entering cell (default for column 0).
+ImGuiTableColumnFlags.IndentDisable = 2 ^ 15 --- Ignore current Indent value when entering cell (default for columns > 0). Indentation changes _within_ the cell will still be honored.
+-- Output status flags, read-only via TableGetColumnFlags()
+ImGuiTableColumnFlags.IsEnabled = 2 ^ 20 --- Status: is enabled == not hidden by user/api (referred to as "Hide" in _DefaultHide and _NoHide) flags.
+ImGuiTableColumnFlags.IsVisible = 2 ^ 21 --- Status: is visible == is enabled AND not clipped by scrolling.
+ImGuiTableColumnFlags.IsSorted = 2 ^ 22 --- Status: is currently part of the sort specs
+ImGuiTableColumnFlags.IsHovered = 2 ^ 23 --- Status: is hovered by mouse
+
+--------------------------------------------------
+
+local ImGuiTableRowFlags = {}
+--- Flags for ImGui::TableNextRow()
+im.ImGuiTableRowFlags = ImGuiTableRowFlags
+--- Flags for ImGui::TableNextRow()
+im.TableRowFlags = ImGuiTableRowFlags
+
+ImGuiTableRowFlags.None = 0
+ImGuiTableRowFlags.Headers = 2 ^ 0 --- Identify header row (set default background color + width of its contents accounted different for auto column width)
+
+--------------------------------------------------
+
+local ImGuiTableBgTarget = {}
+im.ImGuiTableBgTarget = ImGuiTableBgTarget
+--- Enum for ImGui::TableSetBgColor()
+--- Background colors are rendering in 3 layers:
+---  - Layer 0: draw with RowBg0 color if set, otherwise draw with ColumnBg0 if set.
+---  - Layer 1: draw with RowBg1 color if set, otherwise draw with ColumnBg1 if set.
+---  - Layer 2: draw with CellBg color if set.
+--- The purpose of the two row/columns layers is to let you decide if a background color changes should override or blend with the existing color.
+--- When using ImGuiTableFlags_RowBg on the table, each row has the RowBg0 color automatically set for odd/even rows.
+--- If you set the color of RowBg0 target, your color will override the existing RowBg0 color.
+--- If you set the color of RowBg1 or ColumnBg1 target, your color will blend over the RowBg0 color.
+im.TableBgTarget = ImGuiTableBgTarget
+
+ImGuiTableBgTarget.None = 0
+ImGuiTableBgTarget.RowBg0 = 1 --- Set row background color 0 (generally used for background, automatically set when ImGuiTableFlags_RowBg is used)
+ImGuiTableBgTarget.RowBg1 = 2 --- Set row background color 1 (generally used for selection marking)
+ImGuiTableBgTarget.CellBg = 3 --- Set cell background color (top-most color)
 
 --------------------------------------------------
 
@@ -250,6 +365,27 @@ ImGuiHoveredFlags.AllowWhenOverlapped = 2 ^ 6   --- Return true even if the posi
 ImGuiHoveredFlags.AllowWhenDisabled = 2 ^ 7   --- Return true even if the item is disabled
 ImGuiHoveredFlags.RectOnly = ImGuiHoveredFlags.AllowWhenBlockedByPopup + ImGuiHoveredFlags.AllowWhenBlockedByActiveItem + ImGuiHoveredFlags.AllowWhenOverlapped
 ImGuiHoveredFlags.RootAndChildWindows = ImGuiHoveredFlags.RootWindow + ImGuiHoveredFlags.ChildWindows
+
+--------------------------------------------------
+
+local ImGuiDockNodeFlags = {}
+--- Flags for ImGui::DockSpace(), shared/inherited by child nodes.
+--- (Some flags can be applied to individual nodes directly)
+--- FIXME-DOCK: Also see ImGuiDockNodeFlagsPrivate_ which may involve using the WIP and internal DockBuilder api.
+im.ImGuiDockNodeFlags = ImGuiDockNodeFlags
+--- Flags for ImGui::DockSpace(), shared/inherited by child nodes.
+--- (Some flags can be applied to individual nodes directly)
+--- FIXME-DOCK: Also see ImGuiDockNodeFlagsPrivate_ which may involve using the WIP and internal DockBuilder api.
+im.DockNodeFlags = ImGuiDockNodeFlags
+
+ImGuiDockNodeFlags.None = 0
+ImGuiDockNodeFlags.KeepAliveOnly = 2 ^ 0   --- Shared       --- Don't display the dockspace node but keep it alive. Windows docked into this dockspace node won't be undocked.
+---ImGuiDockNodeFlags.NoCentralNode              = 2 ^ 1   --- Shared       --- Disable Central Node (the node which can stay empty)
+ImGuiDockNodeFlags.NoDockingInCentralNode = 2 ^ 2   --- Shared       --- Disable docking inside the Central Node, which will be always kept empty.
+ImGuiDockNodeFlags.PassthruCentralNode = 2 ^ 3   --- Shared       --- Enable passthru dockspace: 1) DockSpace() will render a ImGuiCol_WindowBg background covering everything excepted the Central Node when empty. Meaning the host window should probably use SetNextWindowBgAlpha(0.0f) prior to Begin() when using this. 2) When Central Node is empty: let inputs pass-through + won't display a DockingEmptyBg background. See demo for details.
+ImGuiDockNodeFlags.NoSplit = 2 ^ 4   --- Shared/Local --- Disable splitting the node into smaller nodes. Useful e.g. when embedding dockspaces into a main root one (the root one may have splitting disabled to reduce confusion). Note: when turned off, existing splits will be preserved.
+ImGuiDockNodeFlags.NoResize = 2 ^ 5   --- Shared/Local --- Disable resizing node using the splitter/separators. Useful with programatically setup dockspaces.
+ImGuiDockNodeFlags.AutoHideTabBar = 2 ^ 6    --- Shared/Local --- Tab bar will automatically hide when there is a single window in the dock node.
 
 --------------------------------------------------
 
@@ -310,6 +446,18 @@ ImGuiDir.COUNT = 4
 
 --------------------------------------------------
 
+local ImGuiSortDirection = {}
+--- A sorting direction
+im.ImGuiSortDirection = ImGuiSortDirection
+--- A sorting direction
+im.SortDirection = ImGuiSortDirection
+
+ImGuiSortDirection.None = 0
+ImGuiSortDirection.Ascending = 1 --- Ascending = 0->9, A->Z etc.
+ImGuiSortDirection.Descending = 2 --- Descending = 9->0, Z->A etc.
+
+--------------------------------------------------
+
 local ImGuiKey = {}
 --- User fill ImGuiIO.KeyMap[] array with indices into the ImGuiIO.KeysDown[512] array
 im.ImGuiKey = ImGuiKey
@@ -341,17 +489,17 @@ ImGuiKey.COUNT = 21
 
 --------------------------------------------------
 
-local ImGuiKeyModFlags={}
+local ImGuiKeyModFlags = {}
 --- To test io.KeyMods (which is a combination of individual fields io.KeyCtrl, io.KeyShift, io.KeyAlt set by user/backend)
 im.ImGuiKeyModFlags = ImGuiKeyModFlags
 --- To test io.KeyMods (which is a combination of individual fields io.KeyCtrl, io.KeyShift, io.KeyAlt set by user/backend)
 im.KeyModFlags = ImGuiKeyModFlags
 
-ImGuiKeyModFlags.None       = 0
-ImGuiKeyModFlags.Ctrl       = 2 ^  0
-ImGuiKeyModFlags.Shift      = 2 ^  1
-ImGuiKeyModFlags.Alt        = 2 ^  2
-ImGuiKeyModFlags.Super      = 2 ^  3
+ImGuiKeyModFlags.None = 0
+ImGuiKeyModFlags.Ctrl = 2 ^ 0
+ImGuiKeyModFlags.Shift = 2 ^ 1
+ImGuiKeyModFlags.Alt = 2 ^ 2
+ImGuiKeyModFlags.Super = 2 ^ 3
 
 --------------------------------------------------
 
@@ -359,12 +507,12 @@ local ImGuiNavInput = {}
 --- Gamepad/Keyboard navigation
 --- Keyboard: Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard to enable. NewFrame() will automatically fill io.NavInputs[] based on your io.KeysDown[] + io.KeyMap[] arrays.
 --- Gamepad:  Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad to enable. Backend: set ImGuiBackendFlags.HasGamepad and fill the io.NavInputs[] fields before calling NewFrame(). Note that io.NavInputs[] is cleared by EndFrame().
---- Read instructions in imgui.cpp for more details. Download PNG/PSD at http:--goo.gl/9LgVZW.
+--- Read instructions in imgui.cpp for more details. Download PNG/PSD at http://dearimgui.org/controls_sheets.
 im.ImGuiNavInput = ImGuiNavInput
 --- Gamepad/Keyboard navigation
 --- Keyboard: Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard to enable. NewFrame() will automatically fill io.NavInputs[] based on your io.KeysDown[] + io.KeyMap[] arrays.
 --- Gamepad:  Set io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad to enable. Backend: set ImGuiBackendFlags.HasGamepad and fill the io.NavInputs[] fields before calling NewFrame(). Note that io.NavInputs[] is cleared by EndFrame().
---- Read instructions in imgui.cpp for more details. Download PNG/PSD at http:--goo.gl/9LgVZW.
+--- Read instructions in imgui.cpp for more details. Download PNG/PSD at http://dearimgui.org/controls_sheets.
 im.NavInput = ImGuiNavInput
 
 --- Gamepad Mapping
@@ -482,13 +630,18 @@ ImGuiCol.PlotLines = 40
 ImGuiCol.PlotLinesHovered = 41
 ImGuiCol.PlotHistogram = 42
 ImGuiCol.PlotHistogramHovered = 43
-ImGuiCol.TextSelectedBg = 44
-ImGuiCol.DragDropTarget = 45
-ImGuiCol.NavHighlight = 46 --- Gamepad/keyboard: current highlighted item
-ImGuiCol.NavWindowingHighlight = 47 --- Highlight window when using CTRL+TAB
-ImGuiCol.NavWindowingDimBg = 48 --- Darken/colorize entire screen behind the CTRL+TAB window list, when active
-ImGuiCol.ModalWindowDimBg = 49 --- Darken/colorize entire screen behind a modal window, when one is active
-ImGuiCol.COUNT = 50
+ImGuiCol.TableHeaderBg = 44 --- Table header background
+ImGuiCol.TableBorderStrong = 45 --- Table outer and header borders (prefer using Alpha=1.0 here)
+ImGuiCol.TableBorderLight = 46 --- Table inner borders (prefer using Alpha=1.0 here)
+ImGuiCol.TableRowBg = 47 --- Table row background (even rows)
+ImGuiCol.TableRowBgAlt = 48 --- Table row background (odd rows)
+ImGuiCol.TextSelectedBg = 49
+ImGuiCol.DragDropTarget = 50
+ImGuiCol.NavHighlight = 51 --- Gamepad/keyboard: current highlighted item
+ImGuiCol.NavWindowingHighlight = 52 --- Highlight window when using CTRL+TAB
+ImGuiCol.NavWindowingDimBg = 53 --- Darken/colorize entire screen behind the CTRL+TAB window list, when active
+ImGuiCol.ModalWindowDimBg = 54 --- Darken/colorize entire screen behind a modal window, when one is active
+ImGuiCol.COUNT = 55
 
 --------------------------------------------------
 
@@ -527,14 +680,15 @@ ImGuiStyleVar.FrameBorderSize = 12 --- float     FrameBorderSize
 ImGuiStyleVar.ItemSpacing = 13 --- ImVec2    ItemSpacing
 ImGuiStyleVar.ItemInnerSpacing = 14 --- ImVec2    ItemInnerSpacing
 ImGuiStyleVar.IndentSpacing = 15 --- float     IndentSpacing
-ImGuiStyleVar.ScrollbarSize = 16 --- float     ScrollbarSize
-ImGuiStyleVar.ScrollbarRounding = 17 --- float     ScrollbarRounding
-ImGuiStyleVar.GrabMinSize = 18 --- float     GrabMinSize
-ImGuiStyleVar.GrabRounding = 19 --- float     GrabRounding
-ImGuiStyleVar.TabRounding = 20 --- float     TabRounding
-ImGuiStyleVar.ButtonTextAlign = 21 --- ImVec2    ButtonTextAlign
-ImGuiStyleVar.SelectableTextAlign = 22 --- ImVec2    SelectableTextAlign
-ImGuiStyleVar.COUNT = 23
+ImGuiStyleVar.CellPadding = 16 --- ImVec2    CellPadding
+ImGuiStyleVar.ScrollbarSize = 17 --- float     ScrollbarSize
+ImGuiStyleVar.ScrollbarRounding = 18 --- float     ScrollbarRounding
+ImGuiStyleVar.GrabMinSize = 19 --- float     GrabMinSize
+ImGuiStyleVar.GrabRounding = 20 --- float     GrabRounding
+ImGuiStyleVar.TabRounding = 21 --- float     TabRounding
+ImGuiStyleVar.ButtonTextAlign = 22 --- ImVec2    ButtonTextAlign
+ImGuiStyleVar.SelectableTextAlign = 23 --- ImVec2    SelectableTextAlign
+ImGuiStyleVar.COUNT = 24
 
 --------------------------------------------------
 
@@ -544,10 +698,10 @@ im.ImGuiButtonFlags = ImGuiButtonFlags
 --- Flags for InvisibleButton() [extended in imgui_internal.h]
 im.ButtonFlags = ImGuiButtonFlags
 
-ImGuiButtonFlags.None                   = 0
-ImGuiButtonFlags.MouseButtonLeft        = 2 ^ 0   --- React on left mouse button (default)
-ImGuiButtonFlags.MouseButtonRight       = 2 ^ 1   --- React on right mouse button
-ImGuiButtonFlags.MouseButtonMiddle      = 2 ^ 2   --- React on center mouse button
+ImGuiButtonFlags.None = 0
+ImGuiButtonFlags.MouseButtonLeft = 2 ^ 0   --- React on left mouse button (default)
+ImGuiButtonFlags.MouseButtonRight = 2 ^ 1   --- React on right mouse button
+ImGuiButtonFlags.MouseButtonMiddle = 2 ^ 2   --- React on center mouse button
 
 --------------------------------------------------
 
@@ -598,11 +752,11 @@ im.ImGuiSliderFlags = ImGuiSliderFlags
 --- We use the same sets of flags for DragXXX() and SliderXXX() functions as the features are the same and it makes it easier to swap them.
 im.SliderFlags = ImGuiSliderFlags
 
-ImGuiSliderFlags.None                   = 0
-ImGuiSliderFlags.AlwaysClamp            = 2 ^ 4       --- Clamp value to min/max bounds when input manually with CTRL+Click. By default CTRL+Click allows going out of bounds.
-ImGuiSliderFlags.Logarithmic            = 2 ^ 5       --- Make the widget logarithmic (linear otherwise). Consider using ImGuiSliderFlags_NoRoundToFormat with this if using a format-string with small amount of digits.
-ImGuiSliderFlags.NoRoundToFormat        = 2 ^ 6       --- Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
-ImGuiSliderFlags.NoInput                = 2 ^ 7       --- Disable CTRL+Click or Enter key allowing to input text directly into the widget
+ImGuiSliderFlags.None = 0
+ImGuiSliderFlags.AlwaysClamp = 2 ^ 4       --- Clamp value to min/max bounds when input manually with CTRL+Click. By default CTRL+Click allows going out of bounds.
+ImGuiSliderFlags.Logarithmic = 2 ^ 5       --- Make the widget logarithmic (linear otherwise). Consider using ImGuiSliderFlags_NoRoundToFormat with this if using a format-string with small amount of digits.
+ImGuiSliderFlags.NoRoundToFormat = 2 ^ 6       --- Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
+ImGuiSliderFlags.NoInput = 2 ^ 7       --- Disable CTRL+Click or Enter key allowing to input text directly into the widget
 
 --------------------------------------------------
 
@@ -652,13 +806,16 @@ im.ImGuiViewportFlags = ImGuiViewportFlags
 im.ViewportFlags = ImGuiViewportFlags
 
 ImGuiViewportFlags.None = 0
-ImGuiViewportFlags.NoDecoration = 2 ^ 0   --- Platform Window: Disable platform decorations: title bar, borders, etc. (generally set all windows, but if ImGuiConfigFlags_ViewportsDecoration is set we only set this on popups/tooltips)
-ImGuiViewportFlags.NoTaskBarIcon = 2 ^ 1   --- Platform Window: Disable platform task bar icon (generally set on popups/tooltips, or all windows if ImGuiConfigFlags_ViewportsNoTaskBarIcon is set)
-ImGuiViewportFlags.NoFocusOnAppearing = 2 ^ 2   --- Platform Window: Don't take focus when created.
-ImGuiViewportFlags.NoFocusOnClick = 2 ^ 3   --- Platform Window: Don't take focus when clicked on.
-ImGuiViewportFlags.NoInputs = 2 ^ 4   --- Platform Window: Make mouse pass through so we can drag this window while peaking behind it.
-ImGuiViewportFlags.NoRendererClear = 2 ^ 5   --- Platform Window: Renderer doesn't need to clear the framebuffer ahead (because we will fill it entirely).
-ImGuiViewportFlags.TopMost = 2 ^ 6   --- Platform Window: Display on top (for tooltips only)
-ImGuiViewportFlags.Minimized = 2 ^ 7   --- Platform Window: Window is minimized, can skip render. When minimized we tend to avoid using the viewport pos/size for clipping window or testing if they are contained in the viewport.
-ImGuiViewportFlags.NoAutoMerge = 2 ^ 8   --- Platform Window: Avoid merging this window into another host window. This can only be set via ImGuiWindowClass viewport flags override (because we need to now ahead if we are going to create a viewport in the first place!).
-ImGuiViewportFlags.CanHostOtherWindows = 2 ^ 9    --- Main viewport: can host multiple imgui windows (secondary viewports are associated to a single window)
+ImGuiViewportFlags.IsPlatformWindow = 2 ^ 0 --- Represent a Platform Window
+ImGuiViewportFlags.IsPlatformMonitor = 2 ^ 1 --- Represent a Platform Monitor (unused yet)
+ImGuiViewportFlags.OwnedByApp = 2 ^ 2 --- Platform Window: is created/managed by the application (rather than a dear imgui backend)
+ImGuiViewportFlags.NoDecoration = 2 ^ 3 --- Platform Window: Disable platform decorations: title bar, borders, etc. (generally set all windows, but if ImGuiConfigFlags_ViewportsDecoration is set we only set this on popups/tooltips)
+ImGuiViewportFlags.NoTaskBarIcon = 2 ^ 4 --- Platform Window: Disable platform task bar icon (generally set on popups/tooltips, or all windows if ImGuiConfigFlags_ViewportsNoTaskBarIcon is set)
+ImGuiViewportFlags.NoFocusOnAppearing = 2 ^ 5 --- Platform Window: Don't take focus when created.
+ImGuiViewportFlags.NoFocusOnClick = 2 ^ 6 --- Platform Window: Don't take focus when clicked on.
+ImGuiViewportFlags.NoInputs = 2 ^ 7 --- Platform Window: Make mouse pass through so we can drag this window while peaking behind it.
+ImGuiViewportFlags.NoRendererClear = 2 ^ 8 --- Platform Window: Renderer doesn't need to clear the framebuffer ahead (because we will fill it entirely).
+ImGuiViewportFlags.TopMost = 2 ^ 9 --- Platform Window: Display on top (for tooltips only).
+ImGuiViewportFlags.Minimized = 2 ^ 10 --- Platform Window: Window is minimized, can skip render. When minimized we tend to avoid using the viewport pos/size for clipping window or testing if they are contained in the viewport.
+ImGuiViewportFlags.NoAutoMerge = 2 ^ 11 --- Platform Window: Avoid merging this window into another host window. This can only be set via ImGuiWindowClass viewport flags override (because we need to now ahead if we are going to create a viewport in the first place!).
+ImGuiViewportFlags.CanHostOtherWindows = 2 ^ 12 --- Main viewport: can host multiple imgui windows (secondary viewports are associated to a single window).

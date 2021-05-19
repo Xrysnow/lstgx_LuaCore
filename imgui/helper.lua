@@ -398,7 +398,7 @@ imgui.GlyphRanges = GlyphRanges
 GlyphRanges.Default = 0
 --- Default + Korean characters
 GlyphRanges.Korean = 1
---- Default + Hiragana, Katakana, Half-Width, Selection of 1946 Ideographs
+--- Default + Hiragana, Katakana, Half-Width, Selection of 2999 Ideographs
 GlyphRanges.Japanese = 2
 --- Default + Half-Width + Japanese Hiragana/Katakana + full set of about 21000 CJK Unified Ideographs
 GlyphRanges.ChineseFull = 3
