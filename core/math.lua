@@ -22,7 +22,7 @@ end
 --local ranx = Rand()
 --assert(not ran, 'random generator has been set')
 --ran = {}
-ran = lstg.Random:create()
+ran = lstg.Random()
 ---@type lstg.Random
 local ran = ran
 assert(ran, 'failed to create random generator')
