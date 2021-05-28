@@ -21,15 +21,15 @@ local function onConnect(c)
     local name = c:getDeviceName()
     local id = c:getDeviceId()
     Print(string.format('controller connected: name: %q, id: %d', name, id))
-    status_button[c] = {}
-    status_axis[c] = {}
-    status_axis_pos[c] = {}
-    status_axis_neg[c] = {}
+    status_button[id] = {}
+    status_axis[id] = {}
+    status_axis_pos[id] = {}
+    status_axis_neg[id] = {}
     --local keys = {}
     --for i = 0, 15 do
     --    keys[i] = false
     --end
-    --mapping[c] = {}
+    --mapping[id] = {}
     --if plus.os == 'android' then
     --    -- receive back key
     --    c:receiveExternalKeyEvent(4, true)
@@ -43,15 +43,16 @@ local function onDisonnect(c)
     local name = c:getDeviceName()
     local id = c:getDeviceId()
     Print(string.format('controller disconnected: name: %q, id: %d', name, id))
-    status_button[c] = nil
-    status_axis[c] = nil
-    status_axis_pos[c] = nil
-    status_axis_neg[c] = nil
-    --mapping[c] = nil
+    status_button[id] = nil
+    status_axis[id] = nil
+    status_axis_pos[id] = nil
+    status_axis_neg[id] = nil
+    --mapping[id] = nil
 end
 
-local function _check(c)
-    if not status_button[c] then
+local function _check(cid)
+    if not status_button[cid] then
+        local c = cc.Controller:getControllerByDeviceId(cid)
         onConnect(c)
     end
 end
@@ -64,17 +65,17 @@ local function _is_last(id, keyCode, is_axis, is_pos)
     end
 end
 
----@param c cc.Controller
----@param keyCode cc.Controller
----@param value cc.Controller
----@param isPressed cc.Controller
----@param isAnalog cc.Controller
-local function onKeyDown(c, keyCode, value, isPressed, isAnalog)
+---@param cid number
+---@param keyCode number
+---@param value number
+---@param isPressed boolean
+---@param isAnalog boolean
+local function onKeyDown(cid, keyCode, value, isPressed, isAnalog)
     if keyCode >= 1000 then
         keyCode = keyCode - 1000
     end
-    _check(c)
-    status_button[c][keyCode] = true
+    _check(cid)
+    status_button[cid][keyCode] = true
     --local code = -1
     --for k, v in pairs(mapping_inv) do
     --    if v.key == keyCode and not v.is_axis then
@@ -82,20 +83,21 @@ local function onKeyDown(c, keyCode, value, isPressed, isAnalog)
     --        break
     --    end
     --end
-    --Print(string.format('[CTR] %d down: %02d => %d', c:getDeviceId(), keyCode, code))
+    --Print(string.format('[CTR] %d down: %02d => %d', cid, keyCode, code))
     _last = {
-        id  = c:getDeviceId(),
+        id  = cid,
         key = keyCode,
     }
 end
-local function onKeyUp(c, keyCode, value, isPressed, isAnalog)
+
+local function onKeyUp(cid, keyCode, value, isPressed, isAnalog)
     if keyCode >= 1000 then
         keyCode = keyCode - 1000
     end
-    --Print(string.format('[CTR] %d   up: %02d', c:getDeviceId(), keyCode))
-    _check(c)
-    status_button[c][keyCode] = false
-    if _is_last(c:getDeviceId(), keyCode, nil, nil) then
+    --Print(string.format('[CTR] %d   up: %02d', cid, keyCode))
+    _check(cid)
+    status_button[cid][keyCode] = false
+    if _is_last(cid, keyCode, nil, nil) then
         _last = nil
     end
 end
@@ -106,53 +108,53 @@ local _axis_t = {
     { { nil, false }, nil, { false, nil }, },
     { { true, false }, { true, nil }, nil, },
 }
-local function _set_axis(c, keyCode, posVal, negVal)
+local function _set_axis(cid, keyCode, posVal, negVal)
     if posVal ~= nil then
-        status_axis_pos[c][keyCode] = posVal
+        status_axis_pos[cid][keyCode] = posVal
         if posVal then
             _last = {
-                id      = c:getDeviceId(),
+                id      = cid,
                 key     = keyCode,
                 is_axis = true,
                 is_pos  = true,
             }
         else
-            if _is_last(c:getDeviceId(), keyCode, true, true) then
+            if _is_last(cid, keyCode, true, true) then
                 _last = nil
             end
         end
     end
     if negVal ~= nil then
-        status_axis_neg[c][keyCode] = negVal
+        status_axis_neg[cid][keyCode] = negVal
         if negVal then
             _last = {
-                id      = c:getDeviceId(),
+                id      = cid,
                 key     = keyCode,
                 is_axis = true,
                 is_pos  = false,
             }
         else
-            if _is_last(c:getDeviceId(), keyCode, true, false) then
+            if _is_last(cid, keyCode, true, false) then
                 _last = nil
             end
         end
     end
 end
 
-local function onAxisEvent(c, keyCode, value, isPressed, isAnalog)
+local function onAxisEvent(cid, keyCode, value, isPressed, isAnalog)
     if keyCode >= 1000 then
         keyCode = keyCode - 1000
     end
-    _check(c)
-    local last = status_axis[c][keyCode]
+    _check(cid)
+    local last = status_axis[cid][keyCode]
     if not last then
-        status_axis[c][keyCode] = value
+        status_axis[cid][keyCode] = value
         last = value
     end
     --if math.abs(last - value) < 0.1 then
     --    return
     --end
-    status_axis[c][keyCode] = value
+    status_axis[cid][keyCode] = value
     local i1, i2
     if value < -_threshold then
         i1 = 1
@@ -170,7 +172,7 @@ local function onAxisEvent(c, keyCode, value, isPressed, isAnalog)
     end
     local val = _axis_t[i1][i2]
     if val then
-        _set_axis(c, keyCode, val[1], val[2])
+        _set_axis(cid, keyCode, val[1], val[2])
         --Print('set_axis', keyCode, string.format('%.3f', last), string.format('%.3f', value), val[1], val[2])
     end
 end
