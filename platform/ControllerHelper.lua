@@ -51,6 +51,7 @@ local function onDisonnect(c)
 end
 
 local function _check(cid)
+    assert(type(cid) == 'number')
     if not status_button[cid] then
         local c = cc.Controller:getControllerByDeviceId(cid)
         onConnect(c)
