@@ -446,6 +446,7 @@ function CreateRenderMode(name, blendEquation, blendFuncSrc, blendFuncDst, shade
         shaderProgram = lstg.RenderMode:getDefault():getProgram()
     else
         local res = FindResFX(shaderName)
+        assert(res, shaderName)
         if res then
             shaderProgram = res:getProgram()
         end
@@ -534,6 +535,24 @@ function SetFog(near, far, color)
     end
 end
 lstg.SetFog = SetFog
+
+function SetDepth(enable, compareFunc)
+    local r = cc.Director:getInstance():getRenderer()
+    if enable then
+        r:setDepthTest(true)
+        r:setDepthWrite(true)
+        if compareFunc then
+            if type(compareFunc) == 'string' then
+                compareFunc = ccb.CompareFunction[compareFunc:upper()]
+            end
+            assert(type(compareFunc) == 'number')
+            r:setDepthCompareFunction(compareFunc)
+        end
+    else
+        r:setDepthTest(false)
+        r:setDepthWrite(false)
+    end
+end
 
 --
 
