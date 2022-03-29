@@ -1,8 +1,47 @@
+/*{
+    "blocks": [
+        "FSBlock": {
+            "binding": 1,
+            "members": [
+                {"name": "SCREENSIZE", "type": "vec4"},
+                {"name": "centerX", "type": "float"},
+                {"name": "centerY", "type": "float"},
+                {"name": "size", "type": "float"},
+                {"name": "arg", "type": "float"},
+                {"name": "color", "type": "vec4"},
+                {"name": "colorsize", "type": "float"},
+                {"name": "timer", "type": "float"}
+            ]
+        }
+    ],
+    "samplers": [
+        {"name": "u_texture", "type": "sampler2D", "binding": 2}
+    ]
+}*/
+#if __VERSION__ >= 300
+
+layout(std140, binding=1) uniform FSBlock
+{
+    vec4 SCREENSIZE;
+    float centerX;
+    float centerY;
+    float size;
+    float arg;
+    vec4 color;
+    float colorsize;
+    float timer;
+};
+layout(binding=2) uniform sampler2D u_texture;
+
+layout(location=0) in vec4 v_fragmentColor;
+layout(location=1) in vec2 v_texCoord;
+layout(location=0) out vec4 cc_FragColor;
+
+#else
 
 varying vec4 v_fragmentColor;
 varying vec2 v_texCoord;
 uniform vec4 SCREENSIZE;
-
 uniform float centerX;
 uniform float centerY;
 uniform float size;
@@ -10,8 +49,10 @@ uniform float arg;
 uniform vec4 color;
 uniform float colorsize;
 uniform float timer;
-
 uniform sampler2D u_texture;
+
+#endif
+
 
 vec2 Distortion(vec2 xy, vec2 delta, float deltaLen)
 {
@@ -39,12 +80,22 @@ void main()
         uv += distDelta / screen_size;
     }
 
-	gl_FragColor = v_fragmentColor * texture2D(u_texture, uv);
+#if __VERSION__ >= 300
+	vec4 fragColor = v_fragmentColor * texture(u_texture, uv);
+#else
+	vec4 fragColor = v_fragmentColor * texture2D(u_texture, uv);
+#endif
     
     if (deltaLen <= colorsize) {
         float k = deltaLen / colorsize;
         vec4 addColor = mix(color, vec4(0.0), k * k);
-        gl_FragColor += addColor * addColor.a;
+        fragColor += addColor * addColor.a;
     }
-//    gl_FragColor.a = 1;
+//    fragColor.a = 1;
+
+#if __VERSION__ >= 300
+    cc_FragColor = fragColor;
+#else
+    gl_FragColor = fragColor;
+#endif
 }
