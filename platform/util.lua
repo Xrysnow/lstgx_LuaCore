@@ -62,7 +62,14 @@ function M.changeWritablePath()
     elseif osname == 'windows' then
         FU:setWritablePath('./')
     elseif osname == 'linux' then
-        FU:setWritablePath('./')
+        local dir = require('platform.linux.directory').get_current_dir_name()
+        if not dir then
+            dir = FU:fullPathForFilename('./')
+        end
+        if dir and dir ~= '' then
+            FU:setWritablePath(dir)
+            ret = FU:getWritablePath()
+        end
     end
     if ret then
         if ret:sub(-1) ~= '/' then
