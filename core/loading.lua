@@ -10,19 +10,23 @@ function lstg.loadData()
         for _, dir in ipairs(possible_dir) do
             if FU:isDirectoryExist(dir) then
                 local fp = FU:fullPathForFilename(dir)
-                FU:addSearchPath(fp)
-                SystemLog(string.format(i18n "load %s from local path %q", v, fp))
-                find = true
-                break
+                if fp ~= '' then
+                    FU:addSearchPath(fp)
+                    SystemLog(string.format(i18n "load %s from local path %q", v, fp))
+                    find = true
+                    break
+                end
             end
         end
         if not find then
             for _, zip in ipairs(possible_zip) do
                 if plus.FileExists(zip) then
                     local fp = FU:fullPathForFilename(zip)
-                    SystemLog(string.format(i18n "load %s from %q", v, fp))
-                    LoadPack(fp)
-                    find = true
+                    if fp ~= '' then
+                        SystemLog(string.format(i18n "load %s from %q", v, fp))
+                        LoadPack(fp)
+                        find = true
+                    end
                     break
                 end
             end
