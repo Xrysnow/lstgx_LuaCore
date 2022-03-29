@@ -43,6 +43,9 @@ end
 
 function ffi.try_cdef(s)
     assert(type(s) == 'string')
-    pcall(ffi.cdef, s)
+    local ok, msg = pcall(ffi.cdef, s)
+    if not ok then
+        print(msg)
+    end
 end
 
