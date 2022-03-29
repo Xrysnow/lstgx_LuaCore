@@ -197,6 +197,10 @@ local function _log_app_info()
     --SystemLog(inf)
     plus.language = info.language
     plus.platform = info.platform
+    Print('Application language:', info.language)
+    Print('Application platform:', info.platform)
+    local cc_rp = FU:getWritablePath()
+    Print('Application writable path:', cc_rp)
 end
 _log_app_info()
 
