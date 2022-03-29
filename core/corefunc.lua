@@ -466,8 +466,9 @@ function CreateRenderMode(name, blendEquation, blendFuncSrc, blendFuncDst, shade
     return ret
 end
 
-local p_light = CreateShaderProgramFromPath(
-        shader_path .. 'NormalTex.vert', shader_path .. 'NormalTex.frag')
+-- local p_light = CreateShaderProgramFromPath(
+--         shader_path .. 'NormalTex.vert', shader_path .. 'NormalTex.frag')
+local p_light = nil
 if p_light then
     local rm = lstg.RenderMode:create(
             'lstg.light', _bop.ADD, _bfac.SRC_ALPHA, _bfac.ONE_MINUS_SRC_ALPHA, p_light)
