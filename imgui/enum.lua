@@ -665,30 +665,31 @@ im.StyleVar = ImGuiStyleVar
 
 -- Enum name ---------------------- --- Member in ImGuiStyle structure (see ImGuiStyle for descriptions)
 ImGuiStyleVar.Alpha = 0  --- float     Alpha
-ImGuiStyleVar.WindowPadding = 1  --- ImVec2    WindowPadding
-ImGuiStyleVar.WindowRounding = 2  --- float     WindowRounding
-ImGuiStyleVar.WindowBorderSize = 3  --- float     WindowBorderSize
-ImGuiStyleVar.WindowMinSize = 4  --- ImVec2    WindowMinSize
-ImGuiStyleVar.WindowTitleAlign = 5  --- ImVec2    WindowTitleAlign
-ImGuiStyleVar.ChildRounding = 6  --- float     ChildRounding
-ImGuiStyleVar.ChildBorderSize = 7  --- float     ChildBorderSize
-ImGuiStyleVar.PopupRounding = 8  --- float     PopupRounding
-ImGuiStyleVar.PopupBorderSize = 9  --- float     PopupBorderSize
-ImGuiStyleVar.FramePadding = 10 --- ImVec2    FramePadding
-ImGuiStyleVar.FrameRounding = 11 --- float     FrameRounding
-ImGuiStyleVar.FrameBorderSize = 12 --- float     FrameBorderSize
-ImGuiStyleVar.ItemSpacing = 13 --- ImVec2    ItemSpacing
-ImGuiStyleVar.ItemInnerSpacing = 14 --- ImVec2    ItemInnerSpacing
-ImGuiStyleVar.IndentSpacing = 15 --- float     IndentSpacing
-ImGuiStyleVar.CellPadding = 16 --- ImVec2    CellPadding
-ImGuiStyleVar.ScrollbarSize = 17 --- float     ScrollbarSize
-ImGuiStyleVar.ScrollbarRounding = 18 --- float     ScrollbarRounding
-ImGuiStyleVar.GrabMinSize = 19 --- float     GrabMinSize
-ImGuiStyleVar.GrabRounding = 20 --- float     GrabRounding
-ImGuiStyleVar.TabRounding = 21 --- float     TabRounding
-ImGuiStyleVar.ButtonTextAlign = 22 --- ImVec2    ButtonTextAlign
-ImGuiStyleVar.SelectableTextAlign = 23 --- ImVec2    SelectableTextAlign
-ImGuiStyleVar.COUNT = 24
+ImGuiStyleVar.DisabledAlpha = 1  --- float     Alpha
+ImGuiStyleVar.WindowPadding = 2  --- ImVec2    WindowPadding
+ImGuiStyleVar.WindowRounding = 3  --- float     WindowRounding
+ImGuiStyleVar.WindowBorderSize = 4  --- float     WindowBorderSize
+ImGuiStyleVar.WindowMinSize = 5  --- ImVec2    WindowMinSize
+ImGuiStyleVar.WindowTitleAlign = 6  --- ImVec2    WindowTitleAlign
+ImGuiStyleVar.ChildRounding = 7  --- float     ChildRounding
+ImGuiStyleVar.ChildBorderSize = 8  --- float     ChildBorderSize
+ImGuiStyleVar.PopupRounding = 9  --- float     PopupRounding
+ImGuiStyleVar.PopupBorderSize = 10  --- float     PopupBorderSize
+ImGuiStyleVar.FramePadding = 11 --- ImVec2    FramePadding
+ImGuiStyleVar.FrameRounding = 12 --- float     FrameRounding
+ImGuiStyleVar.FrameBorderSize = 13 --- float     FrameBorderSize
+ImGuiStyleVar.ItemSpacing = 14 --- ImVec2    ItemSpacing
+ImGuiStyleVar.ItemInnerSpacing = 15 --- ImVec2    ItemInnerSpacing
+ImGuiStyleVar.IndentSpacing = 16 --- float     IndentSpacing
+ImGuiStyleVar.CellPadding = 17 --- ImVec2    CellPadding
+ImGuiStyleVar.ScrollbarSize = 18 --- float     ScrollbarSize
+ImGuiStyleVar.ScrollbarRounding = 19 --- float     ScrollbarRounding
+ImGuiStyleVar.GrabMinSize = 20 --- float     GrabMinSize
+ImGuiStyleVar.GrabRounding = 21 --- float     GrabRounding
+ImGuiStyleVar.TabRounding = 22 --- float     TabRounding
+ImGuiStyleVar.ButtonTextAlign = 23 --- ImVec2    ButtonTextAlign
+ImGuiStyleVar.SelectableTextAlign = 24 --- ImVec2    SelectableTextAlign
+ImGuiStyleVar.COUNT = 25
 
 --------------------------------------------------
 
