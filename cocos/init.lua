@@ -22,6 +22,14 @@ THE SOFTWARE.
 
 ]]
 
+-- < axmol-1.0
+-- cc = ax
+cc.Director.setDisplayStats = ax.Director.setStatsDisplay
+cc.Sprite3D = ax.MeshRenderer
+-- ccexp = axexp
+-- ccui = axui
+-- ccb = axb
+
 require "cocos.cocos2d.Cocos2d"
 require "cocos.cocos2d.Cocos2dConstants"
 require "cocos.cocos2d.functions"
@@ -33,7 +41,7 @@ __G__TRACKBACK__ = function(msg)
 end
 
 -- audio
-require "cocos.cocosdenshion.AudioEngine"
+--require "cocos.cocosdenshion.AudioEngine"
 -- cocosstudio
 if nil ~= ccs then
     require "cocos.cocostudio.CocoStudio"
