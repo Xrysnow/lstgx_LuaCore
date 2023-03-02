@@ -333,7 +333,7 @@ end
 ---@param imVec2 ImVec2
 ---@return size_table
 function imgui.toccsize(imVec2)
-    return { width = imVec2.x, height = imVec2.y }
+    return imVec2
 end
 
 function imgui.getColorU32(idx, alpha_mul)

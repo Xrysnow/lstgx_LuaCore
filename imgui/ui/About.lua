@@ -52,7 +52,7 @@ function M:ctor(isPopup)
             im.textWrapped(i18n(d[9]) .. ': ' .. platform)
             im.textWrapped(i18n(d[10]) .. ': ' .. lang:capitalize())
             im.text('')
-            im.textWrapped('Copyright (C) 2018-2020 Xrysnow')
+            im.textWrapped('Copyright (C) 2018-2023 Xrysnow')
             im.endChildFrame()
         end
     end)
