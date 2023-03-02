@@ -338,9 +338,12 @@ end
 
 local Director = cc.Director:getInstance()
 function GameExit()
-    --require('jit.p').stop()
     lstg.saveSettingFile()
+    print('Clear resource pool')
+    lstg.ClearResourcePool()
+    print('FrameEnd')
     lstg.FrameEnd()
+    print('FrameEnd finish')
     if plus and plus.isMobile() then
         Director:endToLua()
     else

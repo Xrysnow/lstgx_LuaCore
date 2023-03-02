@@ -25,7 +25,6 @@ local function _create_pool()
     end
     return ret
 end
-local LRES = lstg.ResourceMgr:getInstance()
 
 local function _toResType(v)
     if type(v) == 'string' then
@@ -71,6 +70,15 @@ end
 
 function lstg.getResourcePool()
     return pools
+end
+
+function lstg.ClearResourcePool()
+    for _, v in ipairs(pools.global) do
+        v:clear()
+    end
+    for _, v in ipairs(pools.stage) do
+        v:clear()
+    end
 end
 
 local CHECK_RES_INFO = {
