@@ -18,7 +18,8 @@ function MainScene:onEnter()
         local ok, ret = pcall(require, 'main_scene')
         if not ok then
             if not LAUNCH_XE then
-                require('platform.launcher_ui')()
+                --require('platform.launcher_ui')()
+                require('platform.fgui').show()
                 --require('platform.launcher')():showWithScene()
             else
                 require('xe.main')():showWithScene()
