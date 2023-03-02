@@ -174,4 +174,26 @@ function M.WideCharToMultiByte(ws)
 	return M.mbs(ws)
 end
 
+function M.convert(s, cpFrom, cpTo)
+    if type(s) ~= 'string' then
+        return s
+    end
+    local sz = #s + 1 --assume 1 byte per character + null terminator
+    local buf = WCS_ctype(sz)
+    sz = MB2WC(cpFrom, MB, s, #s + 1, buf, sz)
+    if sz == 0 then
+        if util.GetLastError() ~= ERROR_INSUFFICIENT_BUFFER then
+            checknz(0)
+        end
+        sz = checknz(MB2WC(cpFrom, MB, s, #s + 1, nil, 0))
+        buf = WCS_ctype(sz)
+        sz = checknz(MB2WC(cpFrom, MB, s, #s + 1, buf, sz))
+    end
+
+    sz = checknz(WC2MB(cpTo, WC, buf, -1, nil, 0, nil, nil))
+    buf = MBS_ctype(sz)
+    checknz(WC2MB(cpTo, WC, buf, -1, buf, sz, nil, nil))
+    return ffi.string(buf, sz - 1) --sz includes null terminator
+end
+
 return M
