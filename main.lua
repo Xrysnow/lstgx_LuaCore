@@ -9,6 +9,8 @@ require('cocos.init')
 setmetatable(_G, nil)
 -- package.path may not end with ';'
 package.path = package.path .. ';?/__init__.lua;'
+-- ';;' will cause error
+package.path = package.path:gsub('[;]+', ';')
 require('cc.ext')
 require('cc.to_string')
 require('cc.color')
