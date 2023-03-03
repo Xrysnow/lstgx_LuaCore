@@ -57,10 +57,19 @@ function M:onCreate()
     im.show()
     im.clear()
 
+    local dpiScale = lstg.WindowHelper:getInstance():getDpiScale()
+    im.getStyle():scaleAllSizes(dpiScale)
+    -- FontGlobalScale will cause blur
+    --im.getIO().FontGlobalScale = dpiScale
+
     local cfg = im.ImFontConfig()
     cfg.OversampleH = 2
     cfg.OversampleV = 2
-    local font_default = im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 14, cfg, {
+    if dpiScale >= 1.5 then
+        cfg.OversampleH = 2
+        cfg.OversampleV = 1
+    end
+    local font_default = im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 14 * dpiScale, cfg, {
         --0x0080, 0x00FF, -- Basic Latin + Latin Supplement
         0x2000, 0x206F, -- General Punctuation
         0x3000, 0x30FF, -- CJK Symbols and Punctuations, Hiragana, Katakana
@@ -75,7 +84,7 @@ function M:onCreate()
     cfg.OversampleH = 3
     cfg.OversampleV = 3
     cfg.MergeMode = true
-    im.addFontTTF('font/NotoSansDisplay-Regular.ttf', 18, cfg, im.GlyphRanges.Default)
+    im.addFontTTF('font/NotoSansDisplay-Regular.ttf', 18 * dpiScale, cfg, im.GlyphRanges.Default)
     --
     local fa = require('xe.ifont')
     cfg = im.ImFontConfig()
@@ -84,7 +93,7 @@ function M:onCreate()
     cfg.MergeMode = true
     cfg.GlyphMinAdvanceX = 12
     cfg.GlyphMaxAdvanceX = 12
-    im.addFontTTF('font/' .. fa.FontIconFileName, 14, cfg, {
+    im.addFontTTF('font/' .. fa.FontIconFileName, 14 * dpiScale, cfg, {
         fa.IconMin, fa.IconMax, 0
     })
     --
@@ -92,7 +101,7 @@ function M:onCreate()
     cfg.OversampleH = 2
     cfg.OversampleV = 2
     cfg.MergeMode = false
-    local font_mono = im.addFontTTF('font/JetBrainsMono-Regular.ttf', 14, cfg, {
+    local font_mono = im.addFontTTF('font/JetBrainsMono-Regular.ttf', 14 * dpiScale, cfg, {
         0x0020, 0x00FF, -- Basic Latin + Latin Supplement
         0x2000, 0x206F, -- General Punctuation
         0
