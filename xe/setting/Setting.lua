@@ -18,7 +18,7 @@ function M:ctor()
     self._curPage = 1
     self:addChild(function()
         local hh = -im.getFrameHeightWithSpacing()
-        local ww = im.getWindowContentRegionWidth()
+        local ww = im.getContentRegionAvail().x
         local sz1 = im.vec2(math.max(ww * 0.3, 50), hh)
         local sz2 = im.vec2(-1, hh)
 
@@ -109,7 +109,7 @@ function M:_set()
     local fsz = setting.frame_size
     if fsz and require('cocos.framework.device').isDesktop then
         --glv:setFrameSize(fsz[1], fsz[2])
-        lstg.WindowHelperDesktop:getInstance():setSize(cc.size(fsz[1], fsz[2])):moveToCenter()
+        lstg.WindowHelper:getInstance():setSize(cc.size(fsz[1], fsz[2])):moveToCenter()
     end
 end
 
