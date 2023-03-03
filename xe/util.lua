@@ -73,9 +73,15 @@ function M.checkIdentifier(s)
 end
 
 ---@param sp cc.Sprite
-function M.createButton(sp, padding)
+function M.createButton(sp, padding, scale)
     padding = padding or 4
+    scale = scale or 1
+    padding = padding * scale
     local sz = sp:getContentSize()
+    sz.x = sz.x * scale
+    sz.y = sz.y * scale
+    sp:setScale(scale)
+
     local btn = require('imgui.widgets.ImageButton')(sp)
     btn:setContentSize(sz):setFramePadding(padding)
 
@@ -89,8 +95,8 @@ function M.createButton(sp, padding)
     btn_disable:setVisible(false)
     node:addTo(btn_disable):setVisible(false)
     sp:addTo(node):setPosition(sz.width / 2 + padding - 1, sz.height / 2 + padding - 1)
-
-    local program = ccb.Program:getBuiltinProgram(15)
+    local ProgramType = require('cc.enum').ProgramType
+    local program = ccb.Program:getBuiltinProgram(ProgramType.GRAY_SCALE)
     assert(program)
     sp:setProgramState(ccb.ProgramState(program))
     sp:setBlendFunc({ src = ccb.BlendFactor.SRC_ALPHA, dst = ccb.BlendFactor.ONE_MINUS_SRC_ALPHA })
@@ -113,10 +119,10 @@ function M.createTextButton(str, padding, cb, color)
     end
 
     local colors2 = {
-        [im.Col.Button]        = im.vec4(0, 0, 0, 0),
-        [im.Col.ButtonActive]  = im.vec4(0, 0, 0, 0),
+        [im.Col.Button] = im.vec4(0, 0, 0, 0),
+        [im.Col.ButtonActive] = im.vec4(0, 0, 0, 0),
         [im.Col.ButtonHovered] = im.vec4(0, 0, 0, 0),
-        [im.Col.Text]          = function()
+        [im.Col.Text] = function()
             return im.getStyleColorVec4(im.Col.TextDisabled)
         end,
     }
@@ -202,7 +208,7 @@ for i, v in ipairs(luaBuiltin) do
 end
 table.insert(luaToken, { "[a-zA-Z_][a-zA-Z0-9_]*", PaletteIndex.Identifier })
 table.insert(luaToken, { "[\\[\\]\\{\\}\\!\\%\\^\\&\\*\\(\\)\\-\\+\\=\\~\\|\\<\\>\\?\\/\\;\\,\\.\\:]",
-                      PaletteIndex.Punctuation })
+                         PaletteIndex.Punctuation })
 function M.getLuaTokenRegex()
     return luaToken
 end
