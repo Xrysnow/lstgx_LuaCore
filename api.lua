@@ -17,7 +17,7 @@ lstg.SetWindowed = SetWindowed
 ---@param width number
 ---@param height number
 function SetResolution(width, height)
-    local w = lstg.WindowHelperDesktop:getInstance()
+    local w = lstg.WindowHelper:getInstance()
     if w and not w:isFullscreen() then
         w:setSize(cc.size(width, height))
     end
@@ -33,12 +33,13 @@ lstg.SetResolution = SetResolution
 ---@param windowed boolean
 ---@param vsync boolean
 function ChangeVideoMode(width, height, windowed, vsync)
-    local w = lstg.WindowHelperDesktop:getInstance()
+    local w = lstg.WindowHelper:getInstance()
     if w then
         if windowed then
             w:setSize(cc.size(width, height))
         else
             w:setFullscreen()
+            --cc.Director:getInstance():getOpenGLView():setFrameSize(width, height)
         end
         w:setVsync(vsync)
         SystemLog(string.format(
@@ -60,7 +61,7 @@ lstg.ChangeVideoMode = ChangeVideoMode
 ---
 ---@param b boolean
 function SetSplash(b)
-    local w = lstg.WindowHelperDesktop:getInstance()
+    local w = lstg.WindowHelper:getInstance()
     if w then
         w:setCursorVisible(b)
     end
@@ -73,7 +74,7 @@ lstg.SetSplash = SetSplash
 ---
 ---@param title string
 function SetTitle(title)
-    local w = lstg.WindowHelperDesktop:getInstance()
+    local w = lstg.WindowHelper:getInstance()
     if w then
         w:setTitle(title)
         --Print('set title to '..title)

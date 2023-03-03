@@ -12,10 +12,10 @@ CC_DISABLE_GLOBAL = false
 
 -- for module display
 CC_DESIGN_RESOLUTION = {
-    width     = 1708,
-    height    = 960,
+    width = 1708,
+    height = 960,
     autoscale = "SHOW_ALL",
-    callback  = function(framesize)
+    callback = function(framesize)
         return { autoscale = "SHOW_ALL" }
     end
 }
@@ -42,14 +42,14 @@ end
 ---@type lstg.setting
 M.setting = ret
 
+local desktop = { windows = true, mac = true, linux = true }
+local isDesktop = desktop[lstg.GetPlatform()]
 M.setting.resizable = true
 --M.setting.transparent = true
 
-if lstg.glfw and M.setting.transparent then
-    local g = require('platform.glfw')
-    -- Init() is necessary for following functions
-    g.Init()
-    g.WindowHint(g.GLFW_TRANSPARENT_FRAMEBUFFER, g.GLFW_TRUE)
+if isDesktop and M.setting.transparent then
+    -- GLFW_TRANSPARENT_FRAMEBUFFER
+    lstg.WindowHelper:getInstance():hint(0x0002000A, 1)
     cc.Director:getInstance():setClearColor({ r = 0, g = 0, b = 0, a = 0 })
 end
 
@@ -76,7 +76,7 @@ if not view then
         local w = setting.windowsize_w or width
         local h = setting.windowsize_h or height
         if setting.windowed then
-            if setting.resizable and lstg.glfw then
+            if setting.resizable and isDesktop then
                 view = cc.GLViewImpl:createWithRect(title, rect(0, 0, w, h), 1, true)
             else
                 view = cc.GLViewImpl:createWithRect(title, rect(0, 0, w, h))
