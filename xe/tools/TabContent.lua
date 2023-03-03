@@ -10,7 +10,8 @@ end
 
 function M:addContent(icon, tooltip, cb)
     local sp = icon
-    local btn, btn_disable = require('xe.util').createButton(sp, 2)
+    local scale = lstg.WindowHelper:getInstance():getDpiScale()
+    local btn, btn_disable = require('xe.util').createButton(sp, 2, scale)
     self:addChild(btn):addChild(btn_disable)
     if cb then
         btn:setOnClick(cb)

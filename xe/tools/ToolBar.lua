@@ -20,14 +20,16 @@ function M:ctor()
     self:addChild(style)
 
     local toolbar_data = require('xe.tools.toolbar_data')
-    local img_size = cc.size(24, 24)
+    local scale = lstg.WindowHelper:getInstance():getDpiScale()
+    local img_size = cc.size(24 * scale, 24 * scale)
     for i, v in ipairs(toolbar_data) do
-        local sp
+        local sp ---@type cc.Sprite
         local path = 'xe/tool/' .. v.bitmap
         if string.fileext(v.bitmap) == 'svg' then
             sp = cc.Sprite:createWithSVGFile(path, img_size)
         else
             sp = cc.Sprite(path)
+            sp:setScale(scale)
         end
         assert(sp)
 
