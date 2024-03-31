@@ -36,7 +36,7 @@ function M:setTexParameters(minFilter, magFilter, wrapS, wrapT)
     local sz = tex:getContentSizeInPixels()
     if not _is_POT(sz.width) or not _is_POT(sz.height) then
         Print(string.format(
-                '[WARN] [setTexParameters] texture %q is NOPT (%d, %d), wrap parameter may not take effect',
+                '[WARN] [setTexParameters] texture %q is NPOT (%d, %d), wrap parameter may not take effect',
                 self:getName(), sz.width, sz.height))
     end
     tex:setTexParameters(minFilter, magFilter, wrapS, wrapT)
@@ -51,7 +51,7 @@ function M:setWrap(wrap)
     local sz = tex:getContentSizeInPixels()
     if not _is_POT(sz.width) or not _is_POT(sz.height) then
         Print(string.format(
-                '[WARN] [setTexParameters] texture %q is NOPT (%d, %d), wrap parameter may not take effect',
+                '[WARN] [setTexParameters] texture %q is NPOT (%d, %d), wrap parameter may not take effect',
                 self:getName(), sz.width, sz.height))
     end
     tex:setTexParameters(ccb.SamplerFilter.LINEAR, ccb.SamplerFilter.LINEAR, assert(_wrap[wrap]), assert(_wrap[wrap]))

@@ -112,7 +112,7 @@ local function setMod(lc)
 
     lc.mod_start_btn:setVisible(false)
     lc.mod_start_btn:addClickEventListener(function()
-        -- require here, make it can be override
+        -- require here, make it can be overridden
         local scene = require('app.views.GameScene'):create(nil, setting.mod)
         saveSetting()
         lstg.loadMod()
