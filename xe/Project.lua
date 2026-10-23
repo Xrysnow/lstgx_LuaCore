@@ -288,7 +288,7 @@ function M.pack()
         logger.log(('failed to create zip file %q'):format(zip_path), 'error')
         return false
     end
-    if not zip:open(lstg.ZipArchive.OpenMode.NEW) then
+    if not zip:open(lstg.ZipArchive.OpenMode.New) then
         zip:unlink()
         logger.log(('failed to open zip file %q'):format(zip_path), 'error')
         return false
@@ -300,7 +300,11 @@ function M.pack()
             return false
         end
     end
-    zip:close()
+    if zip:close() ~= lstg.ZipArchive.ErrorCode.OK then
+        logger.log(('failed to close zip file %q: %s'):format(zip_path, zip:getLastError()), 'error')
+        zip:discard()
+        return false
+    end
     return true
 end
 
