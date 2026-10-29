@@ -25,6 +25,15 @@ function M:ctor(node, idx, wildCard, isFolder)
     end)
 
     self:addChild(btn):addChild(im.sameLine)
+
+    local nt = node:getType()
+    if nt == 'loadimage' then
+        self:addChild(wi.Button(require('xe.ifont').FolderOpen, function()
+            local path = self._value
+            require('xe.image.util').create(path:filename(), path)
+        end))
+    end
+
     self:addChild(function()
         local txt = self._value
         local popup
