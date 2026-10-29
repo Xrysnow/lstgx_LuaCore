@@ -65,47 +65,76 @@ local function main()
 end
 
 local TRACE_MAX_LEVEL = 16
-local function traceback(msg, level)
-    local ret = ''
-    if msg then
-        ret = msg .. '\n'
+local function traceback(thread, msg, level)
+    if type(thread) ~= 'thread' then
+        level = msg
+        msg = thread
+        thread = nil
     end
-    ret = ret .. 'stack traceback:'
+    local isCurrentThread = not thread or thread == coroutine.running()
+    if level == nil then
+        level = isCurrentThread and 1 or 0
+    end
+    -- Match debug.traceback levels without counting this Lua helper.
+    if isCurrentThread and level >= 0 then
+        level = level + 1
+    end
+    local ret = {}
+    if msg ~= nil then
+        local ok, text = pcall(tostring, msg)
+        if not ok or type(text) ~= 'string' then
+            text = string.format('<%s error object>', type(msg))
+        end
+        table.insert(ret, text)
+    end
+    table.insert(ret, 'stack traceback:')
+    local frames = {}
     while true do
-        local info = debug.getinfo(level, "Slnf")
+        local info
+        if thread then
+            info = debug.getinfo(thread, level, "Slnf")
+        else
+            info = debug.getinfo(level, "Slnf")
+        end
         if not info then
             break
         end
+        table.insert(frames, info)
+        level = level + 1
+    end
+    local head = math.floor(TRACE_MAX_LEVEL / 2)
+    local tail = TRACE_MAX_LEVEL - head
+    local index = 1
+    while index <= #frames do
+        if #frames > TRACE_MAX_LEVEL and index == head + 1 then
+            table.insert(ret, '...')
+            index = #frames - tail + 1
+        end
+        local info = frames[index]
         local msgs = {}
         local source = info.source or ''
-        if info.short_src == '[C]' then
+        if info.what == 'C' then
             source = '[C]'
         else
             source = string.format('[%s]', source)
         end
-        table.insert(msgs, string.format('    %s', source, info.currentline, info.name or ""))
+        table.insert(msgs, string.format('    %s', source))
         if info.currentline > 0 then
             table.insert(msgs, string.format('%d:', info.currentline))
         end
-        if info.namewhat and info.name then
+        if info.what == 'main' then
+            table.insert(msgs, ' in main chunk')
+        elseif info.namewhat ~= '' and info.name then
             table.insert(msgs, string.format(' in function \'%s\'', info.name))
+        elseif info.what == 'C' then
+            table.insert(msgs, string.format(' at %s', tostring(info.func)))
         else
-            if info.what == 'm' or info.linedefined == 0 then
-                table.insert(msgs, ' in main chunk')
-            elseif info.what == 'C' then
-                table.insert(msgs, string.format(' at %s', tostring(info.func)))
-            else
-                table.insert(msgs, string.format(' in function <%s:%d>', source, info.linedefined))
-            end
+            table.insert(msgs, string.format(' in function <%s:%d>', source, info.linedefined))
         end
-        ret = ret .. '\n' .. table.concat(msgs, '')
-        level = level + 1
-        if level > TRACE_MAX_LEVEL then
-            ret = ret .. '\n...'
-            break
-        end
+        table.insert(ret, table.concat(msgs, ''))
+        index = index + 1
     end
-    return ret
+    return table.concat(ret, '\n')
 end
 
 -- note: in app.run, only __G__TRACKBACK__ will take effect
