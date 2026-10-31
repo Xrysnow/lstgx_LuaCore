@@ -20,7 +20,7 @@ local function jCall(...)
     end
 end
 local andHelper = 'org/cocos2dx/lib/Cocos2dxHelper'
-local andApp = 'org/cocos2dx/lua/AppActivity'
+local andApp = 'org/cocos/game/AppActivity'
 
 ---@return string
 function M.getAssetsPath()

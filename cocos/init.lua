@@ -22,13 +22,9 @@ THE SOFTWARE.
 
 ]]
 
--- < axmol-1.0
--- cc = ax
-cc.Director.setDisplayStats = ax.Director.setStatsDisplay
-cc.Sprite3D = ax.MeshRenderer
--- ccexp = axexp
--- ccui = axui
--- ccb = axb
+-- Legacy method aliases within the directly registered cc table.
+cc.Director.setDisplayStats = cc.Director.setStatsDisplay
+cc.Sprite3D = cc.MeshRenderer
 
 require "cocos.cocos2d.Cocos2d"
 require "cocos.cocos2d.Cocos2dConstants"
