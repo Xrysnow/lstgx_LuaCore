@@ -49,6 +49,10 @@ function ScrollView:onEvent(callback)
         elseif eventType == 9 then
             event.name = "CONTAINER_MOVED"
         elseif eventType == 10 then
+            event.name = "SCROLLING_BEGAN"
+        elseif eventType == 11 then
+            event.name = "SCROLLING_ENDED"
+        elseif eventType == 12 then
             event.name = "AUTOSCROLL_ENDED"
         end
         event.target = sender
