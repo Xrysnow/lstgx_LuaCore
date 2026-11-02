@@ -16,12 +16,9 @@ function TouchKey:rect()
 end
 
 function TouchKey:containsTouchLocation(x, y)
-    local position = cc.p(self:getPosition())
-    --local s         = self:getTexture():getContentSize()
-    local s = self:getBoundingBox()
-    local touchRect = cc.rect(-s.width / 2 + position.x, -s.height / 2 + position.y, s.width, s.height)
-    local b = cc.rectContainsPoint(touchRect, cc.p(x, y))
-    return b
+    local p = self:convertToNodeSpace(cc.p(x, y))
+    local s = self:getContentSize()
+    return cc.rectContainsPoint(cc.rect(0, 0, s.width, s.height), p)
 end
 
 ---@param aTexture cc.Texture2D
@@ -37,6 +34,15 @@ function TouchKey:create(aTexture, keyCode, isLock)
         if "enter" == tag then
             tk:onEnter()
         elseif "exit" == tag then
+            tk._touchId = nil
+            if tk._setInactive then
+                tk._setInactive()
+            end
+            for _, listener in ipairs(tk._listeners or {}) do
+                tk:getEventDispatcher():removeEventListener(listener)
+            end
+            tk._listeners = nil
+            tk:unscheduleUpdate()
         end
     end)
     return tk
@@ -56,12 +62,14 @@ function TouchKey:onEnter()
     local listener = cc.EventListenerTouchOneByOne:create()
     listener:setSwallowTouches(true)
     local setActive = function()
+        if self._state == StateGrabbed then return end
         self._state = StateGrabbed
         sendKeyEvent(self._keyCode, true)
         self:setColor(_color_active)
         --print('TouchKey: sendKeyEvent true.')
     end
     local setInactive = function()
+        if self._state == StateUngrabbed then return end
         self._state = StateUngrabbed
         sendKeyEvent(self._keyCode, false)
         self:setColor(_color_inactive)
@@ -71,6 +79,7 @@ function TouchKey:onEnter()
     self._setActive = setActive
     self._setInactive = setInactive
     listener:registerScriptHandler(function(touch, event)
+        if self._touchId ~= nil then return false end
         local loc = touch:getLocation()
         if self._isLock then
             if not self:containsTouchLocation(loc.x, loc.y) then
@@ -90,18 +99,30 @@ function TouchKey:onEnter()
             end
             setActive()
         end
+        self._touchId = touch:getId()
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
     listener:registerScriptHandler(function(touch, event)
+        self._touchId = nil
         if not self._isLock then
             setInactive()
         end
         return true
     end, cc.Handler.EVENT_TOUCH_ENDED)
+    listener:registerScriptHandler(function()
+        self._touchId = nil
+        setInactive()
+    end, cc.Handler.EVENT_TOUCH_CANCELLED)
 
     local eventDispatcher = self:getEventDispatcher()
     eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+    self._listeners = { listener }
+    for _, name in ipairs({ 'event_come_to_background', cc.Director.EVENT_PROJECTION_CHANGED }) do
+        local reset = cc.EventListenerCustom:create(name, setInactive)
+        eventDispatcher:addEventListenerWithSceneGraphPriority(reset, self)
+        table.insert(self._listeners, reset)
+    end
     if self._isLock then
         self:scheduleUpdateWithPriorityLua(function()
             self:update()

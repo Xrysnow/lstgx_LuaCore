@@ -10,16 +10,17 @@ local tk_bg = 'res/touchkey_bg.png'
 local font = 'font/WenQuanYiMicroHeiMono.ttf'
 --local glv = cc.Director:getInstance():getOpenGLView()
 
-local function CreateControllerUI(parent)
+local function createKeys(parent)
     cc.Image:setPNGPremultipliedAlphaEnabled(true)
     local tex = cc.Director:getInstance():getTextureCache():addImage(tk_bg)
     cc.Image:setPNGPremultipliedAlphaEnabled(false)
 
-    local scale_pos = screen.scale
-    local scale_size = screen.scale * 0.65
+    local size = cc.Director:getInstance():getOpenGLView():getDesignResolutionSize()
+    local scale_pos = math.min(size.width / 640, size.height / 480)
+    local scale_size = scale_pos * 0.65
     local fontsize = scale_size * 18
 
-    local xx = setting.resx / scale_pos
+    local xx = size.width / scale_pos
     local pESCAPE = cc.pMul(cc.p(xx - 135, 135), scale_pos)
     local pSHIFT = cc.pMul(cc.p(xx - 56, 56), scale_pos)
     local pX = cc.pMul(cc.p(xx - 56, 160), scale_pos)
@@ -53,6 +54,23 @@ local function CreateControllerUI(parent)
     local pos = cc.pMul(cc.p(106, 106), scale_pos)
     stick = stick:create(keys, pos, scale_size)
     cc.SetNode(stick, parent, pos)
+end
+
+local function CreateControllerUI(parent)
+    local keys = cc.Node:create()
+    parent:addChild(keys)
+    local width, height
+    local function layout()
+        local size = cc.Director:getInstance():getOpenGLView():getDesignResolutionSize()
+        if size.width ~= width or size.height ~= height then
+            width, height = size.width, size.height
+            keys:removeAllChildren()
+            createKeys(keys)
+        end
+    end
+    layout()
+    keys:scheduleUpdateWithPriorityLua(layout, 0)
+    return keys
 end
 
 return CreateControllerUI

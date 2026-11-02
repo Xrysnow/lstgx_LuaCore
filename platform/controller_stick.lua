@@ -8,22 +8,42 @@ function M:ctor(keys, position, scale)
 end
 
 function M:onTouchesEnded(touches, event)
+    for _, touch in ipairs(touches) do
+        if touch:getId() == self.touch_id then
+            self:releaseTouch()
+            break
+        end
+    end
+end
+
+function M:releaseTouch()
+    self.touch_id = nil
     self.is_active = false
     self:_deactive()
 end
 
 function M:onTouchesBegan(touches, event)
-    local pos = cc.p(touches[1]:getLocation())
-    local distance = cc.pGetDistance(self.position_, pos)
-    if distance < 200 * self.scale_ then
-        self.is_active = true
-        self:_active(pos)
+    if self.touch_id ~= nil then
+        return
+    end
+    for _, touch in ipairs(touches) do
+        local pos = self:convertToNodeSpace(touch:getLocation())
+        if cc.pGetLength(pos) < 100 * self.scale_ then
+            self.touch_id = touch:getId()
+            self.is_active = true
+            self:_active(pos)
+            break
+        end
     end
 end
 
 function M:onTouchesMove(touches, event)
-    local pos = cc.p(touches[1]:getLocation())
-    self:_update(pos)
+    for _, touch in ipairs(touches) do
+        if touch:getId() == self.touch_id then
+            self:_update(self:convertToNodeSpace(touch:getLocation()))
+            break
+        end
+    end
 end
 
 function M:onCreate(keys, position, scale)
@@ -79,8 +99,24 @@ function M:onCreate(keys, position, scale)
     listener:registerScriptHandler(function(...)
         self:onTouchesMove(...)
     end, cc.Handler.EVENT_TOUCHES_MOVED)
+    listener:registerScriptHandler(function(...)
+        self:onTouchesEnded(...)
+    end, cc.Handler.EVENT_TOUCHES_CANCELLED)
     local eventDispatcher = self:getEventDispatcher()
     eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+    local background = cc.EventListenerCustom:create('event_come_to_background', function()
+        self:releaseTouch()
+    end)
+    eventDispatcher:addEventListenerWithSceneGraphPriority(background, self)
+    local projection = cc.EventListenerCustom:create(cc.Director.EVENT_PROJECTION_CHANGED, function()
+        self:releaseTouch()
+    end)
+    eventDispatcher:addEventListenerWithSceneGraphPriority(projection, self)
+    self:registerScriptHandler(function(tag)
+        if tag == 'exit' then
+            self:releaseTouch()
+        end
+    end)
 
 end
 
@@ -107,7 +143,7 @@ function M:_update(pos)
     if not self.is_active then
         return
     end
-    local p0 = self.position_
+    local p0 = cc.p(0, 0)
     local distance = cc.pGetDistance(p0, pos)
     local direction = cc.pNormalize(cc.pSub(pos, p0))
     if distance > 24 * self.scale_ then

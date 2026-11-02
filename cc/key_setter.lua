@@ -44,7 +44,7 @@ function M:setMulti(states)
 end
 function M:setAll(isPressed)
     isPressed = isPressed and true or false
-    for k, _ in pairs(_keys) do
+    for k, _ in pairs(self._keys) do
         self:set(k, isPressed)
     end
 end
