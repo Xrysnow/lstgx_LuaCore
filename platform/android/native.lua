@@ -9,17 +9,18 @@ local luaj = require('cocos.cocos2d.luaj')
 local call = luaj.callStaticMethod
 local osname = lstg.GetPlatform()
 
-local function jCall(...)
+local function jCall(className, methodName, args, sig)
     if osname == 'android' then
-        local ok, ret = call(...)
+        local ok, ret = call(className, methodName, args, sig)
         if not ok then
-            error("luaj error: " .. tostring(ret))
+            error(('luaj error: %s.%s%s failed (%s)'):format(
+                className, methodName, sig, tostring(ret)), 2)
         else
             return ret
         end
     end
 end
-local andHelper = 'org/cocos2dx/lib/Cocos2dxHelper'
+local andHelper = 'org/cocos/lib/CocosEngine'
 local andApp = 'org/cocos/game/AppActivity'
 
 ---@return string
@@ -31,7 +32,7 @@ end
 
 ---@return string
 function M.getCocos2dxPackageName()
-    local methodName = 'getCocos2dxPackageName'
+    local methodName = 'getPackageName'
     local sig = '()Ljava/lang/String;'
     return jCall(andHelper, methodName, {}, sig)
 end
@@ -79,7 +80,7 @@ function M.getSDCardPath()
     return ret
 end
 
----@return string
+---@return void
 function M.messageBox(title, msg)
     local methodName = 'showDialog'
     local sig = '(Ljava/lang/String;Ljava/lang/String;)V'
@@ -100,17 +101,11 @@ function M.setOrientation(ori)
 end
 
 function M.setOrientationLandscape()
-    local glv = cc.Director:getInstance():getOpenGLView()
-    local sz = glv:getFrameSize()
-    M.setOrientation('SENSOR_LANDSCAPE')
-    glv:setFrameSize(math.max(sz.width, sz.height), math.min(sz.width, sz.height))
+    return M.setOrientation('SENSOR_LANDSCAPE')
 end
 
 function M.setOrientationPortrait()
-    local glv = cc.Director:getInstance():getOpenGLView()
-    local sz = glv:getFrameSize()
-    M.setOrientation('PORTRAIT')
-    glv:setFrameSize(math.min(sz.width, sz.height), math.max(sz.width, sz.height))
+    return M.setOrientation('PORTRAIT')
 end
 
 ---@return number
