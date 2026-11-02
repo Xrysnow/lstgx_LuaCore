@@ -117,4 +117,22 @@ function M.enumMods(path, root_name)
     return ret
 end
 
+function M.enumAvailableMods()
+    local ret = M.enumMods(plus.getWritablePath() .. 'mod/')
+    if lstg.GetPlatform() == 'android' then
+        local names = {}
+        for _, v in ipairs(ret) do names[v.name] = true end
+        for _, v in ipairs(M.enumMods('mod/')) do
+            if not v.isDirectory then
+                -- ResourcePack opens disk files. Never hand it an APK asset path.
+                SystemLog(('bundled ZIP mod %q requires import to app storage'):format(v.name))
+            elseif not names[v.name] then
+                v.bundled = true
+                table.insert(ret, v)
+            end
+        end
+    end
+    return ret
+end
+
 return M

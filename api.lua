@@ -17,12 +17,36 @@ lstg.SetWindowed = SetWindowed
 ---@param width number
 ---@param height number
 function SetResolution(width, height)
-    local w = lstg.WindowHelper:getInstance()
-    if w and not w:isFullscreen() then
-        w:setSize(cc.size(width, height))
+    if type(width) ~= 'number' or type(height) ~= 'number'
+            or width <= 0 or height <= 0 or width == math.huge or height == math.huge
+            or width ~= width or height ~= height then
+        return false, 'invalid-resolution'
     end
+    local w = lstg.WindowHelper:getInstance()
+    if not w or not w:supportsOperation('setSize') then
+        return false, 'unsupported:setSize'
+    end
+    if not w:isFullscreen() then
+        w:setSize(cc.size(width, height))
+        return true
+    end
+    return false, 'fullscreen'
 end
 lstg.SetResolution = SetResolution
+
+--- Change logical rendering dimensions without resizing the native window.
+function SetDesignResolution(width, height)
+    if type(width) ~= 'number' or type(height) ~= 'number'
+            or width <= 0 or height <= 0 or width == math.huge or height == math.huge
+            or width ~= width or height ~= height then
+        return false, 'invalid-resolution'
+    end
+    local view = cc.Director:getInstance():getOpenGLView()
+    if not view then return false, 'view-unavailable' end
+    view:setDesignResolutionSize(width, height, cc.ResolutionPolicy.SHOW_ALL)
+    return true, 'design-resolution-only'
+end
+lstg.SetDesignResolution = SetDesignResolution
 
 ---@~chinese 改变视频选项。若成功返回true，否则返回false
 ---
@@ -33,8 +57,20 @@ lstg.SetResolution = SetResolution
 ---@param windowed boolean
 ---@param vsync boolean
 function ChangeVideoMode(width, height, windowed, vsync)
+    if windowed and (type(width) ~= 'number' or type(height) ~= 'number'
+            or width <= 0 or height <= 0 or width == math.huge or height == math.huge
+            or width ~= width or height ~= height) then
+        return false, 'invalid-resolution'
+    end
     local w = lstg.WindowHelper:getInstance()
     if w then
+        local operation = windowed and 'setSize' or 'setFullscreen'
+        if not w:supportsOperation(operation) then
+            return false, 'unsupported:' .. operation
+        end
+        if not w:supportsOperation('setVsync') then
+            return false, 'unsupported:setVsync'
+        end
         if windowed then
             w:setSize(cc.size(width, height))
         else

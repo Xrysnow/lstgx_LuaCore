@@ -18,7 +18,9 @@ function MainScene:onEnter()
         local ok, ret = pcall(require, 'main_scene')
         if not ok then
             if not LAUNCH_XE then
-                if fgui then
+                if plus.os == 'android' then
+                    require('platform.android.launcher')()
+                elseif fgui then
                     require('platform.fgui').show()
                 else
                     require('platform.launcher')():showWithScene()
@@ -33,6 +35,8 @@ function MainScene:onEnter()
         if lstg._exlauncher then
             SystemLog('use external launcher')
             scene:showWithScene()
+        elseif plus.os == 'android' then
+            require('platform.android.launcher')(true)
         else
             require('platform.launcher2_ui')()
         end

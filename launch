@@ -75,7 +75,6 @@ DoFile('stringify.lua')
 --require('forward')
 require('api')
 if plus.isMobile() then
-    require('jit_test')
     _G['Print'] = function(...)
         local args = { ... }
         local narg = select('#', ...)
@@ -171,12 +170,16 @@ local glv = cc.Director:getInstance():getOpenGLView()
 
 SetSplash(true)
 SetTitle('LuaSTG-x')
-ChangeVideoMode(
-        setting.windowsize_w,
-        setting.windowsize_h,
-        setting.windowed,
-        setting.vsync
-)
+if plus.os == 'android' then
+    assert(SetDesignResolution(setting.resx, setting.resy))
+else
+    ChangeVideoMode(
+            setting.windowsize_w,
+            setting.windowsize_h,
+            setting.windowed,
+            setting.vsync
+    )
+end
 if setting.render_skip == 1 then
     SetFPS(30)
 else

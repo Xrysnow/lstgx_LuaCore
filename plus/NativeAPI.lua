@@ -57,7 +57,7 @@ function plus.EnumFiles(path)
     end
     local pp = FU:fullPathForFilename(path)
     assert(pp ~= '', 'can not find ' .. path)
-    local files = FU:listFiles(path)
+    local files = FU:listFiles(pp)
     local ret = {}
     ---@param f string
     for _, f in ipairs(files) do

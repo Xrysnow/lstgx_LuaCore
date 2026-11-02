@@ -43,7 +43,12 @@ local function main()
     if platform == 'android' then
         -- Keep bundled scripts as the trusted startup source. Shared-storage
         -- data is only read after an explicit document import.
-        require('platform.android.native').setOrientationLandscape()
+        local native = require('platform.android.native')
+        if require('config').setting.orientation == 'portrait' then
+            native.setOrientationPortrait()
+        else
+            native.setOrientationLandscape()
+        end
     end
     lstg.DoFile('launch')
     lstg.SystemLog('start app')

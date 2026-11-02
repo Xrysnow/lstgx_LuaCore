@@ -46,7 +46,14 @@ end, 1, 'load.data.x')
 
 function lstg.loadMod()
     local p = plus.getWritablePath()
-    local path = string.format('%s/mod/%s', p, setting.mod):gsub('//', '/')
+    assert(type(setting.mod) == 'string' and setting.mod ~= ''
+            and setting.mod ~= '.' and setting.mod ~= '..'
+            and not setting.mod:find('[/\\]'), 'invalid mod name')
+    if plus.os == 'android' and setting.mod_info and setting.mod_info.bundled then
+        p = ''
+    end
+    local path = (p == '' and 'mod/' or p .. '/mod/') .. setting.mod
+    path = path:gsub('//', '/')
     local dir, zip = true, true
     if setting.mod_info then
         dir = setting.mod_info.isDirectory
@@ -59,7 +66,7 @@ function lstg.loadMod()
         SystemLog(string.format(i18n 'load mod %q from zip file', setting.mod))
         LoadPack(path .. '.zip')
     else
-        SystemLog(string.format('%s: %s', i18n "can't find mod", path))
+        error(string.format('%s: %s', i18n "can't find mod", path))
     end
     SetResourceStatus('global')
     lstg.loadPlugins()
