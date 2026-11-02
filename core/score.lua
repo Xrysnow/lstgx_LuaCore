@@ -50,7 +50,10 @@ function SaveScoreData()
     local username = setting.username or 'User'
     local dst = score_dir .. username .. '.dat'
     local fu = cc.FileUtils:getInstance()
-    fu:writeStringToFile(Serialize(scoredata), dst)
+    if not fu:writeStringToFile(Serialize(scoredata), dst) then
+        error(('failed to save score data to %q'):format(dst))
+    end
+    return true
 end
 
 ---init score data

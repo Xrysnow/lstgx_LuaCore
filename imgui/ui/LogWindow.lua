@@ -84,7 +84,7 @@ function M:ctor(...)
     }
     self.items = {}
     self.max_item_count = 1000
-    local f = cc.FileUtils:getInstance():getStringFromFile('lstg_log.txt')
+    local f = cc.FileUtils:getInstance():getStringFromFile(lstg.LogSystem:getInstance():getPath())
     if #f > 0 then
         local t = string.split(f, '\n')
         for i, str in ipairs(t) do

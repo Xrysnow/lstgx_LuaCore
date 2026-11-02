@@ -96,4 +96,55 @@ function M.pickFolder(defaultPath)
     return checkReturn(lstg.FileDialog:pickFolder(defaultPath or ''))
 end
 
+-- Android uses MIME types and asynchronous SAF operations. Imported files are
+-- local copies; exporting copies an existing app-owned file to the selected URI.
+-- Keep the request ID and cancel it when its owning UI/scene is disposed.
+local function request(method, args, signature, callback)
+    assert(type(callback) == 'function', 'a completion callback is required')
+    if lstg.GetPlatform() ~= 'android' then
+        return nil, 'unsupported: use the desktop synchronous file dialog'
+    end
+    local requestId
+    args[#args + 1] = function(payload)
+        local ok, result = pcall(require('cjson').decode, payload)
+        if not ok or type(result) ~= 'table' then
+            result = { requestId = requestId, status = 'error', path = '', uri = '',
+                message = 'invalid document result' }
+        end
+        callback(result)
+    end
+    local ok, value = require('cocos.cocos2d.luaj').callStaticMethod(
+            'org/cocos/game/StorageBridge', method, args, signature)
+    if not ok then
+        return nil, 'document request failed: ' .. tostring(value)
+    end
+    requestId = value
+    return requestId
+end
+
+---@param mime string MIME type, for example application/zip or */*
+---@param callback function Receives {requestId,status,path,uri,message} on the engine thread
+function M.importAsync(mime, callback)
+    return request('importDocument', { mime or '*/*' }, '(Ljava/lang/String;I)I', callback)
+end
+
+---@param source string Existing absolute path in an app-specific directory
+---@param suggestedName string User-editable name in the create-document picker
+---@param mime string
+---@param callback function
+function M.exportAsync(source, suggestedName, mime, callback)
+    assert(type(source) == 'string', 'an app-owned source path is required')
+    return request('exportDocument', { source, suggestedName or '', mime or 'application/octet-stream' },
+            '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)I', callback)
+end
+
+function M.cancel(requestId)
+    if lstg.GetPlatform() ~= 'android' then
+        return false
+    end
+    local ok, cancelled = require('cocos.cocos2d.luaj').callStaticMethod(
+            'org/cocos/game/StorageBridge', 'cancelRequest', { requestId }, '(I)Z')
+    return ok and cancelled or false
+end
+
 return M

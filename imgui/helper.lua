@@ -24,10 +24,11 @@ function imgui.create()
     end, cc.Handler.EVENT_KEYBOARD_PRESSED)
     dir:getEventDispatcher():addEventListenerWithFixedPriority(e, 1)
     -- load
-    local ini = fu:getStringFromFile(_iniFile)
+    local iniPath = plus.os == 'android' and (plus.getWritablePath() .. _iniFile) or _iniFile
+    local ini = fu:getStringFromFile(iniPath)
     if #ini > 0 then
         imgui.loadIniSettingsFromMemory(ini, #ini)
-        print(('read %q from %q'):format(_iniFile, fu:fullPathForFilename(_iniFile)))
+        print(('read %q from %q'):format(_iniFile, fu:fullPathForFilename(iniPath)))
     else
         print(('read %q failed'):format(_iniFile))
     end

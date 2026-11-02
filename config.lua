@@ -26,7 +26,13 @@ local M = {}
 require('cocos.cocos2d.json')
 local json = cjson or json
 
-local f = cc.FileUtils:getInstance():getStringFromFile('setting')
+local settingPath = 'setting'
+if lstg.GetPlatform() == 'android' then
+    local path = require('platform.android.native').getInternalDataPath()
+    assert(path and path ~= '', 'internal app storage is unavailable')
+    settingPath = path:gsub('/+$', '') .. '/setting'
+end
+local f = cc.FileUtils:getInstance():getStringFromFile(settingPath)
 local ok, ret
 if #f > 0 then
     ok, ret = pcall(json.decode, f)

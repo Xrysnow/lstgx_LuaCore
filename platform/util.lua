@@ -2,11 +2,13 @@
 local M = {}
 local FU = cc.FileUtils:getInstance()
 
-function M.changeLogPath(path)
+function M.changeLogPath(path, preservePrevious)
     local lp = lstg.LogSystem:getInstance():getPath()
     if lp ~= path then
         if lstg.LogSystem:getInstance():changePath(path) then
-            os.remove(lp)
+            if not preservePrevious then
+                os.remove(lp)
+            end
             SystemLog(('change log path to %q'):format(path))
         else
             SystemLog(('failed to change log path to %q'):format(path))
@@ -21,15 +23,24 @@ function M.changeWritablePath()
     local osname = lstg.GetPlatform()
     if osname == 'android' then
         local native = require('platform.android.native')
-        local p = native.getSDCardPath()
-        if p and p ~= '' then
-            local path = p .. '/lstg/'
-            if FU:isDirectoryExist(path) then
-                FU:setWritablePath(path)
-                FU:addSearchPath(path)
-                ret = path
+        local path = native.getInternalDataPath()
+        if not path or path == '' then
+            error('internal app storage is unavailable')
+        end
+        if path:sub(-1) ~= '/' then
+            path = path .. '/'
+        end
+        if not FU:isDirectoryExist(path) then
+            if not FU:createDirectory(path) or not FU:isDirectoryExist(path) then
+                error(('failed to create app data directory %q'):format(path))
             end
-            M.changeLogPath(path .. '/lstg_log.txt')
+        end
+        -- Match the native files directory used by the log before Lua starts.
+        -- Do not add shared storage or imported scripts to the search paths.
+        FU:setWritablePath(path)
+        ret = path
+        if not M.changeLogPath(path .. 'lstg_log.txt', true) then
+            error(('failed to open app log in %q'):format(path))
         end
     elseif osname == 'mac' then
         local home = os.getenv('HOME')

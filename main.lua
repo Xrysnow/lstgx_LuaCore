@@ -41,22 +41,8 @@ local function main()
     lstg.FrameInit()
     local platform = lstg.GetPlatform()
     if platform == 'android' then
-        -- change src path to 'sdcard/lstg/src' if it exists
-        local sd = require('platform.android.native').getSDCardPath()
-        if sd and sd ~= '' then
-            local src = sd .. '/lstg/src'
-            if fu:isDirectoryExist(src) then
-                local paths = {}
-                for _, v in ipairs(sp) do
-                    if v ~= 'assets/src/' then
-                        table.insert(paths, v)
-                    end
-                end
-                table.insert(paths, src)
-                fu:setSearchPaths(paths)
-                lstg.SystemLog(string.format('change src path to %q', src))
-            end
-        end
+        -- Keep bundled scripts as the trusted startup source. Shared-storage
+        -- data is only read after an explicit document import.
         require('platform.android.native').setOrientationLandscape()
     end
     lstg.DoFile('launch')
