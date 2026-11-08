@@ -94,7 +94,15 @@ else
 end
 
 device.language = language_
-device.writablePath = cc.FileUtils:getInstance():getWritablePath()
+
+--- Returns the current writable path; an empty result means it is unavailable.
+---@return string
+function device.getWritablePath()
+    return cc.FileUtils:getInstance():getWritablePath()
+end
+
+-- Compatibility snapshot at module load. Use getWritablePath() after reconfiguration.
+device.writablePath = device.getWritablePath()
 device.directorySeparator = "/"
 device.pathSeparator = ":"
 if device.platform == "windows" then

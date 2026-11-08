@@ -116,16 +116,11 @@ end
 ---
 ---@return string
 function plus.getWritablePath()
-    if plus.writablePath then
-        return plus.writablePath
+    local path = FU:getWritablePath()
+    if path == '' then
+        error('the writable path is unavailable')
     end
-    local wp = FU:getWritablePath()
-    if plus.isDesktop() and wp == './' then
-        return FU:fullPathForFilename(wp):sub(1, -3)
-    else
-        return wp
-    end
-    --return FU:getWritablePath()
+    return path
 end
 
 local osname = lstg.GetPlatform()
@@ -141,10 +136,9 @@ if osname == 'android' then
     end
     SystemLog(inf)
 end
-local newWritablePath = require('platform.util').changeWritablePath()
-if newWritablePath then
-    plus.writablePath = newWritablePath
-end
+-- Compatibility snapshot taken during startup. Use plus.getWritablePath()
+-- when the current FileUtils configuration is required.
+plus.writablePath = require('platform.util').changeWritablePath()
 
 local _languages = {
     'english',

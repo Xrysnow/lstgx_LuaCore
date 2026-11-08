@@ -18,6 +18,19 @@ function M.changeLogPath(path, preservePrevious)
     return true
 end
 
+-- Configure a physical path, then consume FileUtils' normalized result.
+-- Directory creation belongs to the writer (including LogSystem.changePath).
+local function setWritablePath(path)
+    if not FU:setWritablePath(path) then
+        error(('failed to configure writable path %q'):format(path))
+    end
+    local normalized = FU:getWritablePath()
+    if normalized == '' then
+        error('the writable path is unavailable')
+    end
+    return normalized
+end
+
 function M.changeWritablePath()
     local ret
     local osname = lstg.GetPlatform()
@@ -27,31 +40,21 @@ function M.changeWritablePath()
         if not path or path == '' then
             error('internal app storage is unavailable')
         end
-        if path:sub(-1) ~= '/' then
-            path = path .. '/'
-        end
-        if not FU:isDirectoryExist(path) then
-            if not FU:createDirectory(path) or not FU:isDirectoryExist(path) then
-                error(('failed to create app data directory %q'):format(path))
-            end
-        end
         -- Match the native files directory used by the log before Lua starts.
         -- Do not add shared storage or imported scripts to the search paths.
-        FU:setWritablePath(path)
-        ret = path
-        if not M.changeLogPath(path .. 'lstg_log.txt', true) then
-            error(('failed to open app log in %q'):format(path))
+        ret = setWritablePath(path)
+        if not M.changeLogPath(ret .. 'lstg_log.txt', true) then
+            error(('failed to open app log in %q'):format(ret))
         end
     elseif osname == 'mac' then
         local home = os.getenv('HOME')
-        if #home > 1 then
+        if home and #home > 1 then
             -- use Documents
             local path = home .. '/Documents/lstg'
             if FU:isDirectoryExist(path) then
-                FU:setWritablePath(path)
-                FU:addSearchPath(path)
-                local ok = M.changeLogPath(path .. '/lstg_log.txt')
-                if ok then
+                path = setWritablePath(path)
+                if M.changeLogPath(path .. 'lstg_log.txt') then
+                    FU:addSearchPath(path)
                     ret = path
                 end
             end
@@ -61,33 +64,25 @@ function M.changeWritablePath()
             -- use Resources
             local native = require('platform.apple.native')
             local p = native.getBundleResourcesDirectory()
-            if #p > 1 and FU:isDirectoryExist(p) then
-                local path = p
-                FU:setWritablePath(path)
-                FU:addSearchPath(path)
-                ret = path
-                M.changeLogPath(path .. '/lstg_log.txt')
+            if p and #p > 1 and FU:isDirectoryExist(p) then
+                local path = setWritablePath(p)
+                if M.changeLogPath(path .. 'lstg_log.txt') then
+                    FU:addSearchPath(path)
+                    ret = path
+                else
+                    error(('failed to open app log in %q'):format(path))
+                end
             end
         end
-    elseif osname == 'ios' then
-    elseif osname == 'windows' then
-        FU:setWritablePath('./')
-    elseif osname == 'linux' then
-        local dir = require('platform.linux.directory').get_current_dir_name()
-        if not dir then
-            dir = FU:fullPathForFilename('./')
-        end
-        if dir and dir ~= '' then
-            FU:setWritablePath(dir)
-            ret = FU:getWritablePath()
-        end
+    elseif osname == 'windows' or osname == 'linux' then
+        -- Resolve against the CWD of this call, independently of resource paths.
+        ret = setWritablePath('./')
     end
-    if ret then
-        if ret:sub(-1) ~= '/' then
-            ret = ret .. '/'
-        end
-        SystemLog(('set local writable path to %q'):format(ret))
+    ret = ret or FU:getWritablePath()
+    if ret == '' then
+        error('the writable path is unavailable')
     end
+    SystemLog(('set local writable path to %q'):format(ret))
     return ret
 end
 
