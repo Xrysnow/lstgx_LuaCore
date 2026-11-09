@@ -518,20 +518,20 @@ cc.KeyCode.KEY_LEFT_SHIFT = cc.KeyCode.KEY_SHIFT
 cc.KeyCode.KEY_LEFT_CTRL = cc.KeyCode.KEY_CTRL
 cc.KeyCode.KEY_LEFT_ALT = cc.KeyCode.KEY_ALT
 
-cc.EventAssetsManagerEx = {
-    EventCode = {
-        ERROR_NO_LOCAL_MANIFEST = 0,
-        ERROR_DOWNLOAD_MANIFEST = 1,
-        ERROR_PARSE_MANIFEST    = 2,
-        NEW_VERSION_FOUND       = 3,
-        ALREADY_UP_TO_DATE      = 4,
-        UPDATE_PROGRESSION      = 5,
-        ASSET_UPDATED           = 6,
-        ERROR_UPDATING          = 7,
-        UPDATE_FINISHED         = 8,
-        UPDATE_FAILED           = 9,
-        ERROR_DECOMPRESS        = 10
-    },
+cc.EventAssetsManagerEx = cc.EventAssetsManagerEx or {}
+cc.EventAssetsManagerEx.EventCode =
+{
+    ERROR_NO_LOCAL_MANIFEST = 0,
+    ERROR_DOWNLOAD_MANIFEST = 1,
+    ERROR_PARSE_MANIFEST    = 2,
+    NEW_VERSION_FOUND       = 3,
+    ALREADY_UP_TO_DATE      = 4,
+    UPDATE_PROGRESSION      = 5,
+    ASSET_UPDATED           = 6,
+    ERROR_UPDATING          = 7,
+    UPDATE_FINISHED         = 8,
+    UPDATE_FAILED           = 9,
+    ERROR_DECOMPRESS        = 10
 }
 
 cc.AssetsManagerExStatic = {
