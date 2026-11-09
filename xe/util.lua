@@ -96,9 +96,7 @@ function M.createButton(sp, padding, scale)
     node:addTo(btn_disable):setVisible(false)
     sp:addTo(node):setPosition(sz.x / 2 + padding - 1, sz.y / 2 + padding - 1)
     local ProgramType = require('cc.enum').ProgramType
-    local program = ccb.Program:getBuiltinProgram(ProgramType.GRAY_SCALE)
-    assert(program)
-    sp:setProgramState(ccb.ProgramState(program))
+    sp:setProgramState(ProgramType.GRAY_SCALE)
     sp:setBlendFunc({ src = ccb.BlendFactor.SRC_ALPHA, dst = ccb.BlendFactor.ONE_MINUS_SRC_ALPHA })
 
     return btn, btn_disable
