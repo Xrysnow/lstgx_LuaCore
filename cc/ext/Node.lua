@@ -27,10 +27,10 @@ function M:alignInner(ratio_x, ratio_y)
     local psz = p:getContentSize()
     local sz = self:getContentSize()
     local anc = self:getAnchorPoint()
-    local w, h = sz.width * self:getScaleX(), sz.height * self:getScaleY()
+    local w, h = sz.x * self:getScaleX(), sz.y * self:getScaleY()
     local offset = cc.p(w * anc.x, h * anc.y)
-    local posx = (psz.width - w) * ratio_x
-    local posy = (psz.height - h) * ratio_y
+    local posx = (psz.x - w) * ratio_x
+    local posy = (psz.y - h) * ratio_y
     local pos = cc.pAdd(cc.p(posx, posy), offset)
     return self:setPosition(pos)
 end
@@ -42,8 +42,8 @@ function M:alignInnerX(ratio_x)
     if not p then
         return self
     end
-    local w = self:getContentSize().width * self:getScaleX()
-    local posx = (p:getContentSize().width - w) * ratio_x
+    local w = self:getContentSize().x * self:getScaleX()
+    local posx = (p:getContentSize().x - w) * ratio_x
     posx = posx + w * self:getAnchorPoint().x
     return self:setPositionX(posx)
 end
@@ -55,8 +55,8 @@ function M:alignInnerY(ratio_y)
     if not p then
         return self
     end
-    local h = self:getContentSize().height * self:getScaleY()
-    local posy = (p:getContentSize().height - h) * ratio_y
+    local h = self:getContentSize().y * self:getScaleY()
+    local posy = (p:getContentSize().y - h) * ratio_y
     posy = posy + h * self:getAnchorPoint().y
     return self:setPositionY(posy)
 end
@@ -69,7 +69,7 @@ function M:alignLeft(px)
     end
     local sz = self:getContentSize()
     local anc = self:getAnchorPoint()
-    return self:setPositionX(px + sz.width * anc.x * self:getScaleX())
+    return self:setPositionX(px + sz.x * anc.x * self:getScaleX())
 end
 
 ---@return cc.Node
@@ -81,7 +81,7 @@ function M:alignRight(px)
     local psz = p:getContentSize()
     local sz = self:getContentSize()
     local anc = self:getAnchorPoint()
-    return self:setPositionX(psz.width - (sz.width * (1 - anc.x)) * self:getScaleX() - px)
+    return self:setPositionX(psz.x - (sz.x * (1 - anc.x)) * self:getScaleX() - px)
 end
 
 ---@return cc.Node
@@ -92,7 +92,7 @@ function M:alignBottom(px)
     end
     local sz = self:getContentSize()
     local anc = self:getAnchorPoint()
-    return self:setPositionY(px + sz.height * anc.y * self:getScaleY())
+    return self:setPositionY(px + sz.y * anc.y * self:getScaleY())
 end
 
 ---@return cc.Node
@@ -104,5 +104,5 @@ function M:alignTop(px)
     local psz = p:getContentSize()
     local sz = self:getContentSize()
     local anc = self:getAnchorPoint()
-    return self:setPositionY(psz.height - (sz.height * (1 - anc.y)) * self:getScaleY() - px)
+    return self:setPositionY(psz.y - (sz.y * (1 - anc.y)) * self:getScaleY() - px)
 end

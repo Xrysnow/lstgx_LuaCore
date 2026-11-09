@@ -12,7 +12,7 @@ function M.create(size, color)
     if size then
         --ret:setContentSize(size)
         local sz = ret:getContentSize()
-        ret:setScale(size.width / sz.width, size.height / sz.height)
+        ret:setScale(size.width / sz.x, size.height / sz.y)
     end
     ret:setZoomScale(0)
     return ret

@@ -30,7 +30,7 @@ function M:addTab(text, content, callback)
     tab:setCapInsets(cc.rect(2, 2, 4, 4))
     local lb = cc.Label:createWithSystemFont(text, 'Arial', self._fontsize)
     lb:setTextColor(cc.c4b(0, 0, 0, 255))
-    local width = lb:getContentSize().width + 12
+    local width = lb:getContentSize().x + 12
     tab:setContentSize(cc.size(width, self._tabh))
     tab:setTitleLabel(lb)
     lb:setLocalZOrder(2)

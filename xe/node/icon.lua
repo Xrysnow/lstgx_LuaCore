@@ -14,7 +14,7 @@ function M.getIcon(name)
         local tex = cache:addImage('xe/node.png')
         return cc.Sprite:createWithTexture(tex, cc.rect(unpack(data)))
     else
-        return cc.Sprite('null.png')
+        return cc.Sprite:create('null.png')
     end
 end
 
@@ -24,7 +24,7 @@ function M.getSmallIcon(name)
         local tex = cache:addImage('xe/node_small.png')
         return cc.Sprite:createWithTexture(tex, cc.rect(unpack(data)))
     else
-        return cc.Sprite('null.png')
+        return cc.Sprite:create('null.png')
     end
 end
 

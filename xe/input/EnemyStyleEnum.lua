@@ -121,7 +121,7 @@ function M:_renderImage(id, drawList, center, scale)
     local node = self:_getImage(id)
     if node then
         local sz = node:getContentSize()
-        sz = im.p(sz.width, sz.height)
+        sz = im.p(sz.x, sz.y)
         local hsz = cc.pMul(sz, 1 / 2 * scale)
         local lt = cc.pSub(center, hsz)
         drawList:addCCNode(node, lt)
@@ -146,7 +146,7 @@ function M:_loadImages()
     main._enemy_style = img
     ---@type cc.Sprite[]
     local tmp = {}
-    local container = cc.Node()
+    local container = cc.Node:create()
     container:setVisible(false):addTo(main)
     local blendFunc = { src = ccb.BlendFactor.SRC_ALPHA, dst = ccb.BlendFactor.ONE_MINUS_SRC_ALPHA }
 
@@ -208,9 +208,9 @@ function M:_loadImages()
         local sp = assert(tmp[name])
         addAura(sp, i)
 
-        local node = cc.Node()
+        local node = cc.Node:create()
         local rect = sp:getTextureRect()
-        node:addTo(container):setVisible(false):setContentSize(rect.width, rect.height)
+        node:addTo(container):setVisible(false):setContentSize(cc.p(rect.width, rect.height))
         sp:removeSelf():setVisible(true):addTo(node):alignCenter()
         setRotation(sp, 12)
         img[i] = node
@@ -218,9 +218,9 @@ function M:_loadImages()
     for i = 23, 26 do
         local name = 'enemy_orb' .. (i - 22)
         local sp = assert(tmp[name])
-        local node = cc.Node()
+        local node = cc.Node:create()
         local rect = sp:getTextureRect()
-        node:addTo(container):setVisible(false):setContentSize(rect.width, rect.height)
+        node:addTo(container):setVisible(false):setContentSize(cc.p(rect.width, rect.height))
         sp:removeSelf():setVisible(true):addTo(node):alignCenter()
 
         setRotation(sp, 6)

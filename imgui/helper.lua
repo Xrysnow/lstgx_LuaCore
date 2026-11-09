@@ -16,7 +16,7 @@ function imgui.create()
         base.handler(la)
     end
     -- toggle with grave key
-    local e = cc.EventListenerKeyboard()
+    local e = cc.EventListenerKeyboard:create()
     e:registerScriptHandler(function(k)
         if k == 123 and _canToggle then
             imgui.setVisible(not imgui.isVisible())

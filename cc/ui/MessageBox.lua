@@ -15,8 +15,8 @@ function M:ctor(title, msg, param)
         size_min = size_min or cc.size(200 - 24, 40)
         size_max = size_max or cc.size(600 - 24, 300)
     else
-        size_min = size_min or cc.size(sz.width / 3, sz.width / 3)
-        size_max = size_max or cc.size(sz.width / 2, sz.width / 2)
+        size_min = size_min or cc.size(sz.x / 3, sz.x / 3)
+        size_max = size_max or cc.size(sz.x / 2, sz.x / 2)
     end
 
     self:setContentSize(sz)
@@ -48,7 +48,7 @@ function M:ctor(title, msg, param)
     require('cc.ui.label').clampWidth(lb, size_max.width)
     local sz = lb:getContentSize()
     local txt = lb
-    if sz.height > size_max.height then
+    if sz.y > size_max.height then
         txt = require('cc.ui.label').toScroll(lb, size_max)
     else
         lb:arrangeLeftBottom()
@@ -58,16 +58,16 @@ function M:ctor(title, msg, param)
     local la = ccui.Layout:create()
     self._la = la
     local la_sz = cc.size(
-            math.max(sz.width, size_min.width) + 24,
-            math.max(sz.height, size_min.height) + 22 + 24 + 46)
+            math.max(sz.x, size_min.width) + 24,
+            math.max(sz.y, size_min.height) + 22 + 24 + 46)
     la:setContentSize(la_sz)
     la:setBackGroundColorType(1):setBackGroundColor(cc.WHITE)
     la:addTo(self)
     helper.alignCenter(la)
 
     txt:addTo(la)
-    if sz.height < size_min.height then
-        txt:setPosition(12, 46 + 12 + (size_min.height - sz.height) / 2)
+    if sz.y < size_min.height then
+        txt:setPosition(12, 46 + 12 + (size_min.height - sz.y) / 2)
     else
         txt:setPosition(12, 46 + 12)
     end
@@ -94,7 +94,7 @@ function M:ctor(title, msg, param)
     dr:drawRect(cc.p(0, 0), cc.p(la_sz.width, la_sz.height), cc.convertColor(clr, '4f'))
 
     if plus.isMobile() then
-        local scale = sz.height / 720
+        local scale = sz.y / 720
         scale = scale * 1.5
         la:setScale(scale)
     end
@@ -123,35 +123,35 @@ end
 function M.OK(title, msg, onConfirm, param)
     local ret = M(title, msg, param)
     local sz = ret._la:getContentSize()
-    ret:addButton('OK', cc.p(sz.width - 90, 35), onConfirm, true)
+    ret:addButton('OK', cc.p(sz.x - 90, 35), onConfirm, true)
     return ret
 end
 
 function M.OK_Cancel(title, msg, onConfirm, onCancel)
     local ret = M(title, msg)
     local sz = ret._la:getContentSize()
-    Print(sz.width, sz.height)
-    ret:addButton('OK', cc.p(sz.width - 172, 35), onConfirm, true)
-    ret:addButton('Cancel', cc.p(sz.width - 90, 35), onCancel, true)
+    Print(sz.x, sz.y)
+    ret:addButton('OK', cc.p(sz.x - 172, 35), onConfirm, true)
+    ret:addButton('Cancel', cc.p(sz.x - 90, 35), onCancel, true)
     return ret
 end
 
 function M.Yes_Cancel(title, msg, onConfirm, onCancel)
     local ret = M(title, msg)
     local sz = ret._la:getContentSize()
-    Print(sz.width, sz.height)
-    ret:addButton('Yes', cc.p(sz.width - 172, 35), onConfirm, true)
-    ret:addButton('Cancel', cc.p(sz.width - 90, 35), onCancel, true)
+    Print(sz.x, sz.y)
+    ret:addButton('Yes', cc.p(sz.x - 172, 35), onConfirm, true)
+    ret:addButton('Cancel', cc.p(sz.x - 90, 35), onCancel, true)
     return ret
 end
 
 function M.Yes_No_Cancel(title, msg, onConfirm, onReject, onCancel)
     local ret = M(title, msg)
     local sz = ret._la:getContentSize()
-    Print(sz.width, sz.height)
-    ret:addButton('Yes', cc.p(sz.width - 254, 35), onConfirm, true)
-    ret:addButton('No', cc.p(sz.width - 172, 35), onReject, true)
-    ret:addButton('Cancel', cc.p(sz.width - 90, 35), onCancel, true)
+    Print(sz.x, sz.y)
+    ret:addButton('Yes', cc.p(sz.x - 254, 35), onConfirm, true)
+    ret:addButton('No', cc.p(sz.x - 172, 35), onReject, true)
+    ret:addButton('Cancel', cc.p(sz.x - 90, 35), onCancel, true)
     return ret
 end
 

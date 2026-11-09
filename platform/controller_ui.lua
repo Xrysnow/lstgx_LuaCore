@@ -16,11 +16,11 @@ local function createKeys(parent)
     cc.Image:setPNGPremultipliedAlphaEnabled(false)
 
     local size = cc.Director:getInstance():getOpenGLView():getDesignResolutionSize()
-    local scale_pos = math.min(size.width / 640, size.height / 480)
+    local scale_pos = math.min(size.x / 640, size.y / 480)
     local scale_size = scale_pos * 0.65
     local fontsize = scale_size * 18
 
-    local xx = size.width / scale_pos
+    local xx = size.x / scale_pos
     local pESCAPE = cc.pMul(cc.p(xx - 135, 135), scale_pos)
     local pSHIFT = cc.pMul(cc.p(xx - 56, 56), scale_pos)
     local pX = cc.pMul(cc.p(xx - 56, 160), scale_pos)
@@ -62,8 +62,8 @@ local function CreateControllerUI(parent)
     local width, height
     local function layout()
         local size = cc.Director:getInstance():getOpenGLView():getDesignResolutionSize()
-        if size.width ~= width or size.height ~= height then
-            width, height = size.width, size.height
+        if size.x ~= width or size.y ~= height then
+            width, height = size.x, size.y
             keys:removeAllChildren()
             createKeys(keys)
         end

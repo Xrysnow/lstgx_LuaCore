@@ -48,7 +48,8 @@ function M:ctor(onSlide)
 end
 
 function M:getValue()
-    local x, _ = self._slider:getSlidBallRenderer():getPosition()
+    local position = self._slider:getSlidBallRenderer():getPosition()
+    local x, _ = position.x, position.y
     local v = x / length * 255
     return math.clamp(math.round(v), 0, 255)
 end
@@ -59,7 +60,8 @@ function M:setValue(v)
         return
     end
     self._slider:setPercent(v / 255 * 100)
-    local _, y = self._slider:getSlidBallRenderer():getPosition()
+    local position = self._slider:getSlidBallRenderer():getPosition()
+    local _, y = position.x, position.y
     self._slider:getSlidBallRenderer():setPosition(v / 255 * length, y)
 end
 

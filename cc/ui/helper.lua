@@ -27,9 +27,9 @@ function M.alignInner(node, ratio_x, ratio_y)
     local psz = p:getContentSize()
     local sz = node:getContentSize()
     local anc = node:getAnchorPoint()
-    local offset = cc.p(sz.width * anc.x, sz.height * anc.y)
-    local posx = (psz.width - sz.width) * ratio_x
-    local posy = (psz.height - sz.height) * ratio_y
+    local offset = cc.p(sz.x * anc.x, sz.y * anc.y)
+    local posx = (psz.x - sz.x) * ratio_x
+    local posy = (psz.y - sz.y) * ratio_y
     local pos = cc.pAdd(cc.p(posx, posy), offset)
     node:setPosition(pos)
 end
@@ -44,8 +44,8 @@ function M.alignInnerX(node, ratio_x)
     local psz = p:getContentSize()
     local sz = node:getContentSize()
     local anc = node:getAnchorPoint()
-    local posx = (psz.width - sz.width) * ratio_x
-    posx = posx + sz.width * anc.x
+    local posx = (psz.x - sz.x) * ratio_x
+    posx = posx + sz.x * anc.x
     node:setPositionX(posx)
 end
 
@@ -59,8 +59,8 @@ function M.alignInnerY(node, ratio_y)
     local psz = p:getContentSize()
     local sz = node:getContentSize()
     local anc = node:getAnchorPoint()
-    local posy = (psz.height - sz.height) * ratio_y
-    posy = posy + sz.height * anc.y
+    local posy = (psz.y - sz.y) * ratio_y
+    posy = posy + sz.y * anc.y
     node:setPositionY(posy)
 end
 
@@ -85,7 +85,7 @@ function M.makeFrame(node, color, width)
     local dr = cc.DrawNode:create()
     dr:setLineWidth(width)
     --local sz = node:getContentSize()
-    --local w, h = sz.width, sz.height
+    --local w, h = sz.x or sz.width, sz.y or sz.height
     --TODO: fix
     width = width / node:getScale()
     --dr:drawLine(cc.p(-width, -width / 2), cc.p(w + width, -width / 2), color)
@@ -95,7 +95,7 @@ function M.makeFrame(node, color, width)
     dr.setContentSize = function(this, size)
         dr:clear()
         local sz = size
-        local w, h = sz.width, sz.height
+        local w, h = sz.x or sz.width, sz.y or sz.height
         dr:drawLine(cc.p(-width, -width / 2), cc.p(w + width, -width / 2), color)
         dr:drawLine(cc.p(-width, h + width / 2), cc.p(w + width, h + width / 2), color)
         dr:drawLine(cc.p(-width / 2, -width), cc.p(-width / 2, h + width), color)
@@ -115,13 +115,14 @@ function M.makeDraggable(widget, limited)
             local p = widget:getTouchMovePosition()
             if _last_touch then
                 local delta = cc.pSub(p, _last_touch)
-                local x, y = widget:getPosition()
+                local position = widget:getPosition()
+                local x, y = position.x, position.y
                 local xx, yy = x + delta.x, y + delta.y
                 if limited then
                     local sz = glv:getDesignResolutionSize()
                     local size = widget:getContentSize()
-                    xx = math.max(0, math.min(xx, sz.width - size.width))
-                    yy = math.max(0, math.min(yy, sz.height - size.height))
+                    xx = math.max(0, math.min(xx, sz.x - size.x))
+                    yy = math.max(0, math.min(yy, sz.y - size.y))
                 end
                 widget:setPosition(cc.p(xx, yy))
             end

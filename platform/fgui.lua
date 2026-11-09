@@ -10,7 +10,7 @@ function DemoScene:ctor()
     --director:setClearColor(cc.c4f(0x36 / 255, 0x3B / 255, 0x44 / 255, 0xFF / 255))
 
     if true then
-        local sp = cc.Sprite('joystick_bg.png')
+        local sp = cc.Sprite:create('joystick_bg.png')
         self:addChild(sp)
         sp:setPosition(100, 100)
         return

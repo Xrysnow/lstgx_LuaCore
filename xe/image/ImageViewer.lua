@@ -13,10 +13,12 @@ local function getBG()
     data = data .. '\x66\x66\x66\xff'
     data = data .. '\x33\x33\x33\xff'
     local buf = lstg.Buffer:createFromString(data)
+    -- Restricted Ref construction: research/lua-binding-convergence_2026-11-01/core/callers.md
     local img = cc.Image()
     if not img:initWithRawData(buf, 2, 2, 4) then
         return nil
     end
+    -- Restricted Ref construction: research/lua-binding-convergence_2026-11-01/core/callers.md
     local tex = cc.Texture2D()
     if not tex:initWithImage(img) then
         return nil

@@ -16,7 +16,7 @@ function Scene:onCreate()
         self:addTouchKey()
     end
 
-    local scale = glv:getDesignResolutionSize().height / 480
+    local scale = glv:getDesignResolutionSize().y / 480
     SystemLog(string.format(
             'ui scale = %.3f, screen.scale = %.3f', scale, screen.scale))
 end
@@ -62,7 +62,7 @@ function Scene:addTouchKey()
     if not lstg.tmpvar.disableTouchKey then
         --SystemLog('[GameScene] add TouchKey')
         local ui_layer = cc.Layer:create()
-        ui_layer:setAnchorPoint(0, 0)
+        ui_layer:setAnchorPoint(cc.p(0, 0))
         self:addChild(ui_layer)
         require('platform.controller_ui')(ui_layer)
         --SystemLog('[GameScene] TouchKey added')

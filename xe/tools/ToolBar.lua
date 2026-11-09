@@ -28,7 +28,7 @@ function M:ctor()
         if string.fileext(v.bitmap) == 'svg' then
             sp = cc.Sprite:createWithSVGFile(path, img_size)
         else
-            sp = cc.Sprite(path)
+            sp = cc.Sprite:create(path)
             sp:setScale(scale)
         end
         assert(sp)

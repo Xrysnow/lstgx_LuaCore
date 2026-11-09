@@ -111,7 +111,7 @@ function GetMousePosition()
     local res = glv:getDesignResolutionSize()
     local rect = glv:getViewPortRect()
     local x, y = _GetMousePosition()
-    y = res.height - y
+    y = res.y - y
     x = x + rect.x / glv:getScaleX()
     y = y + rect.y / glv:getScaleY()
     local scale = screen.scale

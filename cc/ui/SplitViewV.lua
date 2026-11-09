@@ -81,8 +81,9 @@ end
 ---@param size size_table
 function M:setContentSize(size)
     self.super.setContentSize(self, size)
-    self.size = size
-    local ww, hh = size.width, size.height
+    local measured = self.super.getContentSize(self)
+    self.size = cc.size(measured.x, measured.y)
+    local ww, hh = measured.x, measured.y
     ww = ww - self.margin.l - self.margin.r
     hh = hh - self.margin.b - self.margin.t - self.margin.m
     if ww < 0 then

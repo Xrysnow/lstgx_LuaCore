@@ -17,13 +17,13 @@ end
 
 function M:setContentSize(size)
     base.setContentSize(self, size)
-    self:setParam(2, cc.p(size.width, size.height))
+    self:setParam(2, imgui.size(size))
     return self
 end
 
 function M:getContentSize()
     local sz = self:getParam(2)
-    return cc.size(sz.x, sz.y)
+    return cc.p(sz.x, sz.y)
 end
 
 function M:setBorder(b)
@@ -47,7 +47,7 @@ end
 function M:getPosition()
     local pos = self._pos_
     if pos then
-        return pos.x, pos.y
+        return cc.p(pos.x, pos.y)
     else
         return base.getPosition(self)
     end

@@ -52,7 +52,7 @@ end
 ---@param maxWidth number
 function M.clampWidth(label, maxWidth)
     local sz = label:getContentSize()
-    local w, _ = sz.width, sz.height
+    local w, _ = sz.x, sz.y
     if w <= maxWidth then
         return
     end
@@ -72,7 +72,7 @@ function M.toScroll(label, size)
     scr:setContentSize(size)
     scr:addChild(label)
     label:arrangeLeftBottom()
-    scr:setInnerContainerSize(cc.size(size.width, sz.height))
+    scr:setInnerContainerSize(cc.size(size.width, sz.y))
     return scr
 end
 
@@ -82,9 +82,10 @@ end
 function M.fixPosition(label)
     local sz = label:getContentSize()
     local ap = label:getAnchorPoint()
-    local x, y = label:getPosition()
-    local left = x - sz.width * ap.x
-    local buttom = y - sz.height * ap.y
+    local position = label:getPosition()
+    local x, y = position.x, position.y
+    local left = x - sz.x * ap.x
+    local buttom = y - sz.y * ap.y
     label:setPositionX(x - left % 1)
     label:setPositionY(y - buttom % 1)
     return label

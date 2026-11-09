@@ -50,7 +50,7 @@ elseif target == cc.PLATFORM_IOS then
     local director = cc.Director:getInstance()
     local view = director:getOpenGLView()
     local framesize = view:getFrameSize()
-    local w, h = framesize.width, framesize.height
+    local w, h = framesize.x, framesize.y
     if w == 640 and h == 960 then
         device.model = "iphone 4"
     elseif w == 640 and h == 1136 then

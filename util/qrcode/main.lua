@@ -78,10 +78,12 @@ function M.sprite(str, ec_level)
     end
     assert(#data / 4 == size * size)
     local buf = lstg.Buffer:createFromString(data)
+    -- Restricted Ref construction: research/lua-binding-convergence_2026-11-01/core/callers.md
     local img = cc.Image()
     if not img:initWithRawData(buf, size, size, 4) then
         return nil
     end
+    -- Restricted Ref construction: research/lua-binding-convergence_2026-11-01/core/callers.md
     local tex = cc.Texture2D()
     if not tex:initWithImage(img) then
         return nil

@@ -5,7 +5,7 @@ local M = class('im.cc.SelectableGroup', base)
 local im = imgui
 
 function M:ctor(nodes, current, flags, sizes)
-    local n = cc.Node()
+    local n = cc.Node:create()
     self._root = n
     n:setVisible(false)
     self:addChild(n)
@@ -110,17 +110,17 @@ function M:_handler()
         local pos = im.getCursorScreenPos()
         local sz = self._sizes[i]
         if not sz then
-            sz = im.vec2(0, nsz.height)
+            sz = im.vec2(0, nsz.y)
         end
         if sz.y == 0 then
-            sz.y = nsz.height
+            sz.y = nsz.y
         end
         local ww, hh = sz.x, sz.y
         if ww == 0 then
             ww = w
         end
-        local xx = pos.x + (ww - nsz.width) / 2
-        local yy = pos.y + (hh - nsz.height) / 2
+        local xx = pos.x + (ww - nsz.x) / 2
+        local yy = pos.y + (hh - nsz.y) / 2
         local param = { '', i == self._cur, self._flags[i] or 0, sz }
         im.pushID(tostring(self) .. i)
         if im.selectable(unpack(param)) then

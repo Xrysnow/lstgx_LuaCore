@@ -345,7 +345,7 @@ function SetImageCenter(name, x, y)
         error(string.format("can't find image %q", name))
     end
     local sz = sp:getSprite():getContentSize()
-    sp:getSprite():setAnchorPoint(cc.p(x / sz.width, 1 - y / sz.height))
+    sp:getSprite():setAnchorPoint(cc.p(x / sz.x, 1 - y / sz.y))
 end
 lstg.SetImageCenter = SetImageCenter
 
@@ -445,7 +445,7 @@ function SetAnimationCenter(name, x, y)
     for i = 0, ani:getCount() - 1 do
         local s = ani:getSprite(i)
         local sz = s:getContentSize()
-        s:setAnchorPoint(cc.p(x / sz.width, 1 - y / sz.height))
+        s:setAnchorPoint(cc.p(x / sz.x, 1 - y / sz.y))
     end
 end
 lstg.SetAnimationCenter = SetAnimationCenter

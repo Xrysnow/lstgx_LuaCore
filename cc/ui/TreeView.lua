@@ -24,7 +24,7 @@ function M:_setRoot(node)
     local sz = self:getContentSize()
     self:setInnerContainerSize(sz)
     self:setInnerContainerPosition(cc.p(0, 0))
-    self.root:updatePosition(sz.height)
+    self.root:updatePosition(sz.y)
 end
 
 function M:setCurrent(node)
@@ -44,40 +44,40 @@ function M:updatePosition()
     local in_sz = self:getInnerContainerSize()
     local sz = self:getContentSize()
     local l1, l2, l3
-    if sz.height >= in_sz.height then
+    if sz.y >= in_sz.y then
         l1, l3 = 0, 0
-        l2 = in_sz.height
+        l2 = in_sz.y
     else
         l1 = -in_pos.y
-        l2 = sz.height
-        l3 = in_sz.height - l1 - l2
+        l2 = sz.y
+        l3 = in_sz.y - l1 - l2
     end
     assert(l1 >= 0 and l2 >= 0 and l3 >= 0, string.format('got %.1f,%.1f,%.1f', l1, l2, l3))
     --Print(string.format('got %.1f,%.1f,%.1f', l1, l2, l3))
 
     local target_y, pos_y
     local h = self.root:getCurrentHeight()
-    local dh = h - in_sz.height
+    local dh = h - in_sz.y
 
-    if h <= sz.height then
-        target_y = sz.height
+    if h <= sz.y then
+        target_y = sz.y
         pos_y = 0
     else
         target_y = h
         if dh < 0 then
             if l3 == 0 then
-                pos_y = sz.height - h
+                pos_y = sz.y - h
             else
                 local l_ = l1 + l2 + dh
-                if l_ < sz.height then
+                if l_ < sz.y then
                     pos_y = 0
                 else
-                    pos_y = sz.height - l_
+                    pos_y = sz.y - l_
                 end
             end
         else
             --if l3 == 0 then
-            --    pos_y = sz.height - h
+            --    pos_y = sz.y - h
             --else
             --    pos_y = in_pos.y - dh
             --end
@@ -87,7 +87,7 @@ function M:updatePosition()
 
     --Print(string.format('h=%d, posy=%d', h, pos_y))
     --TODO: inner size
-    self:setInnerContainerSize(cc.size(sz.width, h))
+    self:setInnerContainerSize(cc.size(sz.x, h))
     self:setInnerContainerPosition(cc.p(0, pos_y))
     self.root:updatePosition(target_y)
 end

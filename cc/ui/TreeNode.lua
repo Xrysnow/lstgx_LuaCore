@@ -64,7 +64,7 @@ function M:ctor(icon, text, onSelect, onUnselect, param)
     _hidden:addTo(self):setVisible(false)
     self._hidden = _hidden
 
-    --self:setContentSize(cc.size(lb:getContentSize().width + 64, self._h))
+    --self:setContentSize(cc.size(lb:getContentSize().x + 64, self._h))
     --self:setBackGroundColorType(1):setBackGroundColor(cc.c3b(127, 255, 127))
 end
 
@@ -120,7 +120,7 @@ end
 
 function M:setString(str)
     self.lb:setString(str or '...')
-    local w = self.lb:getContentSize().width
+    local w = self.lb:getContentSize().x
     self.btn:setContentSize(cc.size(w + 4, self._h))
     self.selectBg:setContentSize(cc.size(w + 4, self._h))
     self:setContentSize(cc.size(w + 56, self._h))
@@ -361,7 +361,7 @@ function M:_checkChildIndex(idx)
 end
 
 function M:getCurrentHeight()
-    local h = self:getContentSize().height
+    local h = self:getContentSize().y
     if self._fold then
         return h
     else
@@ -380,7 +380,7 @@ function M:updatePosition(y_base)
         self:setPosition(cc.p(20, y_base))
     end
     if not self._fold then
-        local y = 0 -- self:getContentSize().height
+        local y = 0 -- self:getContentSize().y
         for _, v in self._children:iter() do
             v:updatePosition(y)
             y = y - v:getCurrentHeight()

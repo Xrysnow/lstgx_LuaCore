@@ -12,13 +12,13 @@ TouchKey._state = StateGrabbed
 
 function TouchKey:rect()
     local s = self:getTexture():getContentSize()
-    return cc.rect(-s.width / 2, -s.height / 2, s.width, s.height)
+    return cc.rect(-s.x / 2, -s.y / 2, s.x, s.y)
 end
 
 function TouchKey:containsTouchLocation(x, y)
     local p = self:convertToNodeSpace(cc.p(x, y))
     local s = self:getContentSize()
-    return cc.rectContainsPoint(cc.rect(0, 0, s.width, s.height), p)
+    return cc.rectContainsPoint(cc.rect(0, 0, s.x, s.y), p)
 end
 
 ---@param aTexture cc.Texture2D
@@ -50,6 +50,7 @@ end
 
 local director = cc.Director:getInstance()
 local function sendKeyEvent(keyCode, isPressed)
+    -- Restricted Ref construction: research/lua-binding-convergence_2026-11-01/core/callers.md
     local e = cc.EventKeyboard:new(keyCode, isPressed)
     director:getRunningScene():getEventDispatcher():dispatchEvent(e);
 end

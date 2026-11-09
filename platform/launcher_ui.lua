@@ -280,7 +280,7 @@ local function setInput(lc)
         ctr_labels[v] = label
         btn:addChild(label)
         local size = btn:getContentSize()
-        label:setPosition(cc.p(size.width / 2, size.height / 2))
+        label:setPosition(cc.p(size.x / 2, size.y / 2))
 
         btn._sel = false
         btn.setSelect = function(self, b)
@@ -476,7 +476,7 @@ local function CreateLauncherUI()
     end
 
     --local ui_layer = cc.Layer:create()
-    --ui_layer:setAnchorPoint(0, 0)
+    --ui_layer:setAnchorPoint(cc.p(0, 0))
     --launcher_scene:addChild(ui_layer)
     --require('platform.controller_ui')(ui_layer)
 
@@ -484,7 +484,7 @@ local function CreateLauncherUI()
     local sp = video.Player:create('[Touhou 3D] Subterranean Stars.mp4')
     sp:addTo(launcher_scene)
     local sz = sp:getContentSize()
-    sp:setPosition(sz.width / 2, sz.height / 2)
+    sp:setPosition(sz.x / 2, sz.y / 2)
     sp:vplay()
     ]]
 

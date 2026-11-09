@@ -6,7 +6,7 @@ local lis
 
 function M.start()
     if not lis then
-        lis = cc.EventListenerKeyboard()
+        lis = cc.EventListenerKeyboard:create()
         lis:registerScriptHandler(function(key)
             if handlers_k[key] then
                 for k, v in pairs(handlers_k[key]) do

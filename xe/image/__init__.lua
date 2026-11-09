@@ -101,6 +101,7 @@ function M:_loadIcons()
     local cache = cc.Director:getInstance():getTextureCache()
     for i, v in ipairs(names) do
         local path = ('icp/icon/%s.png'):format(v)
+        -- Restricted Ref construction: research/lua-binding-convergence_2026-11-01/core/callers.md
         local img = cc.Image()
         local ok = img:initWithImageFile(path)
         assert(ok)

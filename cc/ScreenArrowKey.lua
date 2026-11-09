@@ -8,6 +8,7 @@ M.LastMove = { x = 0, y = 0 }
 
 local director = cc.Director:getInstance()
 local function sendKeyEvent(keyCode, isPressed)
+    -- Restricted Ref construction: research/lua-binding-convergence_2026-11-01/core/callers.md
     local e = cc.EventKeyboard:new(keyCode, isPressed)
     director:getRunningScene():getEventDispatcher():dispatchEvent(e)
 end

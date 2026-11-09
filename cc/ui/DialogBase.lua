@@ -41,8 +41,8 @@ function M:ctor(title, size)
     local la = ccui.Layout:create()
     self._la = la
     local la_sz = cc.size(
-            math.min(sz.width, size.width),
-            math.min(sz.height, size.height))
+            math.min(sz.x, size.width),
+            math.min(sz.y, size.height))
     la:setContentSize(la_sz)
     la:setBackGroundColorType(1):setBackGroundColor(cc.WHITE)
     la:addTo(self)
@@ -123,13 +123,15 @@ function M:setContentSize(size)
     --self.super.setContentSize(self, size)
     --self._la:alignCenter()
     --self._btn:setContentSize(size)
-    local x, y = self._la:getPosition()
+    local width, height = size.x or size.width, size.y or size.height
+    local position = self._la:getPosition()
+    local x, y = position.x, position.y
     local sz = self._la:getContentSize()
-    if x + sz.width > size.width then
-        self._la:setPositionX(size.width - sz.width)
+    if x + sz.x > width then
+        self._la:setPositionX(width - sz.x)
     end
-    if y + sz.height > size.height then
-        self._la:setPositionY(size.height - sz.height)
+    if y + sz.y > height then
+        self._la:setPositionY(height - sz.y)
     end
     return self
 end

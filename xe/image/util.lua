@@ -32,7 +32,7 @@ function M.create(name, path, rect)
         return nil
     end
     local sz = sp:getContentSize()
-    local t = { name = name, sprite = sp, size = { x = sz.width, y = sz.height } }
+    local t = { name = name, sprite = sp, size = { x = sz.x, y = sz.y } }
     local viewer = require('xe.image.ImageViewer')(t)
     sp:addTo(viewer):setVisible(false)
 

@@ -7,8 +7,8 @@ local wi = require('imgui.Widget')
 local function createLabel(str, size)
     local lb = cc.Label:createWithSystemFont(str, 'Arial', size or 32)
     local sz = lb:getContentSize()
-    local n = cc.Node()
-    n:setContentSize(sz.width, sz.height * 2)
+    local n = cc.Node:create()
+    n:setContentSize(cc.p(sz.x, sz.y * 2))
     lb:addTo(n):alignCenter()
     return n
     --return cc.Label:createWithSystemFont(str, 'Arial', size or 32)
@@ -19,14 +19,14 @@ end
 local function createButton(label, onClick)
     local h_pad = 8
     local btn = wi.Widget()
-    local node = cc.Node()
+    local node = cc.Node:create()
     node:addChild(label)
     btn:addChild(node)
     btn:setHandler(function()
         local w = im.getWindowWidth() - im.getStyle().WindowPadding.x * 2
         local sz = label:getContentSize()
-        local h = sz.height + h_pad
-        node:setContentSize(w, h)
+        local h = sz.y + h_pad
+        node:setContentSize(cc.p(w, h))
         label:setPosition(w / 2, h / 2)
         if im.ccNodeButton(node, 0) then
             if onClick then
@@ -163,7 +163,7 @@ function M:onCreate()
     end
     self._label_data = require('platform.launcher_ui_data').label
     self._labels = {}
-    local label_holder = cc.Node()
+    local label_holder = cc.Node:create()
     label_holder:addTo(win):setVisible(false)
     for k, v in pairs(self._label_data) do
         local lb = createLabel(i18n(v))

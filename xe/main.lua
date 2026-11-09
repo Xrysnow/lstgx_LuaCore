@@ -43,7 +43,7 @@ function M:onCreate()
 
     cc.Director:getInstance():setDisplayStats(false)
 
-    local bg = cc.Sprite('xe/background.png')
+    local bg = cc.Sprite:create('xe/background.png')
     local bg_sz
     if bg then
         bg:addTo(scene):setLocalZOrder(-1)
@@ -141,10 +141,10 @@ function M:onCreate()
             local fsz = glv:getFrameSize()
             local dl = im.getBackgroundDrawList()
             local pos = im.getWindowPos()
-            local scale = math.max(fsz.width / bg_sz.width, fsz.height / bg_sz.height)
-            local w = bg_sz.width * scale
-            local h = bg_sz.height * scale
-            local a = im.vec2((fsz.width - w) / 2, (fsz.height - h) / 2)
+            local scale = math.max(fsz.x / bg_sz.x, fsz.y / bg_sz.y)
+            local w = bg_sz.x * scale
+            local h = bg_sz.y * scale
+            local a = im.vec2((fsz.x - w) / 2, (fsz.y - h) / 2)
             a = cc.pAdd(a, pos)
             local b = cc.pAdd(a, im.vec2(w, h))
             dl:addImage(bg, a, b)
@@ -201,7 +201,7 @@ function M:onCreate()
     --la:addChild(im.showStyleEditor)
     --la:addChild(implot.showDemoWindow)
 
-    local e = cc.EventListenerKeyboard()
+    local e = cc.EventListenerKeyboard:create()
     e:registerScriptHandler(function(k, ev)
         M._kbCode = k
     end, cc.Handler.EVENT_KEYBOARD_PRESSED)
@@ -232,7 +232,7 @@ function M._menu()
         end
     end
     --local fsz = glv:getFrameSize()
-    --im.text(('(%d, %d)'):format(fsz.width, fsz.height))
+    --im.text(('(%d, %d)'):format(fsz.x, fsz.y))
     if require('cocos.framework.device').isMobile then
         local pos = im.getIO().MousePos
         if M._kbCode then

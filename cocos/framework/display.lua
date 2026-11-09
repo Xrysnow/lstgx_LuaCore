@@ -59,17 +59,17 @@ end
 
 local function setDesignResolution(r, framesize)
     if r.autoscale == "FILL_ALL" then
-        view:setDesignResolutionSize(framesize.width, framesize.height, cc.ResolutionPolicy.FILL_ALL)
+        view:setDesignResolutionSize(framesize.x, framesize.y, cc.ResolutionPolicy.FILL_ALL)
     else
-        local scaleX, scaleY = framesize.width / r.width, framesize.height / r.height
-        local width, height = framesize.width, framesize.height
+        local scaleX, scaleY = framesize.x / r.width, framesize.y / r.height
+        local width, height = framesize.x, framesize.y
         if r.autoscale == "FIXED_WIDTH" then
-            width = framesize.width / scaleX
-            height = framesize.height / scaleX
+            width = framesize.x / scaleX
+            height = framesize.y / scaleX
             view:setDesignResolutionSize(width, height, cc.ResolutionPolicy.NO_BORDER)
         elseif r.autoscale == "FIXED_HEIGHT" then
-            width = framesize.width / scaleY
-            height = framesize.height / scaleY
+            width = framesize.x / scaleY
+            height = framesize.y / scaleY
             view:setDesignResolutionSize(width, height, cc.ResolutionPolicy.NO_BORDER)
         elseif r.autoscale == "EXACT_FIT" then
             view:setDesignResolutionSize(r.width, r.height, cc.ResolutionPolicy.EXACT_FIT)
@@ -85,11 +85,11 @@ end
 
 local function setConstants()
     local sizeInPixels = view:getFrameSize()
-    display.sizeInPixels = { width = sizeInPixels.width, height = sizeInPixels.height }
+    display.sizeInPixels = { width = sizeInPixels.x, height = sizeInPixels.y }
 
     local viewsize = director:getWinSize()
     display.contentScaleFactor = director:getContentScaleFactor()
-    display.size = { width = viewsize.width, height = viewsize.height }
+    display.size = { width = viewsize.x, height = viewsize.y }
     display.width = display.size.width
     display.height = display.size.height
     display.cx = display.width / 2

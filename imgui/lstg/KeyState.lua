@@ -16,7 +16,7 @@ local keys = {
 function M:ctor(...)
     base.ctor(self, ...)
     local sz = im.vec2(36, 36)
-    local sp = cc.Sprite()
+    local sp = cc.Sprite:create()
     sp:addTo(self):setVisible(false)
     local id = 'im.lstg.KeyState'
     local function render(idx, c)

@@ -66,7 +66,7 @@ lstg.eventDispatcher:addListener('ui.DrawFrame', function()
     local w = lstg.world
     local l, r, b, t = w.scrl, w.scrr, w.scrb, w.scrt
     local sz = FindResSprite('white'):getSprite():getContentSize()
-    local ww, hh = sz.width, sz.height
+    local ww, hh = sz.x, sz.y
     Render('white', (l + r) / 2, t, 0, (r - l + 1) / ww, 2 / hh)
     Render('white', (l + r) / 2, b, 0, (r - l + 1) / ww, 2 / hh)
     Render('white', l, (t + b) / 2, 0, 2 / ww, (t - b + 1) / hh)

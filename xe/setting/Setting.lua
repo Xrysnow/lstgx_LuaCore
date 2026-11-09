@@ -125,9 +125,9 @@ function M:_update()
         local s = self._setting
         local glv = cc.Director:getInstance():getOpenGLView()
         local fsz = glv:getFrameSize()
-        s.frame_size = { fsz.width, fsz.height }
-        setting.windowsize_w = fsz.width
-        setting.windowsize_h = fsz.height
+        s.frame_size = { fsz.x, fsz.y }
+        setting.windowsize_w = fsz.x
+        setting.windowsize_h = fsz.y
 
         lstg.saveSettingFile()
     end

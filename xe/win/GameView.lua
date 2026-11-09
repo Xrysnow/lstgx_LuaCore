@@ -149,7 +149,7 @@ function M:_render()
     local sz = im.getWindowSize()
     local sp = rt:getSprite()
     local spsz = sp:getContentSize()
-    spsz = cc.p(spsz.width, spsz.height)
+    spsz = cc.p(spsz.x, spsz.y)
     local scale
     if sz.x / sz.y > spsz.x / spsz.y then
         scale = sz.y / spsz.y

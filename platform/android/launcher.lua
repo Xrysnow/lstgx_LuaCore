@@ -124,7 +124,7 @@ local function createLauncher(alreadyLoaded)
     local startButton
 
     local function fillList(list, entries, text, select, preferred)
-        local width = list:getContentSize().width
+        local width = list:getContentSize().x
         local height = math.max(248, #entries * 56)
         list:setInnerContainerSize(cc.size(width, height))
         local backgrounds = {}
@@ -222,9 +222,9 @@ local function createLauncher(alreadyLoaded)
 
     local function layout()
         local size = view:getDesignResolutionSize()
-        local scale = math.min(size.width / 960, size.height / 540)
+        local scale = math.min(size.x / 960, size.y / 540)
         root:setScale(scale)
-        root:setPosition((size.width - 960 * scale) / 2, (size.height - 540 * scale) / 2)
+        root:setPosition((size.x - 960 * scale) / 2, (size.y - 540 * scale) / 2)
     end
     scene:registerScriptHandler(function(tag)
         if tag == 'enter' then layout() end

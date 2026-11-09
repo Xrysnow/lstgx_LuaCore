@@ -34,10 +34,10 @@ function M:setTexParameters(minFilter, magFilter, wrapS, wrapT)
     wrapT = assert(_wrap[wrapT])
     local tex = self:getTexture()
     local sz = tex:getContentSizeInPixels()
-    if not _is_POT(sz.width) or not _is_POT(sz.height) then
+    if not _is_POT(sz.x) or not _is_POT(sz.y) then
         Print(string.format(
                 '[WARN] [setTexParameters] texture %q is NPOT (%d, %d), wrap parameter may not take effect',
-                self:getName(), sz.width, sz.height))
+                self:getName(), sz.x, sz.y))
     end
     tex:setTexParameters(minFilter, magFilter, wrapS, wrapT)
     return self
@@ -49,10 +49,10 @@ end
 function M:setWrap(wrap)
     local tex = self:getTexture()
     local sz = tex:getContentSizeInPixels()
-    if not _is_POT(sz.width) or not _is_POT(sz.height) then
+    if not _is_POT(sz.x) or not _is_POT(sz.y) then
         Print(string.format(
                 '[WARN] [setTexParameters] texture %q is NPOT (%d, %d), wrap parameter may not take effect',
-                self:getName(), sz.width, sz.height))
+                self:getName(), sz.x, sz.y))
     end
     tex:setTexParameters(ccb.SamplerFilter.LINEAR, ccb.SamplerFilter.LINEAR, assert(_wrap[wrap]), assert(_wrap[wrap]))
     return self

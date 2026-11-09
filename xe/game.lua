@@ -228,7 +228,7 @@ function M.start(rank, player, stage_, debugStage, debugSC)
     end
 
     if not node then
-        node = cc.Node()
+        node = cc.Node:create()
         node:addTo(imgui.get())
         node:scheduleUpdateWithPriorityLua(M._update, 0)
     end

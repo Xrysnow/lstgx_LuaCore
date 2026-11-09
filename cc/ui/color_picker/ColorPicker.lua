@@ -183,7 +183,8 @@ function M:_setHinterPos(p)
 end
 
 function M:_getHinterPos()
-    local x, y = self.cir_hinter:getPosition()
+    local position = self.cir_hinter:getPosition()
+    local x, y = position.x, position.y
     return cc.pSub(cc.p(x, y), o)
 end
 
