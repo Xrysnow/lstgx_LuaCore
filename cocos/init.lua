@@ -38,10 +38,6 @@ end
 
 -- audio
 --require "cocos.cocosdenshion.AudioEngine"
--- cocosstudio
-if nil ~= ccs then
-    require "cocos.cocostudio.CocoStudio"
-end
 -- ui
 if nil ~= ccui then
     require "cocos.ui.GuiConstants"

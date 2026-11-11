@@ -2,20 +2,6 @@
 local Sprite = cc.Sprite
 
 ---
----@param path string
----@param size size_table
----@return cc.Sprite
-function Sprite:createWithSVGFile(path, size)
-    -- Restricted Ref construction: research/lua-binding-convergence_2026-11-01/core/callers.md
-    local img = cc.Image()
-    img:initWithSVGFile(unpack({ path, size }))
-    -- Restricted Ref construction: research/lua-binding-convergence_2026-11-01/core/callers.md
-    local tex = cc.Texture2D()
-    tex:initWithImage(img)
-    return cc.Sprite:createWithTexture(tex)
-end
-
----
 ---@param b lstg.Buffer buffer which holds the image data.
 ---@return boolean true if loaded correctly.
 function Sprite:createWithImageData(b)
