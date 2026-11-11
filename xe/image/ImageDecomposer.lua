@@ -24,11 +24,12 @@ local function getBG()
     if not tex:initWithImage(img) then
         return nil
     end
-    tex:setTexParameters(
-            ccb.SamplerFilter.NEAREST,
-            ccb.SamplerFilter.NEAREST,
-            ccb.SamplerAddressMode.REPEAT,
-            ccb.SamplerAddressMode.REPEAT)
+    tex:setTexParameters({
+            minFilter = ccb.SamplerFilter.NEAREST,
+            magFilter = ccb.SamplerFilter.NEAREST,
+            sAddressMode = ccb.SamplerAddressMode.REPEAT,
+            tAddressMode = ccb.SamplerAddressMode.REPEAT,
+    })
     return cc.Sprite:createWithTexture(tex)
 end
 

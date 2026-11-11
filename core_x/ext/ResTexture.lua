@@ -39,7 +39,10 @@ function M:setTexParameters(minFilter, magFilter, wrapS, wrapT)
                 '[WARN] [setTexParameters] texture %q is NPOT (%d, %d), wrap parameter may not take effect',
                 self:getName(), sz.x, sz.y))
     end
-    tex:setTexParameters(minFilter, magFilter, wrapS, wrapT)
+    tex:setTexParameters({
+        minFilter = minFilter, magFilter = magFilter,
+        sAddressMode = wrapS, tAddressMode = wrapT,
+    })
     return self
 end
 
@@ -54,6 +57,9 @@ function M:setWrap(wrap)
                 '[WARN] [setTexParameters] texture %q is NPOT (%d, %d), wrap parameter may not take effect',
                 self:getName(), sz.x, sz.y))
     end
-    tex:setTexParameters(ccb.SamplerFilter.LINEAR, ccb.SamplerFilter.LINEAR, assert(_wrap[wrap]), assert(_wrap[wrap]))
+    tex:setTexParameters({
+        minFilter = ccb.SamplerFilter.LINEAR, magFilter = ccb.SamplerFilter.LINEAR,
+        sAddressMode = assert(_wrap[wrap]), tAddressMode = assert(_wrap[wrap]),
+    })
     return self
 end

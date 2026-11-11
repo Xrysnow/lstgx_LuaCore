@@ -8,7 +8,12 @@ function M:ctor(size)
 
     local bg = cc.Sprite:create('ui/ImagePreviewer/bg.png')
     bg:setTextureRect(cc.rect(0, 0, self.size.width, self.size.height))
-    bg:getTexture():setTexParameters(gl.LINEAR, gl.LINEAR, gl.REPEAT, gl.REPEAT)
+    bg:getTexture():setTexParameters({
+        minFilter = ccb.SamplerFilter.LINEAR,
+        magFilter = ccb.SamplerFilter.LINEAR,
+        sAddressMode = ccb.SamplerAddressMode.REPEAT,
+        tAddressMode = ccb.SamplerAddressMode.REPEAT,
+    })
     bg:addTo(self):alignTop(0):alignLeft(0)
     self._bg = bg
 
