@@ -75,6 +75,9 @@ function ChangeVideoMode(width, height, windowed, vsync)
             w:setSize(cc.size(width, height))
         else
             w:setFullscreen()
+            if not w:isFullscreen() then
+                return false, 'display-unavailable'
+            end
             --cc.Director:getInstance():getOpenGLView():setFrameSize(width, height)
         end
         w:setVsync(vsync)

@@ -173,12 +173,18 @@ SetTitle('LuaSTG-x')
 if plus.os == 'android' then
     assert(SetDesignResolution(setting.resx, setting.resy))
 else
-    ChangeVideoMode(
+    local changed = ChangeVideoMode(
             setting.windowsize_w,
             setting.windowsize_h,
             setting.windowed,
             setting.vsync
     )
+    if not changed and not setting.windowed then
+        if ChangeVideoMode(setting.windowsize_w, setting.windowsize_h, true, setting.vsync) then
+            setting.windowed = true
+            SystemLog('fullscreen unavailable; started in windowed mode')
+        end
+    end
 end
 if setting.render_skip == 1 then
     SetFPS(30)
@@ -230,9 +236,9 @@ function lstg.loadSetting(change_vm)
     end
 
     local size = glv:getDesignResolutionSize()
-    SystemLog(string.format('DesignRes = %d, %d', size.width, size.height))
+    SystemLog(string.format('DesignRes = %d, %d', size.x, size.y))
     size = glv:getFrameSize()
-    SystemLog(string.format('FrameSize = %d, %d', size.width, size.height))
+    SystemLog(string.format('FrameSize = %d, %d', size.x, size.y))
     SystemLog(string.format('Scale     = %.3f, %.3f', glv:getScaleX(), glv:getScaleY()))
     --SystemLog('setting = \n' .. stringify(_setting))
     --SystemLog('screen = \n' .. stringify(screen))

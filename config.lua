@@ -89,6 +89,10 @@ if not view then
             end
         else
             view = cc.GLViewImpl:createWithFullScreen(title)
+            if not view then
+                -- Locked/disconnected displays may not expose a fullscreen mode.
+                view = cc.GLViewImpl:createWithRect(title, rect(0, 0, w, h), 1, true)
+            end
         end
     else
         view = cc.GLViewImpl:createWithRect(title, rect(0, 0, width, height))
