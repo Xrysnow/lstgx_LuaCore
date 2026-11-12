@@ -50,7 +50,7 @@ local function main()
             native.setOrientationLandscape()
         end
     end
-    lstg.DoFile('launch')
+    lstg.DoFile('launch.lua')
     lstg.SystemLog('start app')
     require("app.MyApp"):create():run()
 end
