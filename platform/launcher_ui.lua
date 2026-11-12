@@ -120,7 +120,9 @@ local function setMod(lc)
             SystemLog('use external launcher')
             scene:showWithScene()
         else
-            require('platform.launcher2_ui')()
+            local launcher = require('platform.launcher')()
+            launcher:setModLoaded()
+            launcher:showWithScene()
         end
     end)
 end

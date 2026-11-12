@@ -1,240 +1,705 @@
---TODO
----@class x.launcher:ViewBase
-local M = class("MainScene", require('cc.ViewBase'))
+---@class x.launcher:cc.ViewBase
+local M = class('Launcher', require('cc.ViewBase'))
 local im = imgui
-local wi = require('imgui.Widget')
+local director = cc.Director:getInstance()
+local controller = require('platform.ControllerHelper')
 
-local function createLabel(str, size)
-    local lb = cc.Label:createWithSystemFont(str, 'Arial', size or 32)
-    local sz = lb:getContentSize()
-    local n = cc.Node:create()
-    n:setContentSize(cc.p(sz.x, sz.y * 2))
-    lb:addTo(n):alignCenter()
-    return n
-    --return cc.Label:createWithSystemFont(str, 'Arial', size or 32)
+local function tr(en, zh)
+    return i18n({ en = en, zh = zh })
 end
----
----@param label cc.Label
----@param onClick function
-local function createButton(label, onClick)
-    local h_pad = 8
-    local btn = wi.Widget()
-    local node = cc.Node:create()
-    node:addChild(label)
-    btn:addChild(node)
-    btn:setHandler(function()
-        local w = im.getWindowWidth() - im.getStyle().WindowPadding.x * 2
-        local sz = label:getContentSize()
-        local h = sz.y + h_pad
-        node:setContentSize(cc.p(w, h))
-        label:setPosition(w / 2, h / 2)
-        if im.ccNodeButton(node, 0) then
-            if onClick then
-                onClick()
-            end
+
+local function copy(value)
+    if type(value) ~= 'table' then return value end
+    local result = {}
+    for k, v in pairs(value) do result[k] = copy(v) end
+    return result
+end
+
+-- Only edit launcher preferences; preserve MOD/editor/extension data.
+local preferences = {
+    'bgmvolume', 'sevolume', 'res_ratio', 'resy', 'resx', 'windowsize_w',
+    'windowsize_h', 'windowed', 'vsync', 'posteffect', 'render_skip',
+    'keys', 'keysys', 'controller_map', 'username', 'allowsnapshot',
+    'orientation', 'touchkey',
+}
+local pages = {
+    { 'mod', 'MOD library', 'MOD 库' },
+    { 'graph', 'Display', '画面' },
+    { 'sound', 'Audio', '声音' },
+    { 'input', 'Input', '输入' },
+    { 'others', 'General', '常规' },
+}
+local actions = {
+    { 'keys', 'up', 'Move up', '上移' },
+    { 'keys', 'down', 'Move down', '下移' },
+    { 'keys', 'left', 'Move left', '左移' },
+    { 'keys', 'right', 'Move right', '右移' },
+    { 'keys', 'shoot', 'Shoot / confirm', '射击 / 确定' },
+    { 'keys', 'slow', 'Focus', '低速移动' },
+    { 'keys', 'spell', 'Spell / cancel', '符卡 / 取消' },
+    { 'keys', 'special', 'Special', '特殊操作' },
+    { 'keysys', 'menu', 'Pause / menu', '暂停 / 菜单' },
+    { 'keysys', 'repfast', 'Replay fast', '回放加速' },
+    { 'keysys', 'repslow', 'Replay slow', '回放减速' },
+    { 'keysys', 'snapshot', 'Screenshot', '截图' },
+    { 'keysys', 'toggle_collider', 'Show hitboxes', '显示碰撞体' },
+}
+local keyNames = {}
+for name, code in pairs(require('keycode')) do keyNames[code] = name end
+local accent = im.vec4(0.27, 0.83, 0.77, 1)
+local muted = im.vec4(0.57, 0.64, 0.73, 1)
+
+local function text(value)
+    im.textUnformatted(tostring(value))
+end
+
+local function hint(value)
+    im.pushStyleColor(im.Col.Text, muted)
+    im.pushTextWrapPos(0)
+    text(value)
+    im.popTextWrapPos()
+    im.popStyleColor()
+end
+
+local function heading(en, zh)
+    im.textColored(accent, tr(en, zh))
+    im.separator()
+    im.spacing()
+end
+
+local function combo(label, preview, entries, selected, choose)
+    im.setNextItemWidth(math.min(320, im.getContentRegionAvail().x))
+    if im.beginCombo(label, preview) then
+        for i, entry in ipairs(entries) do
+            im.pushID(i)
+            if im.selectable(entry, selected == i) then choose(i) end
+            if selected == i then im.setItemDefaultFocus() end
+            im.popID()
         end
-    end)
-    return btn
+        im.endCombo()
+    end
 end
 
-local function getDocking()
-    local docking_window_flags = bit.bor(
-    --im.WindowFlags.MenuBar,
-            im.WindowFlags.NoDocking,
-            im.WindowFlags.NoTitleBar,
-            im.WindowFlags.NoCollapse,
-            im.WindowFlags.NoResize,
-            im.WindowFlags.NoMove,
-            im.WindowFlags.NoBringToFrontOnFocus,
-            im.WindowFlags.NoNavFocus,
-            im.WindowFlags.NoBackground
-    )
-    local id = 0xaaa
-    local function f()
-        local viewport = im.getMainViewport()
-        im.setNextWindowPos(viewport.Pos)
-        im.setNextWindowSize(viewport.Size)
-        im.setNextWindowViewport(viewport.ID)
-        im.pushStyleVar(im.StyleVar.WindowRounding, 0)
-        im.pushStyleVar(im.StyleVar.WindowBorderSize, 0)
-        im.pushStyleVar(im.StyleVar.WindowPadding, im.p(0, 0))
-        im.begin('Dock Space', nil, docking_window_flags)
-        im.popStyleVar(3)
-        im.dockSpace(id, im.p(0, 0), im.DockNodeFlags.PassthruCentralNode)
-        im.endToLua()
+function M:_readPreferences(source)
+    local result = {}
+    for _, name in ipairs(preferences) do
+        local value = source[name]
+        if value == nil then value = default_setting[name] end
+        result[name] = copy(value)
     end
-    return f, id
+    return result
 end
 
 function M:onCreate()
-    local dock_id = 'launcher.dock'
-    require('imgui.lstg.util').load(nil, dock_id, true)
-    local la = im.get()
-    im.show()
-
-    la:addChild(function()
-        --im.setNextWindowDockID(im.getID('Dock Space'), im.Cond.Always)
-        im.setNextWindowDockID(0x9F5F9276, im.Cond.Always)
-    end)
-
-    --la:addChild(im.showDemoWindow)
-
-    local wrapper = wi.styleVar(im.StyleVar.WindowPadding, im.p(0, 0))
-    wrapper:addTo(la)
-
-    --wrapper:addChild(function()
-    --    local sz = im.getWindowSize()
-    --    print(sz.x, sz.y)
-    --    --im.setNextWindowSize(sz, im.Cond.Always)
-    --    --im.setNextWindowSize(im.vec2(-1, -1), im.Cond.Always)
-    --end)
-
-    local win = wi.Window('Launcher')
-    win:addTo(wrapper)
-    win:setFlags(im.WindowFlags.NoMove, im.WindowFlags.NoTitleBar, im.WindowFlags.NoDecoration)
-
-    --
-
-    --im.getStyle():scaleAllSizes(3)
-    win:addChild(function()
-        --local sp = im.getStyle().ItemSpacing
-        im.pushStyleVar(im.StyleVar.ItemSpacing, im.p(0, 0))
-        im.pushStyleVar(im.StyleVar.FramePadding, im.p(0, 0))
-    end)
-
-    local c1
-    c1 = wi.Widget(function()
-        --local w = im.getWindowContentRegionWidth()
-        local w = im.getContentRegionAvail().x
-        local id = im.getID(tostring(self) .. 'c1')
-        local width = w / 3
-        if im.beginChildFrame(id, im.p(width, 0), 0) then
-            local col = im.getStyleColorVec4(im.Col.WindowBg)
-            col.w = 1
-            im.pushStyleColor(im.Col.Header, col)
-            wi._handler(c1)
-            im.popStyleColor()
+    self._page, self._filter = 'mod', ''
+    self._mode = 'game'
+    self._stages, self._spells, self._replays = {}, {}, {}
+    self._draft = self:_readPreferences(setting)
+    self._dirty = false
+    self._status = tr('Select a MOD to begin.', '选择一个 MOD，开始游戏。')
+    self:_refreshMods()
+    local listener = cc.EventListenerKeyboard:create()
+    listener:registerScriptHandler(function(code)
+        if not self._active then return end
+        if code == KEY.F5 then
+            self:_queue(function() self:_reload() end)
+            return
         end
-        im.endChildFrame()
-    end)
-    local sel = require('imgui.cc.SelectableGroup')()
-    sel:setOnSelect(function(_, idx)
-        self:_onSel1(idx)
-    end)
-
-    self._sel1 = sel
-
-    c1:addChild(sel)
-    win:addChild(c1)
-
-    win:addChild(im.sameLine)
-
-    local c2
-    c2 = wi.Widget(function()
-        --local w = im.getWindowContentRegionWidth()
-        local w = im.getContentRegionAvail().x
-        local col = im.getStyleColorVec4(im.Col.WindowBg)
-        col.w = 1
-        im.pushStyleColor(im.Col.FrameBg, col)
-        local id = im.getID(tostring(self) .. 'c2')
-        local width = w / 3 * 2
-        if im.beginChildFrame(id, im.p(width, 0), 0) then
-            wi._handler(c2)
+        local capture = self._capture
+        if not capture then return end
+        if code == KEY.ESCAPE then
+            self._capture = nil
+        elseif capture.kind == 'keyboard' then
+            local keys = self._draft[capture.group]
+            local old = keys[capture.name]
+            -- Swap duplicate keys to keep game/system bindings exclusive.
+            for _, action in ipairs(actions) do
+                local group, name = action[1], action[2]
+                if self._draft[group][name] == code then self._draft[group][name] = old end
+            end
+            keys[capture.name] = code
+            self._dirty, self._capture = true, nil
         end
-        im.endChildFrame()
-        im.popStyleColor()
+    end, cc.Handler.EVENT_KEYBOARD_PRESSED)
+    director:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
+    self:scheduleUpdateWithPriorityLua(function()
+        if not self._active then return end
+        local capture = self._capture
+        local last = capture and capture.kind == 'controller' and controller.getLast()
+        if last then
+            local map = self._draft.controller_map
+            local old = map[capture.group][capture.name]
+            local direction
+            if last.is_axis then direction = last.is_pos end
+            for _, group in pairs(map) do
+                for name, binding in pairs(group) do
+                    if binding[1] == last.key and binding[2] == direction then group[name] = copy(old) end
+                end
+            end
+            map[capture.group][capture.name] = last.is_axis and { last.key, last.is_pos } or { last.key }
+            self._dirty, self._capture = true, nil
+        end
+        -- Apply native window and scene changes outside ImGui's frame.
+        local pending = self._pending
+        if pending then
+            self._pending = nil
+            local ok, err = pcall(pending)
+            if not ok then
+                self._error, self._status = true, tostring(err)
+                SystemLog('Launcher: ' .. self._status)
+            end
+        end
+    end, 0)
+end
+
+function M:onEnter()
+    self._previousStats = director:isStatsDisplay()
+    director:setDisplayStats(false)
+    -- The shared ImGui layer is detached while cocos switches scenes. Reuse it
+    -- on return instead of creating a second layer before it is reattached.
+    if not self._layer then
+        require('imgui.lstg.util').load(nil, nil, true, true)
+        self._layer = im.get()
+    end
+    local layer = self._layer
+    self._previousVisibility = layer:isVisible()
+    layer:setVisible(true)
+    im.setToggleEnable(false)
+    if not M._font then
+        M._font = im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 20, nil, {
+            0x0020, 0x00FF, 0x2000, 0x206F, 0x3000, 0x30FF,
+            0x4E00, 0x9FAF, 0xFF00, 0xFFEF, 0,
+        })
+    end
+    if not self._renderer then
+        self._renderer = require('imgui.Widget').Widget()
+        self._renderer:setHandler(function()
+            if self._active then self:_render() end
+        end)
+        layer:addChild(self._renderer)
+    end
+    self._active = true
+    if self._loaded and not lstg._exlauncher then
+        self:_queue(function() self:_refreshChoices() end)
+    end
+end
+
+function M:onExit()
+    self._active, self._capture = false, nil
+    im.setToggleEnable(true)
+    director:setDisplayStats(self._previousStats)
+    local layer = self._layer
+    if layer then layer:setVisible(self._previousVisibility) end
+end
+
+function M:onCleanup()
+    if self._renderer then
+        self._renderer:removeSelf()
+        self._renderer = nil
+    end
+    self._layer = nil
+end
+
+function M:_queue(action)
+    if not self._pending then
+        self._capture, self._error = nil, false
+        self._pending = action
+    end
+end
+
+function M:_reload()
+    local name = 'platform.launcher'
+    local previous = package.loaded[name]
+    local replacement
+    package.loaded[name] = nil
+    local ok, err = pcall(function()
+        -- XFileUtils caches script bytes separately from Lua's module cache.
+        local path = debug.getinfo(M._reload, 'S').source:match('^@(.+)$')
+        if path then
+            local resources = lstg.ResourceMgr:getInstance()
+            resources:removeLocalFileCache(path)
+            for _, pack in ipairs(resources:getResourcePacks()) do pack:removeFileCache(path) end
+        end
+        local launcher = require(name)
+        -- Keep the shared layer and font atlas across reloads.
+        launcher._font = M._font
+        replacement = launcher(self:getApp(), self:getName())
+        replacement._layer = self._layer
+        replacement._attempted = self._attempted
+        if self._loaded then replacement:setModLoaded() end
     end)
-    local sel2 = require('imgui.cc.SelectableGroup')()
-    sel2:setOnSelect(function(_, idx)
-        self:_onSel2(idx)
+    if not ok then
+        package.loaded[name] = previous
+        if replacement then replacement:cleanup() end
+        error(err, 0)
+    end
+    if self._attempted and not self._loaded then
+        replacement._status, replacement._error = self._status, true
+    else
+        replacement._status = tr('Launcher reloaded. Unsaved edits discarded.', '启动器已重载，未保存的更改已丢弃。')
+    end
+    local parent, order = self:getParent(), self:getLocalZOrder()
+    -- Exit/cleanup the old view before entering the new one so visibility,
+    -- statistics, keyboard listeners and render callbacks stay balanced.
+    self:removeSelf()
+    parent:addChild(replacement, order)
+end
+
+function M:_refreshMods()
+    local selected = self._selected or setting.mod_info
+    local ok, result = pcall(M.enumMods, plus.getWritablePath() .. 'mod/')
+    self._mods, self._selected = ok and result or {}, nil
+    if not ok then
+        self._status, self._error = tostring(result), true
+        SystemLog('Launcher: ' .. self._status)
+    end
+    for _, mod in ipairs(self._mods) do
+        if mod.name == (selected and selected.name or setting.mod)
+                and (not selected or mod.isDirectory == selected.isDirectory) then
+            self._selected = mod
+            break
+        end
+    end
+    self._selected = self._selected or self._mods[1]
+end
+
+function M:_apply()
+    local draft = self._draft
+    assert(draft.username:match('%S'), tr('Player name cannot be empty.', '玩家名称不能为空。'))
+    assert(draft.windowsize_w >= 640 and draft.windowsize_w <= 7680
+            and draft.windowsize_h >= 360 and draft.windowsize_h <= 4320,
+            tr('Window size must be within 640x360 and 7680x4320.', '窗口大小须在 640×360 至 7680×4320 之间。'))
+    -- Keep existing custom render dimensions unless ratio/height was edited.
+    local changedVideo = draft.windowsize_w ~= setting.windowsize_w
+            or draft.windowsize_h ~= setting.windowsize_h or draft.windowed ~= setting.windowed
+            or draft.vsync ~= setting.vsync
+    if changedVideo then
+        local ok, err = ChangeVideoMode(draft.windowsize_w, draft.windowsize_h, draft.windowed, draft.vsync)
+        assert(ok, tr('Cannot apply video mode: ', '无法应用显示模式：') .. tostring(err))
+    end
+    for _, name in ipairs(preferences) do setting[name] = copy(draft[name]) end
+    SetBGMVolume(setting.bgmvolume / 100)
+    SetSEVolume(setting.sevolume / 100)
+    SetFPS(setting.render_skip == 1 and 30 or 60)
+    controller.loadFromSetting()
+    M.saveSetting()
+    self._draft = self:_readPreferences(setting)
+    self._dirty = false
+    self._status = tr('Settings applied and saved.', '设置已应用并保存。')
+end
+
+function M:_loadMod()
+    if self._attempted or not self._selected then return end
+    self:_apply()
+    setting.mod, setting.mod_info = self._selected.name, copy(self._selected)
+    M.saveSetting()
+    -- A failed root.lua can still mutate globals. Never load a second MOD.
+    self._attempted = true
+    require('app.views.GameScene')
+    local ok, err = pcall(lstg.loadMod)
+    if not ok then
+        error(tr('MOD loading failed; restart the application.\n', 'MOD 加载失败，请重启程序。\n') .. tostring(err))
+    end
+    self:setModLoaded()
+    if lstg._exlauncher then self:_startGame() end
+end
+
+-- Adopt an already loaded MOD without executing root.lua again.
+function M:setModLoaded()
+    self._attempted = true
+    self._draft = self:_readPreferences(setting)
+    if lstg._exlauncher then
+        self._loaded = true
+        return
+    end
+    local content = require('game.content')
+    content._reset()
+    self._ranks, self._rankNames = {}, {}
+    if stage and stage.groups then self._ranks, self._rankNames = content.enumRanks() end
+    self._players = player_list and content.enumPlayers() or {}
+    self._rank = self._ranks[1]
+    for _, rank in ipairs(self._ranks) do
+        if rank == scoredata.difficulty_select then self._rank = rank end
+    end
+    self._player = math.min(math.max(scoredata.player_select or 1, 1), #self._players)
+    self._loaded = true
+    self:_refreshChoices()
+    self._status = tr('MOD loaded. Choose difficulty and player.', 'MOD 已加载，请选择难度与玩家。')
+end
+
+function M:_refreshChoices()
+    local content = require('game.content')
+    self._stages = content.enumStages(self._rank)
+    self._stage = #self._stages > 0 and math.min(self._stage or 1, #self._stages) or nil
+    self._spells = content.enumSpells()
+    self._spell = #self._spells > 0 and math.min(self._spell or 1, #self._spells) or nil
+    if ext and ext.replay then
+        self._replays = content.enumReplays()
+    else
+        self._replays = {}
+    end
+    self._replay = #self._replays > 0 and math.min(self._replay or 1, #self._replays) or nil
+    self._replayStage = 1
+end
+
+function M:_canStart()
+    if lstg._exlauncher then return true end
+    if self._mode == 'replay' then return self._replay ~= nil end
+    if not self._player or self._player < 1 then return false end
+    if self._mode == 'spell' then return self._spell ~= nil end
+    if not self._rank then return false end
+    return self._mode ~= 'stage' or self._stage ~= nil
+end
+
+function M:_startGame()
+    assert(self:_canStart(), tr('Complete the game selection first.', '请先完成游戏内容选择。'))
+    self:_apply()
+    if not lstg._exlauncher then
+        local content = require('game.content')
+        local ok, err
+        lstg.practice = nil
+        cheat = (self._mode == 'stage' or self._mode == 'spell') and self._cheat or false
+        if self._mode == 'replay' then
+            ok, err = content.setReplay(self._replays[self._replay], self._replayStage)
+            assert(ok, err)
+        else
+            ok, err = content.setPlayer(self._player)
+            assert(ok, err or tr('Select a player.', '请选择玩家。'))
+            if self._mode == 'spell' then
+                ok, err = content.setSpell(self._spells[self._spell].index)
+            else
+                ok, err = content.setRank(self._rank)
+                assert(ok, err or tr('Select a difficulty.', '请选择难度。'))
+                if self._mode == 'stage' then ok, err = content.setStage(self._stage) end
+            end
+            assert(ok, err)
+        end
+    end
+    require('app.views.GameScene'):create(nil, setting.mod):showWithScene()
+end
+
+function M:_renderGameSelection()
+    local modes = { 'game', 'stage', 'spell', 'replay' }
+    local labels = { tr('Full game', '普通游戏'), tr('Stage practice', '关卡练习'),
+        tr('Spell practice', '符卡练习'), tr('Watch replay', '回放观看') }
+    local current = 1
+    for i, mode in ipairs(modes) do if mode == self._mode then current = i end end
+    combo(tr('Mode', '游戏模式'), labels[current], labels, current, function(i)
+        self._mode = modes[i]
+        self:_queue(function() self:_refreshChoices() end)
     end)
-    self._sel2 = sel2
-    c2:addChild(sel2)
-    win:addChild(c2)
-
-    win:addChild(function()
-        im.popStyleVar(2)
-    end)
-
-    self._page_types={ 'mod', 'input', 'sound', 'graph', 'others', 'exit' }
-    local title_data = require('platform.launcher_ui_data').title
-    for _, v in ipairs(self._page_types) do
-        self:_addSel1(i18n(title_data[v]))
+    if self._mode == 'game' or self._mode == 'stage' then
+        local rankLabels, rankIndex = {}, 0
+        for i, rank in ipairs(self._ranks) do
+            rankLabels[i] = tostring(self._rankNames[rank])
+            if rank == self._rank then rankIndex = i end
+        end
+        combo(tr('Difficulty', '难度'), rankLabels[rankIndex] or '-', rankLabels, rankIndex, function(i)
+            self._rank = self._ranks[i]
+            self:_queue(function() self:_refreshChoices() end)
+        end)
     end
-    self._label_data = require('platform.launcher_ui_data').label
-    self._labels = {}
-    local label_holder = cc.Node:create()
-    label_holder:addTo(win):setVisible(false)
-    for k, v in pairs(self._label_data) do
-        local lb = createLabel(i18n(v))
-        lb:addTo(label_holder)
-        self._labels[k] = lb
+    if self._mode ~= 'replay' then
+        local names = {}
+        for i, player in ipairs(self._players) do names[i] = tostring(player[1]) end
+        combo(tr('Player', '玩家'), names[self._player] or '-', names, self._player,
+                function(i) self._player = i end)
     end
-
-    win:addChild(std.bind(self._renderPage, self))
-
-    SystemLog(string.format('will enum mods in %q', plus.getWritablePath() .. 'mod/'))
-    self._page_type='mod'
-    self:_setMod()
+    if self._mode == 'stage' then
+        combo(tr('Stage', '关卡'), self._stages[self._stage] or '-', self._stages, self._stage,
+                function(i) self._stage = i end)
+        if #self._stages == 0 then hint(tr('This difficulty has no practice stages.', '此难度没有开放练习的关卡。')) end
+    elseif self._mode == 'spell' then
+        local spells = {}
+        for i, spell in ipairs(self._spells) do spells[i] = ('No.%d  %s'):format(spell.index, spell.name) end
+        combo(tr('Spell card', '符卡'), spells[self._spell] or '-', spells, self._spell,
+                function(i) self._spell = i end)
+        if #spells == 0 then hint(tr('This MOD has no practice spell cards.', '此 MOD 没有开放练习的符卡。')) end
+    elseif self._mode == 'replay' then
+        if im.button(tr('Refresh replays', '刷新回放')) then self:_queue(function() self:_refreshChoices() end) end
+        local names = {}
+        for i, replay in ipairs(self._replays) do
+            names[i] = ('No.%02d  %s  %s  %s'):format(replay.index, replay.user, replay.date_str, replay.rank_str)
+        end
+        combo(tr('Replay', '回放'), names[self._replay] or '-', names, self._replay, function(i)
+            self._replay, self._replayStage = i, 1
+        end)
+        local replay = self._replays[self._replay]
+        if replay then
+            local stages = {}
+            for i, entry in ipairs(replay.stages) do stages[i] = entry[1] end
+            combo(tr('Start stage', '起始关卡'), stages[self._replayStage] or '-', stages, self._replayStage,
+                    function(i) self._replayStage = i end)
+            hint(('%s / %s / %s / %s: %d'):format(replay.player, replay.date_str, replay.time_str,
+                    tr('Score', '得分'), replay.total_score))
+        else
+            hint(tr('No replays yet. Save a replay after a game, then refresh.', '尚无回放。游戏结束后保存录像，再点击刷新。'))
+        end
+    end
+    if self._mode == 'stage' or self._mode == 'spell' then
+        local changed, value = im.checkbox(tr('Practice invincibility', '练习无敌'), self._cheat or false)
+        if changed then self._cheat = value end
+    end
+    if not self:_canStart() then hint(tr('Select available game content to start.', '请选择可用的游戏内容后开始。')) end
 end
 
---function M:_initData()
---    self._data = {}
---end
-
-function M:_addSel1(text)
-    self._sel1:addNode(createLabel(text))
-end
-
-function M:_addSel2(text)
-    self._sel2:addNode(createLabel(text))
-end
-
-function M:_onSel1(idx)
-    if idx == #self._page_types then
-        -- exit
-        --GameExit()
+function M:_renderModPage()
+    heading(self._loaded and 'Ready to play' or 'Your MOD library', self._loaded and '准备开始' or '选择 MOD')
+    if self._attempted then
+        text(tr('Loaded MOD: ', '当前 MOD：') .. setting.mod)
+        hint(tr('Restart the application to switch MODs.', '切换 MOD 需要重新启动程序。'))
+        if not self._loaded then return end
+        if not lstg._exlauncher then self:_renderGameSelection() end
+        im.spacing()
+        im.beginDisabled(not self:_canStart())
+        if im.button(tr('Start game', '开始游戏'), im.p(220, 44)) then
+            self:_queue(function() self:_startGame() end)
+        end
+        im.endDisabled()
+        return
     end
-    self._page_type = self._page_types[idx]
-    self._sel2:setVisible(idx == 1)
-    print(self._page_type)
+    im.setNextItemWidth(math.max(120, im.getContentRegionAvail().x - 110))
+    local changed
+    changed, self._filter = im.inputText('##mod_search', self._filter)
+    im.sameLine()
+    if im.button(tr('Refresh', '刷新'), im.p(94, 0)) then self:_refreshMods() end
+    hint(tr('Search by name. Folders and ZIP archives are supported.', '输入名称筛选，支持包含 root.lua 的目录及 ZIP 压缩包。'))
+    local count = 0
+    if im.beginChild('mod_list', im.p(0, -170), true) then
+        for i, mod in ipairs(self._mods) do
+            if mod.name:lower():find(self._filter:lower(), 1, true) then
+                count = count + 1
+                im.pushID(i)
+                if im.selectable(mod.name .. '###mod', self._selected == mod, 0, im.p(0, 36)) then
+                    self._selected = mod
+                end
+                im.popID()
+            end
+        end
+        if count == 0 then
+            hint(#self._mods == 0 and tr('No MODs found. Add a MOD to the directory below, then refresh.',
+                    '未发现 MOD。请放入下方目录，然后刷新。') or tr('No matches.', '没有匹配的 MOD。'))
+        end
+    end
+    im.endChild()
+    hint(plus.getWritablePath() .. 'mod/')
+    local mod = self._selected
+    text(mod and (tr('Selected: ', '已选择：') .. mod.name) or tr('Nothing selected', '尚未选择'))
+    if mod then hint(mod.isDirectory and tr('Folder MOD', '目录 MOD') or tr('ZIP archive', 'ZIP 压缩包')) end
+    im.beginDisabled(not mod)
+    if im.button(tr('Load selected MOD', '加载所选 MOD'), im.p(220, 40)) then
+        self:_queue(function() self:_loadMod() end)
+    end
+    im.endDisabled()
 end
 
-function M:_onSel2(idx)
-    if self._page_type == 'mod' then
-        --
-    end
-    print(idx)
-end
-
-function M:_setMod()
-    self._sel2:setVisible(true)
-    local mods = M.enumMods(plus.getWritablePath() .. 'mod/')
-    local mod_sel = self._modsel or 0
-    for i, v in ipairs(mods) do
-        self:_addSel2(v.name)
-    end
-end
-
-function M:_renderPage()
-    local ty = self._page_type
-    if ty == 'sound' then
-        self:_renderSoundPage()
-    end
+function M:_checkbox(label, name)
+    local changed, value = im.checkbox(label, self._draft[name])
+    if changed then self._draft[name], self._dirty = value, true end
 end
 
 function M:_renderSoundPage()
-    im.ccNode(self._labels.volume_bgm)
-    local ret, v1, v2 = nil, math.floor(setting.bgmvolume), math.floor(setting.sevolume)
-    ret, v1 = im.sliderInt('', v1, 0, 100)
-    if ret then
-        setting.bgmvolume = v1
+    heading('Audio levels', '音量设置')
+    for _, item in ipairs({ { 'bgmvolume', 'BGM volume', '背景音乐' }, { 'sevolume', 'SE volume', '音效' } }) do
+        im.setNextItemWidth(math.min(400, im.getContentRegionAvail().x))
+        local changed, value = im.sliderInt(tr(item[2], item[3]), self._draft[item[1]], 0, 100, '%d%%')
+        if changed then self._draft[item[1]], self._dirty = value, true end
     end
-    im.ccNode(self._labels.volume_se)
-    ret, v2 = im.sliderInt('', v2, 0, 100)
-    if ret then
-        setting.sevolume = v2
+    hint(tr('Set a volume to 0 to mute it. Save settings to apply audio levels.', '音量设为 0 即可静音；保存设置后应用音量。'))
+end
+
+function M:_renderGraphPage()
+    heading('Display settings', '画面设置')
+    local draft = self._draft
+    self:_checkbox(tr('Windowed', '窗口模式'), 'windowed')
+    combo(tr('Window preset', '窗口预设'), ('%d x %d'):format(draft.windowsize_w, draft.windowsize_h),
+            { '854 x 480', '1280 x 720', '1708 x 960', '1920 x 1080', '2560 x 1440' }, nil, function(i)
+                local sizes = { { 854, 480 }, { 1280, 720 }, { 1708, 960 }, { 1920, 1080 }, { 2560, 1440 } }
+                draft.windowsize_w, draft.windowsize_h = unpack(sizes[i])
+                self._dirty = true
+            end)
+    for _, item in ipairs({ { 'windowsize_w', 'Width', '窗口宽度' }, { 'windowsize_h', 'Height', '窗口高度' } }) do
+        im.setNextItemWidth(200)
+        local changed, value = im.inputInt(tr(item[2], item[3]), draft[item[1]], 2, 100)
+        if changed then draft[item[1]], self._dirty = value, true end
     end
+    hint(tr('Window dimensions are used in windowed mode. Save to apply.', '窗口尺寸用于窗口模式，保存后应用。'))
+    im.spacing()
+    local ratios = { { 16, 9 }, { 4, 3 }, { 16, 10 } }
+    combo(tr('Game aspect ratio', '游戏画面比例'), table.concat(draft.res_ratio, ':'), { '16:9', '4:3', '16:10' }, nil,
+            function(i)
+                draft.res_ratio = copy(ratios[i])
+                draft.resx = math.ceil(draft.resy * ratios[i][1] / ratios[i][2] / 2) * 2
+                self._dirty = true
+            end)
+    combo(tr('Game resolution', '游戏分辨率'), ('%d x %d'):format(draft.resx, draft.resy),
+            { '480p', '720p', '960p', '1080p', '1440p' }, nil, function(i)
+                draft.resy = ({ 480, 720, 960, 1080, 1440 })[i]
+                draft.resx = math.ceil(draft.resy * draft.res_ratio[1] / draft.res_ratio[2] / 2) * 2
+                self._dirty = true
+            end)
+    self:_checkbox(tr('Vertical sync', '垂直同步'), 'vsync')
+    self:_checkbox(tr('Post effects', '后处理效果'), 'posteffect')
+    combo(tr('Render rate', '渲染帧率'), draft.render_skip == 1 and '30 FPS' or '60 FPS',
+            { '60 FPS', '30 FPS' }, draft.render_skip + 1, function(i)
+                draft.render_skip, self._dirty = i - 1, true
+            end)
+    hint(tr('Game resolution and post effects take effect when entering a game. Simulation remains at 60 FPS.',
+            '游戏分辨率和后处理在进入游戏时生效。游戏逻辑保持每秒 60 帧。'))
+end
+
+function M:_renderInputPage()
+    heading('Keyboard and controller', '键盘与手柄')
+    hint(tr('Click a binding, then press a key or move a controller axis. Escape cancels. Duplicate bindings swap.',
+            '点击映射后按键，或拨动手柄轴；Esc 取消。重复映射会自动交换。'))
+    if self._capture then
+        im.textColored(accent, tr('Waiting for input...', '等待输入……'))
+        im.sameLine()
+        if im.button(tr('Cancel', '取消')) then self._capture = nil end
+    end
+    im.spacing()
+    im.columns(3, 'bindings', true)
+    text(tr('Action', '操作')); im.nextColumn()
+    text(tr('Keyboard', '键盘')); im.nextColumn()
+    text(tr('Controller', '手柄')); im.nextColumn()
+    im.separator()
+    for i, action in ipairs(actions) do
+        local group, name = action[1], action[2]
+        im.pushID(i)
+        im.alignTextToFramePadding()
+        text(tr(action[3], action[4])); im.nextColumn()
+        local code = self._draft[group][name]
+        if im.button(keyNames[code] or tostring(code), im.p(-1, 0)) then
+            self._capture = { kind = 'keyboard', group = group, name = name }
+        end
+        im.nextColumn()
+        local binding = self._draft.controller_map[group][name]
+        if binding then
+            local label = binding[2] ~= nil and ('Axis %d %s'):format(binding[1], binding[2] and '+' or '-')
+                    or ('Button %d'):format(binding[1])
+            if im.button(label, im.p(-1, 0)) then
+                self._capture = { kind = 'controller', group = group, name = name }
+            end
+        else text('-') end
+        im.nextColumn()
+        im.popID()
+    end
+    im.columns(1)
+    im.spacing()
+    if im.button(tr('Reset input bindings', '恢复默认输入映射')) then
+        for _, name in ipairs({ 'keys', 'keysys', 'controller_map' }) do self._draft[name] = copy(default_setting[name]) end
+        self._dirty, self._capture = true, nil
+    end
+end
+
+function M:_renderOthersPage()
+    heading('General preferences', '常规设置')
+    im.setNextItemWidth(math.min(320, im.getContentRegionAvail().x))
+    local changed, value = im.inputText(tr('Player name', '玩家名称'), self._draft.username)
+    if changed then self._draft.username, self._dirty = value, true end
+    self:_checkbox(tr('Allow screenshots', '允许截图'), 'allowsnapshot')
+    if plus.isMobile() then
+        self:_checkbox(tr('Touch controls', '触摸按键'), 'touchkey')
+        combo(tr('Orientation', '屏幕方向'), self._draft.orientation,
+                { tr('Landscape', '横屏'), tr('Portrait', '竖屏') }, nil, function(i)
+                    self._draft.orientation = i == 1 and 'landscape' or 'portrait'
+                    self._dirty = true
+                end)
+    end
+    im.spacing()
+    hint(tr('Settings file', '设置文件'))
+    text(plus.getWritablePath() .. 'setting')
+    hint(tr('Save applies changes. Revert discards unsaved edits. Defaults only resets launcher preferences.',
+            '保存将应用更改；撤销将放弃未保存的编辑；恢复默认仅重置启动器设置。'))
+    im.spacing()
+    heading('About LuaSTG-x', '关于 LuaSTG-x')
+    local fu = cc.FileUtils:getInstance()
+    if fu:isFileExist('VERSION.txt') then text(fu:getStringFromFile('VERSION.txt')) end
+    hint(tr('Uses FFmpeg under LGPL 2.1 or later. Third-party notices: licenses/ and THIRD_PARTY_NOTICES.txt.',
+            '使用 FFmpeg（LGPL 2.1 或更新版本）。第三方声明见 licenses/ 和 THIRD_PARTY_NOTICES.txt。'))
+end
+
+function M:_render()
+    local font = M._font
+    local viewport = im.getMainViewport()
+    im.setNextWindowPos(viewport.Pos)
+    im.setNextWindowSize(viewport.Size)
+    im.setNextWindowViewport(viewport.ID)
+    if font then im.pushFont(font) end
+    im.pushStyleVar(im.StyleVar.WindowPadding, im.p(24, 20))
+    im.pushStyleVar(im.StyleVar.ItemSpacing, im.p(12, 10))
+    im.pushStyleVar(im.StyleVar.FramePadding, im.p(10, 7))
+    im.pushStyleVar(im.StyleVar.FrameRounding, 5)
+    im.pushStyleVar(im.StyleVar.WindowRounding, 0)
+    im.pushStyleVar(im.StyleVar.SelectableTextAlign, im.p(0, 0.5))
+    local colors = {
+        { im.Col.WindowBg, im.vec4(0.055, 0.075, 0.11, 1) },
+        { im.Col.ChildBg, im.vec4(0.075, 0.10, 0.145, 1) },
+        { im.Col.FrameBg, im.vec4(0.12, 0.16, 0.22, 1) },
+        { im.Col.Button, im.vec4(0.13, 0.23, 0.29, 1) },
+        { im.Col.ButtonHovered, im.vec4(0.17, 0.38, 0.43, 1) },
+        { im.Col.ButtonActive, im.vec4(0.16, 0.48, 0.49, 1) },
+        { im.Col.Header, im.vec4(0.12, 0.32, 0.36, 1) },
+        { im.Col.HeaderHovered, im.vec4(0.15, 0.28, 0.34, 1) },
+        { im.Col.CheckMark, accent }, { im.Col.SliderGrab, accent },
+    }
+    for _, color in ipairs(colors) do im.pushStyleColor(color[1], color[2]) end
+    local flags = bit.bor(im.WindowFlags.NoDecoration, im.WindowFlags.NoMove,
+            im.WindowFlags.NoSavedSettings, im.WindowFlags.NoDocking)
+    if im.begin('LuaSTG-x Launcher', nil, flags) then
+        im.textColored(accent, 'LuaSTG-x')
+        im.sameLine()
+        hint(tr('GAME LAUNCHER / F5: reload (discards unsaved edits)', '游戏启动器 / F5：重载界面（丢弃未保存的更改）'))
+        im.separator()
+        local height = math.max(100, im.getContentRegionAvail().y - 108)
+        local sidebar = math.min(180, viewport.Size.x * 0.24)
+        if im.beginChild('navigation', im.p(sidebar, height), true) then
+            im.spacing()
+            for _, page in ipairs(pages) do
+                if im.selectable(tr(page[2], page[3]) .. '###' .. page[1], self._page == page[1], 0, im.p(0, 40)) then
+                    self._page, self._capture = page[1], nil
+                end
+            end
+        end
+        im.endChild()
+        im.sameLine()
+        if im.beginChild('page', im.p(0, height), true) then
+            local render = { mod = self._renderModPage, graph = self._renderGraphPage,
+                sound = self._renderSoundPage, input = self._renderInputPage, others = self._renderOthersPage }
+            render[self._page](self)
+        end
+        im.endChild()
+        im.separator()
+        im.beginDisabled(self._pending ~= nil)
+        if im.button(tr('Save settings', '保存设置')) then self:_queue(function() self:_apply() end) end
+        im.sameLine()
+        if im.button(tr('Revert', '撤销更改')) then
+            self._draft = self:_readPreferences(setting)
+            self._dirty, self._capture = false, nil
+            self._status, self._error = tr('Unsaved edits discarded.', '已撤销未保存的更改。'), false
+        end
+        im.sameLine()
+        if im.button(tr('Defaults', '恢复默认')) then
+            self._draft = self:_readPreferences(default_setting)
+            self._dirty, self._capture = true, nil
+        end
+        im.sameLine()
+        if im.button(tr('Exit', '退出')) then self:_queue(GameExit) end
+        im.endDisabled()
+        if self._dirty then
+            im.sameLine()
+            im.textColored(accent, tr('Unsaved changes', '有未保存的更改'))
+        end
+        im.pushStyleColor(im.Col.Text, self._error and im.vec4(1, 0.52, 0.42, 1) or muted)
+        im.pushTextWrapPos(0)
+        text(self._status)
+        im.popTextWrapPos()
+        im.popStyleColor()
+    end
+    im.endToLua()
+    im.popStyleColor(#colors)
+    im.popStyleVar(6)
+    if font then im.popFont() end
 end
 
 function M.enumMods(path)
@@ -242,7 +707,7 @@ function M.enumMods(path)
 end
 
 function M.saveSetting()
-    lstg.saveSettingFile()
+    return lstg.saveSettingFile()
 end
 
 return M

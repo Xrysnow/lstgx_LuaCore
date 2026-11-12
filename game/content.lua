@@ -3,7 +3,7 @@ local M = {}
 function M.enumRanks()
     local _rank_names = {}
     local _ranks = {}
-    for _, sg in ipairs(stage.groups) do
+    for _, sg in ipairs(stage.groups or {}) do
         if sg ~= 'Spell Practice' then
             _rank_names[stage.groups[sg].difficulty] = sg
             table.insert(_ranks, stage.groups[sg].difficulty)
@@ -37,7 +37,7 @@ function M.enumPlayers()
 end
 
 function M.setPlayer(index)
-    if not player_list then
+    if not player_list or not player_list[index] then
         return false
     end
     local player_name = player_list[index][2]
@@ -60,27 +60,20 @@ local _stage_names = {}
 local _stage_origin_names = {}
 
 function M.enumStages(rank)
-    if table.nums(_stages) == 0 then
-        for _, sg in ipairs(stage.groups) do
-            if sg ~= 'Spell Practice' and stage.groups[sg].allow_practice then
-                _stage_groups[stage.groups[sg].difficulty] = sg
-                _stages[sg] = {}
-                for _, s in ipairs(stage.groups[sg]) do
-                    if stage.stages[s].allow_practice then
-                        table.insert(_stages[sg],
-                                     string.match(s, "^[%w_][%w_ ]*"))
-                    end
+    local dif = rank or scoredata.difficulty_select or 1
+    _stage_names, _stage_origin_names = {}, {}
+    for _, name in ipairs(stage.groups or {}) do
+        local group = stage.groups[name]
+        if name ~= 'Spell Practice' and group.difficulty == dif and group.allow_practice then
+            _stage_groups[dif] = name
+            for _, origin in ipairs(group) do
+                if stage.stages[origin] and stage.stages[origin].allow_practice then
+                    table.insert(_stage_names, origin:match('^(.-)@') or origin)
+                    table.insert(_stage_origin_names, origin)
                 end
             end
+            break
         end
-    end
-
-    local dif = rank or scoredata.difficulty_select or 1
-    _stage_names = _stages[_stage_groups[dif]]
-    _stage_origin_names = {}
-    local t = stage.groups[_stage_groups[dif]]
-    for k, v in pairs(_stage_names) do
-        _stage_origin_names[k] = t[k]
     end
     return _stage_names, _stage_origin_names
 end
@@ -97,7 +90,8 @@ end
 
 function M.setStage(index)
     local dif = scoredata.difficulty_select or 1
-    local stage_name = stage.groups[_stage_groups[dif]][index]
+    local _, origins = M.enumStages(dif)
+    local stage_name = origins[index]
     if not stage_name then
         return false, ("can't find stage %d"):format(index)
     end
@@ -114,6 +108,9 @@ local _spell_ranks = {}
 local _spell_rank_names = {}
 
 function M.enumSpells()
+    if type(_sc_table) ~= 'table' or type(_editor_class) ~= 'table' then
+        return {}, {}, {}, {}
+    end
     local _ranks, _rank_names = M.enumRanks()
     if #_spells == 0 then
         local need_fix = false
@@ -216,9 +213,10 @@ function M._getSlotStages(slot)
     local ret = {}
     for i, v in pairs(slot.stages) do
         --local score = string.format('%09d', v.score)
-        local name = string.match(v.stageName, '^.+@(.+)$')
+        local name = string.match(v.stageName, '^(.-)@') or v.stageName
         table.insert(ret, { name, v.score })
     end
+    return ret
 end
 
 function M._getReplaySlots()
@@ -227,7 +225,7 @@ function M._getReplaySlots()
     for i = 1, ext.replay.GetSlotCount() do
         --local text = {}
         local slot = ext.replay.GetSlot(i)
-        if slot then
+        if slot and slot.stages and #slot.stages > 0 then
             -- use time of the first stage
             local datetime = slot.stages[1].stageDate
             local date_str = os.date("%y/%m/%d", datetime)
