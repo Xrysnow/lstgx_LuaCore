@@ -8,6 +8,21 @@ local game_util = require('game.util')
 function Scene:onCreate()
     lstg.loadSetting()
 
+    if imgui then
+        local listener = cc.EventListenerKeyboard:create()
+        listener:registerScriptHandler(function(code)
+            if code ~= KEY.F12 then return end
+            if not self._imguiTools then
+                self._imguiLayer, self._imguiTools = require('imgui.lstg.util').load()
+                self._imguiTools:setVisible(false)
+            end
+            local visible = not self._imguiTools:isVisible()
+            self._imguiTools:setVisible(visible)
+            imgui.setVisible(visible)
+        end, cc.Handler.EVENT_KEYBOARD_PRESSED)
+        director:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
+    end
+
     self:scheduleUpdateWithPriorityLua(function(dt)
         self:update(dt)
     end, 0)
@@ -23,6 +38,7 @@ end
 
 local profiler = profiler
 function Scene:onEnter()
+    if imgui then imgui.setToggleEnable(false) end
     --ex.Test('test2.mp4')
     if stage.next_stage then
         return
@@ -39,6 +55,13 @@ function Scene:onEnter()
     --    profiler.toc('RenderFunc')
     --end)
     --cc.Director:getInstance():getEventDispatcher():addEventListenerWithFixedPriority(e, 1)
+end
+
+function Scene:onExit()
+    if self._imguiTools then
+        self._imguiTools:setVisible(false)
+        self._imguiLayer:setVisible(false)
+    end
 end
 
 function Scene:showWithScene(transition, time, more)

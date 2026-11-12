@@ -138,6 +138,9 @@ function M:onCreate()
     director:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
     self:scheduleUpdateWithPriorityLua(function()
         if not self._active then return end
+        -- onEnter runs inside the parent scene's child traversal. Add the
+        -- shared ImGui layer only after that traversal has finished.
+        if not self._renderer then self:_initImGui() end
         local capture = self._capture
         local last = capture and capture.kind == 'controller' and controller.getLast()
         if last then
@@ -153,34 +156,20 @@ function M:onCreate()
             map[capture.group][capture.name] = last.is_axis and { last.key, last.is_pos } or { last.key }
             self._dirty, self._capture = true, nil
         end
-        -- Apply native window and scene changes outside ImGui's frame.
-        local pending = self._pending
-        if pending then
-            self._pending = nil
-            local ok, err = pcall(pending)
-            if not ok then
-                self._error, self._status = true, tostring(err)
-                SystemLog('Launcher: ' .. self._status)
-            end
-        end
     end, 0)
 end
 
-function M:onEnter()
-    self._previousStats = director:isStatsDisplay()
-    director:setDisplayStats(false)
+function M:_initImGui()
     -- The shared ImGui layer is detached while cocos switches scenes. Reuse it
     -- on return instead of creating a second layer before it is reattached.
     if not self._layer then
-        require('imgui.lstg.util').load(nil, nil, true, true)
-        self._layer = im.get()
+        self._layer = im.on()
+        im.configFlagDisable(im.ConfigFlags.NavEnableKeyboard, im.ConfigFlags.NavEnableGamepad)
     end
     local layer = self._layer
-    self._previousVisibility = layer:isVisible()
     layer:setVisible(true)
-    im.setToggleEnable(false)
     if not M._font then
-        M._font = im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 20, nil, {
+        M._font = im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 36, nil, {
             0x0020, 0x00FF, 0x2000, 0x206F, 0x3000, 0x30FF,
             0x4E00, 0x9FAF, 0xFF00, 0xFFEF, 0,
         })
@@ -192,6 +181,13 @@ function M:onEnter()
         end)
         layer:addChild(self._renderer)
     end
+end
+
+function M:onEnter()
+    self._previousStats = director:isStatsDisplay()
+    director:setDisplayStats(false)
+    if self._layer then self._layer:setVisible(true) end
+    im.setToggleEnable(false)
     self._active = true
     if self._loaded and not lstg._exlauncher then
         self:_queue(function() self:_refreshChoices() end)
@@ -200,10 +196,9 @@ end
 
 function M:onExit()
     self._active, self._capture = false, nil
-    im.setToggleEnable(true)
     director:setDisplayStats(self._previousStats)
     local layer = self._layer
-    if layer then layer:setVisible(self._previousVisibility) end
+    if layer then layer:setVisible(false) end
 end
 
 function M:onCleanup()
@@ -218,6 +213,20 @@ function M:_queue(action)
     if not self._pending then
         self._capture, self._error = nil, false
         self._pending = action
+        -- Run outside both ImGui's frame and Node::update: reload can destroy
+        -- this view, so its native update callback must have returned first.
+        local scheduler = director:getScheduler()
+        local token
+        token = scheduler:scheduleScriptFunc(function()
+            scheduler:unscheduleScriptEntry(token)
+            self._pending = nil
+            if not self._active then return end
+            local ok, err = pcall(action)
+            if not ok then
+                self._error, self._status = true, tostring(err)
+                SystemLog('Launcher: ' .. self._status)
+            end
+        end, 0, false)
     end
 end
 

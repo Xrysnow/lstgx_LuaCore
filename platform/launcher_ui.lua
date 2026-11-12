@@ -472,11 +472,6 @@ local function CreateLauncherUI()
     local inf_label = lc._warning:getChildren()[1]
     inf_label:setString(inf)
 
-    require('imgui.lstg.util').load(launcher_scene)
-    if imgui and plus.is_mobile then
-        imgui.hide()
-    end
-
     --local ui_layer = cc.Layer:create()
     --ui_layer:setAnchorPoint(cc.p(0, 0))
     --launcher_scene:addChild(ui_layer)

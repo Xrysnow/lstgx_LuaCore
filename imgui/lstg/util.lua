@@ -25,6 +25,7 @@ function M.load(target, docking, no_tool, no_font)
     local la = im.on(target or cc.Director:getInstance():getRunningScene())
     if docking then
         im.clear()
+        la._lstgTools = nil
         local wi = require('imgui.Widget')
         local dock
         dock = wi.Widget(function()
@@ -43,22 +44,35 @@ function M.load(target, docking, no_tool, no_font)
         end)
         la:addChild(dock)
     end
-    if not no_font then
+    if not no_font and not M._fontLoaded then
         im.addFontTTF('font/WenQuanYiMicroHeiMono.ttf', 16)
+        M._fontLoaded = true
     end
-    if not no_tool then
+    if not no_tool and not la._lstgTools then
+        local tools = require('imgui.Widget').Widget()
+        tools:setHandler(function()
+            local dockID = im.getID('LuaSTG-x Tools Dock')
+            for _, window in ipairs(tools:getChildren()) do
+                -- Merge on first display; allow undocking and rearranging afterwards.
+                im.setNextWindowDockID(dockID, im.Cond.Once)
+                window:handler()
+            end
+        end)
         --la:addChild(im.showDemoWindow)
-        la:addChild(require('imgui.ui.Console').createWindow('Console'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.ui.LogWindow').createWindow('Log'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.ui.StyleSetting')('Setting'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.ui.VariableWatch').createWindow('Watch'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.lstg.GameInfo')('Game Info'):setContentSize(cc.size(500, 500)))
-        la:addChild(require('imgui.ui.About').createWindow('About'):setContentSize(cc.size(500, 500)))
+        tools:addChild(require('imgui.ui.Console').createWindow('Console'):setContentSize(cc.size(500, 500)))
+        tools:addChild(require('imgui.ui.LogWindow').createWindow('Log'):setContentSize(cc.size(500, 500)))
+        tools:addChild(require('imgui.ui.StyleSetting')('Setting'):setContentSize(cc.size(500, 500)))
+        tools:addChild(require('imgui.ui.VariableWatch').createWindow('Watch'):setContentSize(cc.size(500, 500)))
+        tools:addChild(require('imgui.lstg.GameInfo')('Game Info'):setContentSize(cc.size(500, 500)))
+        tools:addChild(require('imgui.ui.About').createWindow('About'):setContentSize(cc.size(500, 500)))
+        la:addChild(tools)
+        la._lstgTools = tools
     end
     -- disable navigation
     im.configFlagDisable(im.ConfigFlags.NavEnableKeyboard, im.ConfigFlags.NavEnableGamepad)
     --im.setVisible(setting.imgui_visible)
     la:setVisible(setting.imgui_visible)
+    return la, la._lstgTools
 end
 
 function M.loadFont()
