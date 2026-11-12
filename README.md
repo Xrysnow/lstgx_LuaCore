@@ -19,3 +19,4 @@ Core Lua scripts of [LuaSTG-x](https://github.com/Xrysnow/LuaSTG-x).
 - `plus`: ported from LuaSTGPlus.
 - `shader`: default shaders.
 - `util`: utilities.
+- `video`: optional video API compatibility; load `require("video.compat")` after video registration to support the old Player interface.
