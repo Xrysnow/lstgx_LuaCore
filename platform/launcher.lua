@@ -28,6 +28,7 @@ local pages = {
     { 'sound', 'Audio', '声音' },
     { 'input', 'Input', '输入' },
     { 'others', 'General', '常规' },
+    { 'about', 'About', '关于' },
 }
 local actions = {
     { 'keys', 'up', 'Move up', '上移' },
@@ -51,6 +52,19 @@ local muted = im.vec4(0.57, 0.64, 0.73, 1)
 
 local function text(value)
     im.textUnformatted(tostring(value))
+end
+
+local function textHeight(value, wrap)
+    local cursor = im.getCursorPos()
+    -- Use ImGui's actual text layout and wrapping without drawing the text.
+    im.pushClipRect(im.p(0, 0), im.p(0, 0), true)
+    if wrap then im.pushTextWrapPos(0) end
+    text(value)
+    local height = im.getItemRectSize().y
+    if wrap then im.popTextWrapPos() end
+    im.popClipRect()
+    im.setCursorPos(cursor)
+    return height
 end
 
 local function hint(value)
@@ -452,7 +466,7 @@ function M:_renderModPage()
         if not lstg._exlauncher then self:_renderGameSelection() end
         im.spacing()
         im.beginDisabled(not self:_canStart())
-        if im.button(tr('Start game', '开始游戏'), im.p(220, 44)) then
+        if im.button(tr('Start game', '开始游戏')) then
             self:_queue(function() self:_startGame() end)
         end
         im.endDisabled()
@@ -464,8 +478,17 @@ function M:_renderModPage()
     im.sameLine()
     if im.button(tr('Refresh', '刷新'), im.p(94, 0)) then self:_refreshMods() end
     hint(tr('Search by name. Folders and ZIP archives are supported.', '输入名称筛选，支持包含 root.lua 的目录及 ZIP 压缩包。'))
+    -- Keep the footer consistent with its measurements if selection changes below.
+    local mod = self._selected
+    local path = plus.getWritablePath() .. 'mod/'
+    local selection = mod and (tr('Selected: ', '已选择：') .. mod.name) or tr('Nothing selected', '尚未选择')
+    local kind = mod and (mod.isDirectory and tr('Folder MOD', '目录 MOD') or tr('ZIP archive', 'ZIP 压缩包'))
+    local spacing = im.getStyle().ItemSpacing.y
+    local footerHeight = textHeight(path, true) + textHeight(selection) + im.getFrameHeight() + spacing * 3
+    if kind then footerHeight = footerHeight + textHeight(kind, true) + spacing end
+    local height = math.max(4, im.getContentRegionAvail().y - footerHeight)
     local count = 0
-    if im.beginChild('mod_list', im.p(0, -170), true) then
+    if im.beginChild('mod_list', im.p(0, height), true) then
         for i, mod in ipairs(self._mods) do
             if mod.name:lower():find(self._filter:lower(), 1, true) then
                 count = count + 1
@@ -482,12 +505,11 @@ function M:_renderModPage()
         end
     end
     im.endChild()
-    hint(plus.getWritablePath() .. 'mod/')
-    local mod = self._selected
-    text(mod and (tr('Selected: ', '已选择：') .. mod.name) or tr('Nothing selected', '尚未选择'))
-    if mod then hint(mod.isDirectory and tr('Folder MOD', '目录 MOD') or tr('ZIP archive', 'ZIP 压缩包')) end
+    hint(path)
+    text(selection)
+    if kind then hint(kind) end
     im.beginDisabled(not mod)
-    if im.button(tr('Load selected MOD', '加载所选 MOD'), im.p(220, 40)) then
+    if im.button(tr('Load selected MOD', '加载所选 MOD')) then
         self:_queue(function() self:_loadMod() end)
     end
     im.endDisabled()
@@ -545,7 +567,7 @@ function M:_renderGraphPage()
                 draft.render_skip, self._dirty = i - 1, true
             end)
     hint(tr('Game resolution and post effects take effect when entering a game. Simulation remains at 60 FPS.',
-            '游戏分辨率和后处理在进入游戏时生效。游戏逻辑保持每秒 60 帧。'))
+            '游戏分辨率和后处理在进入游戏时生效。游戏逻辑保持每秒60帧。'))
 end
 
 function M:_renderInputPage()
@@ -611,12 +633,10 @@ function M:_renderOthersPage()
     text(plus.getWritablePath() .. 'setting')
     hint(tr('Save applies changes. Revert discards unsaved edits. Defaults only resets launcher preferences.',
             '保存将应用更改；撤销将放弃未保存的编辑；恢复默认仅重置启动器设置。'))
-    im.spacing()
-    heading('About LuaSTG-x', '关于 LuaSTG-x')
-    local fu = cc.FileUtils:getInstance()
-    if fu:isFileExist('VERSION.txt') then text(fu:getStringFromFile('VERSION.txt')) end
-    hint(tr('Uses FFmpeg under LGPL 2.1 or later. Third-party notices: licenses/ and THIRD_PARTY_NOTICES.txt.',
-            '使用 FFmpeg（LGPL 2.1 或更新版本）。第三方声明见 licenses/ 和 THIRD_PARTY_NOTICES.txt。'))
+end
+
+function M:_renderAboutPage()
+    require('imgui.ui.About').renderContent()
 end
 
 function M:_render()
@@ -649,9 +669,12 @@ function M:_render()
     if im.begin('LuaSTG-x Launcher', nil, flags) then
         im.textColored(accent, 'LuaSTG-x')
         im.sameLine()
-        hint(tr('GAME LAUNCHER / F5: reload (discards unsaved edits)', '游戏启动器 / F5：重载界面（丢弃未保存的更改）'))
+        hint(tr('GAME LAUNCHER', '游戏启动器'))
         im.separator()
-        local height = math.max(100, im.getContentRegionAvail().y - 108)
+        -- Button actions may change the status; render the text measured this frame.
+        local status = self._status
+        local footerHeight = im.getFrameHeight() + textHeight(status, true) + im.getStyle().ItemSpacing.y * 3
+        local height = math.max(4, im.getContentRegionAvail().y - footerHeight)
         local sidebar = math.min(180, viewport.Size.x * 0.24)
         if im.beginChild('navigation', im.p(sidebar, height), true) then
             im.spacing()
@@ -665,7 +688,8 @@ function M:_render()
         im.sameLine()
         if im.beginChild('page', im.p(0, height), true) then
             local render = { mod = self._renderModPage, graph = self._renderGraphPage,
-                sound = self._renderSoundPage, input = self._renderInputPage, others = self._renderOthersPage }
+                sound = self._renderSoundPage, input = self._renderInputPage,
+                others = self._renderOthersPage, about = self._renderAboutPage }
             render[self._page](self)
         end
         im.endChild()
@@ -692,7 +716,7 @@ function M:_render()
         end
         im.pushStyleColor(im.Col.Text, self._error and im.vec4(1, 0.52, 0.42, 1) or muted)
         im.pushTextWrapPos(0)
-        text(self._status)
+        text(status)
         im.popTextWrapPos()
         im.popStyleColor()
     end

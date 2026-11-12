@@ -4,21 +4,15 @@ local M = class('im.About', base)
 local im = imgui
 local wi = base
 local _platform = {
-    'Windows', 'Linux', 'macOS', 'Android', 'iPhone', 'iPad',
-    'BlackBerry', 'NACL', 'Emscripten', 'Tizen', 'WinRT', 'WP8', }
+    'Windows', 'Linux', 'macOS', 'Android', 'iOS', }
 local _languages = {
     'english', 'chinese', 'french', 'italian', 'german',
     'spanish', 'dutch', 'russian', 'korean', 'japanese',
     'hungarian', 'portuguese', 'arabic', 'norwegian', 'polish',
     'turkish', 'ukrainian', 'romanian', 'bulgarian', 'belarusian', }
 
-function M:ctor(isPopup)
-    base.ctor(self)
-    self._setting = setting.xe
-    if isPopup == nil then
-        isPopup = true
-    end
-    self._isPopup = isPopup
+-- Draw inside the current window so launchers and standalone windows share content.
+function M.renderContent()
     local app = cc.Application:getInstance()
     local platform = _platform[app:getTargetPlatform() + 1]
     local lang = _languages[app:getCurrentLanguage() + 1] or 'unknown'
@@ -27,8 +21,34 @@ function M:ctor(isPopup)
     local backend_device = cfg:getValue('renderer', 'N/A')
     local backend_version = cfg:getValue('version', 'N/A')
     local build_date = lstg.GetBuildDate and lstg.GetBuildDate() or 'N/A'
-
     local d = M._data
+
+    im.setWindowFontScale(1.5)
+    im.textWrapped('LuaSTG-x')
+    im.setWindowFontScale(1)
+    im.separator()
+    im.textWrapped(i18n(d[1]))
+    im.textWrapped(i18n(d[2]) .. ': https://github.com/Xrysnow/LuaSTG-x')
+    im.text('')
+    im.textWrapped(i18n(d[3]) .. ': ' .. build_date)
+    im.textWrapped(i18n(d[4]) .. ': ' .. cc_version)
+    im.textWrapped(i18n(d[5]) .. ': ' .. backend_device)
+    im.textWrapped(i18n(d[6]) .. ': ' .. backend_version)
+    im.textWrapped(i18n(d[7]) .. ': ' .. jit.version)
+    im.textWrapped(i18n(d[8]) .. ': ' .. jit.arch)
+    im.textWrapped(i18n(d[9]) .. ': ' .. platform)
+    im.textWrapped(i18n(d[10]) .. ': ' .. lang:capitalize())
+    im.text('')
+    im.textWrapped('Copyright (C) 2018-2026 Xrysnow')
+end
+
+function M:ctor(isPopup)
+    base.ctor(self)
+    self._setting = setting.xe
+    if isPopup == nil then
+        isPopup = true
+    end
+    self._isPopup = isPopup
     self:addChild(function()
         local hh = -im.getFrameHeightWithSpacing()
         if not isPopup then
@@ -36,25 +56,9 @@ function M:ctor(isPopup)
         end
 
         if im.beginChildFrame(im.getID('lstg.about'), im.vec2(-1, hh)) then
-            im.setWindowFontScale(1.5)
-            im.textWrapped('LuaSTG-x')
-            im.setWindowFontScale(1)
-            im.separator()
-            im.textWrapped(i18n(d[1]))
-            im.textWrapped(i18n(d[2]) .. ': https://github.com/Xrysnow/LuaSTG-x')
-            im.text('')
-            im.textWrapped(i18n(d[3]) .. ': ' .. build_date)
-            im.textWrapped(i18n(d[4]) .. ': ' .. cc_version)
-            im.textWrapped(i18n(d[5]) .. ': ' .. backend_device)
-            im.textWrapped(i18n(d[6]) .. ': ' .. backend_version)
-            im.textWrapped(i18n(d[7]) .. ': ' .. jit.version)
-            im.textWrapped(i18n(d[8]) .. ': ' .. jit.arch)
-            im.textWrapped(i18n(d[9]) .. ': ' .. platform)
-            im.textWrapped(i18n(d[10]) .. ': ' .. lang:capitalize())
-            im.text('')
-            im.textWrapped('Copyright (C) 2018-2023 Xrysnow')
-            im.endChildFrame()
+            M.renderContent()
         end
+        im.endChildFrame()
     end)
 
     if isPopup then
@@ -111,8 +115,8 @@ M._data = {
         zh = '编译日期',
     },
     {
-        en = 'Cocos2d-x version',
-        zh = 'Cocos2d-x版本',
+        en = 'Engine version',
+        zh = '引擎版本',
     },
     {
         en = 'Render device name',
