@@ -47,8 +47,8 @@ local actions = {
 }
 local keyNames = {}
 for name, code in pairs(require('keycode')) do keyNames[code] = name end
-local accent = im.vec4(0.27, 0.83, 0.77, 1)
-local muted = im.vec4(0.57, 0.64, 0.73, 1)
+local accent = im.vec4(0.82, 0.82, 0.82, 1)
+local muted = im.vec4(0.62, 0.62, 0.62, 1)
 
 local function text(value)
     im.textUnformatted(tostring(value))
@@ -662,15 +662,29 @@ function M:_render()
     im.pushStyleVar(im.StyleVar.WindowRounding, 0)
     im.pushStyleVar(im.StyleVar.SelectableTextAlign, im.p(0, 0.5))
     local colors = {
-        { im.Col.WindowBg, im.vec4(0.055, 0.075, 0.11, 1) },
-        { im.Col.ChildBg, im.vec4(0.075, 0.10, 0.145, 1) },
-        { im.Col.FrameBg, im.vec4(0.12, 0.16, 0.22, 1) },
-        { im.Col.Button, im.vec4(0.13, 0.23, 0.29, 1) },
-        { im.Col.ButtonHovered, im.vec4(0.17, 0.38, 0.43, 1) },
-        { im.Col.ButtonActive, im.vec4(0.16, 0.48, 0.49, 1) },
-        { im.Col.Header, im.vec4(0.12, 0.32, 0.36, 1) },
-        { im.Col.HeaderHovered, im.vec4(0.15, 0.28, 0.34, 1) },
+        { im.Col.Text, im.vec4(0.90, 0.90, 0.90, 1) },
+        { im.Col.TextDisabled, muted },
+        { im.Col.WindowBg, im.vec4(0.09, 0.09, 0.09, 1) },
+        { im.Col.ChildBg, im.vec4(0.12, 0.12, 0.12, 1) },
+        { im.Col.PopupBg, im.vec4(0.14, 0.14, 0.14, 1) },
+        { im.Col.Border, im.vec4(0.27, 0.27, 0.27, 1) },
+        { im.Col.FrameBg, im.vec4(0.18, 0.18, 0.18, 1) },
+        { im.Col.FrameBgHovered, im.vec4(0.26, 0.26, 0.26, 1) },
+        { im.Col.FrameBgActive, im.vec4(0.32, 0.32, 0.32, 1) },
+        { im.Col.Button, im.vec4(0.22, 0.22, 0.22, 1) },
+        { im.Col.ButtonHovered, im.vec4(0.30, 0.30, 0.30, 1) },
+        { im.Col.ButtonActive, im.vec4(0.38, 0.38, 0.38, 1) },
+        { im.Col.Header, im.vec4(0.28, 0.28, 0.28, 1) },
+        { im.Col.HeaderHovered, im.vec4(0.34, 0.34, 0.34, 1) },
+        { im.Col.HeaderActive, im.vec4(0.40, 0.40, 0.40, 1) },
         { im.Col.CheckMark, accent }, { im.Col.SliderGrab, accent },
+        { im.Col.SliderGrabActive, im.vec4(0.94, 0.94, 0.94, 1) },
+        { im.Col.ScrollbarBg, im.vec4(0.10, 0.10, 0.10, 1) },
+        { im.Col.ScrollbarGrab, im.vec4(0.30, 0.30, 0.30, 1) },
+        { im.Col.ScrollbarGrabHovered, im.vec4(0.40, 0.40, 0.40, 1) },
+        { im.Col.ScrollbarGrabActive, im.vec4(0.50, 0.50, 0.50, 1) },
+        { im.Col.Separator, im.vec4(0.27, 0.27, 0.27, 1) },
+        { im.Col.TextSelectedBg, im.vec4(0.45, 0.45, 0.45, 0.55) },
     }
     for _, color in ipairs(colors) do im.pushStyleColor(color[1], color[2]) end
     local flags = bit.bor(im.WindowFlags.NoDecoration, im.WindowFlags.NoMove,
